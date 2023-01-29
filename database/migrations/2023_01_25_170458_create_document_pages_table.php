@@ -16,15 +16,15 @@ return new class extends Migration
         Schema::create('document_pages', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('document_id')->unsigned();
-            $table->integer("page");
-            $table->text("predefined_text");
-            $table->string("x_coord");
-            $table->string("y_coord");
-            $table->string("max_width");
-            $table->string("color");
-            $table->string("font_size");
-            $table->string("font");
-            $table->string("text_align");
+            $table->integer('page');
+            $table->text('predefined_text');
+            $table->string('x_coord');
+            $table->string('y_coord');
+            $table->string('max_width');
+            $table->string('color');
+            $table->string('font_size');
+            $table->string('font');
+            $table->string('text_align');
             $table->foreign('document_id')
                     ->references('id')
                     ->on('documents')

@@ -15,8 +15,9 @@ return new class extends Migration
     {
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
-            $table->string("name");
-            $table->integer("type")->comment("1. Cover,2. Book");
+            $table->string('name');
+            $table->integer('type')->comment('1. Cover,2. Book');
+            $table->string('attatchment');
             $table->bigInteger('product_id')->unsigned();
             $table->foreign('product_id')
                     ->references('id')
