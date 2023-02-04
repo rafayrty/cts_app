@@ -17,6 +17,8 @@
         "laravel/tinker": "^2.7",
         "league/flysystem-aws-s3-v3": "^3.12",
         "livewire/livewire": "^2.11",
+        "setasign/fpdf": "^1.8",
+        "setasign/fpdi": "^2.3",
         "spatie/pdf-to-image": "^1.2"
     },
     "require-dev": {

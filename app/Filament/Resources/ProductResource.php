@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
+use App\Forms\Components\PDFPositioner;
 use App\Models\Product;
 use Closure;
 use Filament\Forms\Components\Card;
@@ -11,8 +12,10 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -43,6 +46,9 @@ class ProductResource extends Resource
                 ->schema([Wizard::make([
                     Wizard\Step::make('Add Product')
                     ->schema([
+                        Placeholder::make('Info')
+                        ->content(new HtmlString('<h1 class="bg-gray-200 p-2 rounded-md font-semibold dark:bg-gray-900">Please put this code {basmti} in the position that will be modified by the user</h1>')),
+                        TextInput::make('demo_name')->placeholder('Enter Product Name With the {name}')->required(),
                         TextInput::make('name')->placeholder('Enter Product Name')->required()->reactive()
                             ->afterStateUpdated(function (Closure $set, $state) {
                                 $set('slug', make_slug($state));
@@ -94,7 +100,7 @@ class ProductResource extends Resource
                                  ]),
                                  FileUpload::make('attatchment')
                                      ->acceptedFileTypes(['application/pdf'])
-                                     ->helperText('File must be a pdf and must be smaller than 20mb')->maxSize(20 * 1024) //20MB
+                                     ->helperText('File must be a pdf and must be smaller than 500mb')->maxSize(500 * 1024) //20MB
                                      ->required()
                                     ->reactive()
                                     ->afterStateUpdated(function (Closure $set, Closure $get, $state) use ($pdfs) {
@@ -115,8 +121,39 @@ class ProductResource extends Resource
                                         }
                                         array_push($pdfs, ['filename' => $name, 'type' => $get('type'), 'name' => $get('name'), 'pdf' => $images]);
                                         $set('../../pdf_info', json_encode($pdfs));
-                                        $set('../../../add_content', 'hey');
+                                        //Set barcode Location
+                                        if (count($pdfs) > 1) {
+                                            $location = ['first' => 'First Page', 'last' => 'Last Page', 'both' => 'Both First & Last'];
+                                            $set('barcode_settings.location', $location);
+                                        } else {
+                                            $location = ['first' => 'First Page', 'last' => 'Last Page'];
+                                            $set('barcode_settings.location', $location);
+                                        }
                                     }),
+                                 Section::make('Barcode Settings')->schema([
+
+                                     Grid::make(2)
+                                        ->schema([
+                                            Radio::make('barcode_position')
+                                               ->options([
+                                                   'top_left' => 'Top Left',
+                                                   'top_right' => 'Top Right',
+                                                   'bottom_left' => 'Bottom Left',
+                                                   'bottom_right' => 'Bottom Right',
+                                               ])->required(),
+                                            Select::make('location')
+                                            ->options(function (Closure $get, Closure $set) {
+                                                if ($get('../../pdf_info') != '') {
+                                                    $json_pdfs = json_decode($get('../../pdf_info'),true);
+                                                    if(count($json_pdfs) > 1){
+                                                        return ['first'=>"First Page",'last'=>"Last Page",'both'=>"Both Page"];
+                                                    }else{
+                                                        return ['first'=>"First Page"];
+                                                    }
+                                                }
+                                            })->required()->reactive(),
+                                        ]),
+                                 ])->compact(),
                              ]),
                      ]),
                     /* Step3 */
@@ -127,37 +164,108 @@ class ProductResource extends Resource
                                     ->schema([
                                         Grid::make(2)
                                         ->schema([
-                                            Select::make('document')
+                                            Select::make('page')
                                                 ->options(function (Closure $get, Closure $set) {
                                                     if ($get('../../pdf_info') != '') {
                                                         $json_pdfs = json_decode($get('../../pdf_info'), true);
+                                                        $key = array_search($get('pdf_name'), array_column($json_pdfs, 'filename'));
+                                                        $pages_count = count($json_pdfs[$key]['pdf']);
                                                         $array = [];
-                                                        foreach ($json_pdfs as $pdf) {
-                                                            $array[] = $pdf['name'];
+                                                        for ($i = 1; $i <= $pages_count; $i++) {
+                                                            $array[] = $i;
                                                         }
 
                                                         return $array;
                                                     }
-                                                }),
+                                                })
+                                                ->disabled(function (Closure $set, Closure $get, $state) {
+                                                    if ($get('document') != '' && $get('../../pdf_info') != '') {
+                                                        return false;
+                                                    }
+
+                                                    return true;
+                                                })->afterStateUpdated(function (Closure $set, Closure $get, $state) {
+                                                    if ($get('document') != '' && $get('../../pdf_info') != '') {
+                                                        $json_pdfs = json_decode($get('../../pdf_info'), true);
+                                                        $key = array_search($get('document'), array_column($json_pdfs, 'filename'));
+                                                        $json_pdfs[$key]['type'] = $state;
+                                                        $img_page = (int) $get('page');
+                                                        $set('image', [
+                                                            'predefined_text' => $get('predefined_text'),
+                                                            'image' => asset($json_pdfs[0]['pdf'][$img_page]),
+                                                            'text_align' => $get('text_align')]);
+                                                    }
+                                                })->reactive()->required(),
+                                            Select::make('document')
+                                                ->options(function (Closure $get, Closure $set) {
+                                                    if ($get('../../pdf_info') != '') {
+                                                        $array = [];
+                                                        $json_pdfs = json_decode($get('../../pdf_info'), true);
+                                                        foreach ($json_pdfs as $pdf) {
+                                                            if ($pdf['name']) {
+                                                                $array[] = $pdf['name'];
+                                                            }
+                                                        }
+
+                                                        return $array;
+                                                    }
+                                                })->reactive(),
                                         ]),
                                         Placeholder::make('Info')
-                                        ->content(new HtmlString('<h1 class="bg-gray-200 p-2 rounded-md font-semibold dark:bg-gray-900">Please put this code {nadsoftText} in the position that will be modified by the user</h1>')),
-                                        Textarea::make('predefined_text'),
+                                        ->content(new HtmlString('<h1 class="bg-gray-200 p-2 rounded-md font-semibold dark:bg-gray-900">Please put this code {basmti} in the position that will be modified by the user</h1>')),
+                                        Textarea::make('predefined_text')->rows(5)->extraAttributes(['dir' => 'rtl'])->reactive(),
                                         Grid::make(2)
                                         ->schema([
-                                            TextInput::make('X_coord')->numeric()->minValue(1)->required(),
-                                            TextInput::make('Y_coord')->numeric()->required(),
-                                            ColorPicker::make('Color')->required(),
-                                            TextInput::make('MaxWidth')->numeric()->required(),
-                                            TextInput::make('FontSize')->numeric()->required(),
-                                            Select::make('Text_Align')
-                                                ->options([
-                                                    'center' => 'Center',
-                                                    'left' => 'Left',
-                                                    'right' => 'Right',
-                                                ])->required(),
+                                            TextInput::make('X_coord')->default(0)->numeric()->reactive()->minValue(1)->required(),
+                                            TextInput::make('Y_coord')->default(0)->numeric()->reactive()->required(),
+                                            ColorPicker::make('color')->default('#000000')->reactive()->required(),
+                                            TextInput::make('max_width')->default(100)->suffix('PX')->reactive()->numeric()->required(),
+                                            TextInput::make('font_size')->default(16)->reactive()->numeric()->required(),
+                                            Select::make('font_face')
+                                                                                            ->options([
+                                                                                                'sans-serif' => 'sans-serif',
+                                                                                                'helvetica' => 'Helvetica',
+                                                                                            ])->default('helvetica')->reactive()->required(),
+                                            Select::make('text_align')
+                                                                                            ->options([
+                                                                                                'C' => 'Center',
+                                                                                                'L' => 'Left',
+                                                                                                'R' => 'Right',
+                                                                                            ])->afterStateUpdated(function (Closure $set, Closure $get, $state) {
+                                                                                                if ($get('document') != '' && $get('../../pdf_info') != '') {
+                                                                                                    $json_pdfs = json_decode($get('../../pdf_info'), true);
+                                                                                                    $key = array_search($get('document'), array_column($json_pdfs, 'filename'));
+                                                                                                    $json_pdfs[$key]['type'] = $state;
+                                                                                                    $img_page = (int) $get('page');
+                                                                                                    //$set('image', [$get('predefined_text'), asset($json_pdfs[0]['pdf'][$img_page]), $get('text_align')]);
+                                                                                                }
+                                                                                            })->default('R')->reactive()->required(),
+
                                         ]),
-                                    ]),
+                                        PDFPositioner::make('image')->set_pdf_data(function (Closure $get, $state) {
+                                            if ($get('page') != '') {
+                                                $json_pdfs = json_decode($get('../../pdf_info'), true);
+                                                $key = array_search($get('document'), array_column($json_pdfs, 'filename'));
+                                                $json_pdfs[$key]['type'] = $get('page');
+                                                $img_page = (int) $get('page');
+
+                                                return [
+                                                    'predefined_text' => $get('predefined_text'),
+                                                    'page' => asset($json_pdfs[0]['pdf'][$img_page]),
+                                                    'text_align' => $get('text_align'),
+                                                    'X' => $get('X_coord'),
+                                                    'Y' => $get('Y_coord'),
+                                                    'width' => $get('max_width'),
+                                                    'font_size' => $get('font_size'),
+                                                    'color' => $get('color'),
+                                                ];
+                                            }
+
+                                            return [];
+                                        }
+                                        )
+                                        ->reactive(),
+                                    ])->collapsible(),
                             ]),
                 ])->startOnStep(2),
                 ]),
