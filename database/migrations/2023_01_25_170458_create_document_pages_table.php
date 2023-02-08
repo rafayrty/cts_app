@@ -25,10 +25,10 @@ return new class extends Migration
             $table->string('font_size');
             $table->string('font');
             $table->string('text_align');
-            $table->foreign('document_id')
-                    ->references('id')
-                    ->on('documents')
-                    ->onCascade('delete');
+            //$table->foreign('document_id')
+            //->references('id')
+            //->on('documents')
+            //->onCascade('delete');
             $table->timestamps();
         });
     }

@@ -9,8 +9,17 @@ class PDFPositioner extends Field
 {
     protected string $view = 'forms.components.p-d-f-positioner';
 
-    public $count = 5;
     public array|Closure $pdf_data = [];
+
+    public function update_width()
+    {
+        $this->pdf_data = null;
+    }
+
+    public function update_pdf_data($data)
+    {
+        //dd($data);
+    }
 
     public function set_pdf_data(array|Closure $pdf_data): static
     {
@@ -19,10 +28,6 @@ class PDFPositioner extends Field
         return $this;
     }
 
-    public function increment()
-    {
-        $this->count++;
-    }
     public function getData(): array
     {
         return $this->evaluate($this->pdf_data);

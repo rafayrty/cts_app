@@ -17,7 +17,11 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->integer('type')->comment('1. Cover,2. Book');
+            $table->string('pdf_name');
             $table->string('attatchment');
+            $table->json('pages')->nullable();
+            $table->json('dedications')->nullable();
+            $table->json('barcodes')->nullable();
             $table->bigInteger('product_id')->unsigned();
             $table->foreign('product_id')
                     ->references('id')

@@ -18,3 +18,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('fill-data-pdf', [PDFController::class, 'index']);
+Route::get('fill-data-pdf-product/{id}', [PDFController::class, 'product'])->name('preview.pdf');

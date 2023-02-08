@@ -19,9 +19,11 @@
         "livewire/livewire": "^2.11",
         "setasign/fpdf": "^1.8",
         "setasign/fpdi": "^2.3",
-        "spatie/pdf-to-image": "^1.2"
+        "spatie/pdf-to-image": "^1.2",
+        "xthiago/pdf-version-converter": "dev-master"
     },
     "require-dev": {
+        "doctrine/dbal": "^3.5",
         "fakerphp/faker": "^1.9.1",
         "laravel/pint": "^1.4",
         "laravel/sail": "^1.0.1",

@@ -15,9 +15,17 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('slug')->unique();
+            $table->string('demo_name');
             $table->string('name');
+            $table->string('slug')->unique();
             $table->string('description');
+            $table->json('pages');
+            $table->json('dedications');
+            $table->json('barcodes');
+            $table->text('pdf_info');
+            //$table->text('pdf_name');
+            $table->bigInteger('category_id')->unsigned();
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
             $table->string('price');
             $table->json('images');
             $table->timestamps();

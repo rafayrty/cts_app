@@ -6,6 +6,7 @@ use function Pest\Laravel\artisan;
 use function PHPUnit\Framework\assertEquals;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+
 it('check if a admin user is created and show in table', function () {
     //$role = Role::create(['name' => 'super_admin']);
     //Artisan::call("shield:install --no-interaction");
