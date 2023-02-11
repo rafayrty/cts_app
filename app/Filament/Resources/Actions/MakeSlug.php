@@ -8,7 +8,10 @@ class MakeSlug
 {
     public function __invoke(Closure $set, $state)
     {
-        if ($state != make_slug($state)) {
+        //if ($state != make_slug($state)) {
+        //$set('slug', make_slug($state));
+        //}
+        if (filled($state)) {
             $set('slug', make_slug($state));
         }
     }

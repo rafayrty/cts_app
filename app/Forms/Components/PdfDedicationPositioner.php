@@ -2,9 +2,9 @@
 
 namespace App\Forms\Components;
 
+use Closure;
 use Filament\Forms\Components\Field;
 
-use Closure;
 class PdfDedicationPositioner extends Field
 {
     protected string $view = 'forms.components.pdf-dedication-positioner';

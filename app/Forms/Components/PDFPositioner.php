@@ -9,11 +9,13 @@ class PDFPositioner extends Field
 {
     protected string $view = 'forms.components.p-d-f-positioner';
 
+    protected array $listeners = ['new_event' => 'incrementPostCount'];
+
     public array|Closure $pdf_data = [];
 
-    public function update_width()
+    public function incrementPostCount()
     {
-        $this->pdf_data = null;
+        dd('hey');
     }
 
     public function update_pdf_data($data)

@@ -6,6 +6,7 @@ use App\Filament\Resources\DedicationResource\Pages;
 use App\Models\Dedication;
 use Filament\Forms;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Textarea;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -28,7 +29,7 @@ class DedicationResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->extraAttributes(['dir' => 'rtl'])
                     ->required(),
-                Forms\Components\TextArea::make('dedication')
+                TextArea::make('dedication')
                     ->extraAttributes(['dir' => 'rtl'])
                     ->rows(10)
                     ->columnSpanFull()

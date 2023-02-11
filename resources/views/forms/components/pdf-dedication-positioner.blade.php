@@ -4,9 +4,28 @@
         $img_id = 'img-' . Str::random(20);
     @endphp
     <div x-data="{
-    state: $wire.entangle('{{ $getStatePath() }}'),
+    dedication_state: $wire.entangle('{{ $getStatePath() }}').defer,
+
         init() {
-            let self = this;
+        let self = this;
+        let dedication_elems = document.querySelectorAll('.draggable-element-dedication-{{$img_id}}');
+
+   const debounce = (func, delay) => {
+        let debounceTimer
+        return function() {
+            const context = this
+            const args = arguments
+                clearTimeout(debounceTimer)
+                    debounceTimer
+                = setTimeout(() => func.apply(context, args), delay)
+                }
+        }
+        dedication_elems.forEach(elem=>{
+          elem.addEventListener('input',(e)=>{
+            let data_id = e.target.getattribute('data-id')
+            self.dedication_state.dedication_texts[data_id]['value']['text'] = e.target.innerhtml;
+          })
+        })
             interact('.draggable-element-dedication')
                 .resizable({
                     // resize from all edges and corners
@@ -27,15 +46,19 @@
                             y += event.deltaRect.top
 
                             target.style.transform = 'translate(' + x + 'px,' + y + 'px)'
+                         target.setAttribute('data-x', x)
+                          target.setAttribute('data-y', y)
+                        },
 
-                            let data_id = target.getAttribute('data-id')
-                          if(self.state.dedication_texts[data_id]){
-                            self.state.dedication_texts[data_id]['value']['max_width'] = event.rect.width;
-                            self.state.dedication_texts[data_id]['value']['width_percent'] = (event.rect.width / event.target.parentElement.clientWidth) * 100;
+                        end(event) {
+                            var target = event.target
+                          console.log(self.dedication_state);
+                          let data_id = target.getAttribute('data-id')
+                          if(self.dedication_state.dedication_texts[data_id]){
+                            //console.log($wire.get(`{{$getStatePath()}}.predefined_texts.${data_id}.value.max_width`))
+                            self.dedication_state.dedication_texts[data_id]['value']['max_width'] = event.rect.width;
+                            self.dedication_state.dedication_texts[data_id]['value']['width_percent'] = (event.rect.width / event.target.parentElement.clientWidth) * 100;
                           }
-                            //updateValue(data_id,'max_width',event.rect.width);
-                            target.setAttribute('data-x', x)
-                            target.setAttribute('data-y', y)
                         }
                     },
                     modifiers: [
@@ -77,18 +100,18 @@
                             const valueX = (x / event.target.parentElement.clientWidth) * 100;
                             const valueY = (y / event.target.parentElement.clientHeight) * 100;
                             const screen_size = {height:window.innerHeight,width:window.innerWidth}
-                          console.log(self.state)
-                          if(self.state.dedication_texts[data_id]){
+                          console.log(self.dedication_state)
+                          if(self.dedication_state.dedication_texts[data_id]){
 
-                            self.state.dedication_texts[data_id]['value']['screen_size'] = screen_size;
-                            self.state.dedication_texts[data_id]['value']['X_coord_percent'] = valueX;
+                            self.dedication_state.dedication_texts[data_id]['value']['screen_size'] = screen_size;
+                            self.dedication_state.dedication_texts[data_id]['value']['X_coord_percent'] = valueX;
 
-                            self.state.dedication_texts[data_id]['value']['width_percent'] = (event.rect.width / event.target.parentElement.clientWidth) * 100;
-                            self.state.dedication_texts[data_id]['value']['Y_coord_percent'] = valueY;
-                            self.state.dedication_texts[data_id]['value']['X_coord'] = x;
-                            self.state.dedication_texts[data_id]['value']['Y_coord'] = y;
-//                           self.state.dedication_texts[data_id]['value']['Y_coord'] = y;
-//                            self.state.dedication_texts[data_id]['value']['X_coord'] = x;
+                            self.dedication_state.dedication_texts[data_id]['value']['width_percent'] = (event.rect.width / event.target.parentElement.clientWidth) * 100;
+                            self.dedication_state.dedication_texts[data_id]['value']['Y_coord_percent'] = valueY;
+                            self.dedication_state.dedication_texts[data_id]['value']['X_coord'] = x;
+                            self.dedication_state.dedication_texts[data_id]['value']['Y_coord'] = y;
+//                           self.dedication_state.dedication_texts[data_id]['value']['Y_coord'] = y;
+//                            self.dedication_state.dedication_texts[data_id]['value']['X_coord'] = x;
 
                             setTimeout(function() {
                                 target.focus()
@@ -105,7 +128,7 @@
                 var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
                 var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
                 // translate the element
-                //update state
+                //update dedication_state
 
                 const valueX = (x / event.target.parentElement.clientWidth) * 100;
                 const valueY = (y / event.target.parentElement.clientHeight) * 100;
@@ -146,12 +169,10 @@ $text_align = 'right';
   direction:rtl;
   transform:translate({{ $item['value']['X_coord'] }}px,{{ $item['value']['Y_coord'] }}px)
               "
-                        x-on:input.debounce.1000ms="state.dedication_texts[{{ $key }}]['value']['text'] = $event.target.innerHTML"
                         contenteditable="true"
-                        {{-- ondblclick="this.contentEditable=true;this.className='inEdit';" onblur="this.contentEditable=false;this.className='';" contenteditable="false"<] --}}
                         data-x={{ $item['value']['X_coord'] }}
                         data-y={{ $item['value']['Y_coord'] }}
-                        class="draggable-element-dedication" data-id="{{ $key }}">
+                        class="draggable-element-dedication-{{$img_id}}" data-id="{{ $key }}">
                         {!! $item['value']['text'] !!}
                     </div>
                 @endforeach

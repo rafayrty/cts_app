@@ -19,19 +19,19 @@ class Product extends Model
     protected $guarded = [];
 
     /**
+     * The roles that belong to the user.
+     */
+    public function product_attributes()
+    {
+        return $this->belongsToMany(ProductAttributeOption::class);
+    }
+
+    /**
      * Get the documents for the product.
      */
     public function documents()
     {
         return $this->hasMany(Document::class);
-    }
-
-    /**
-     * Get the document pages for the product.
-     */
-    public function document_pages()
-    {
-        return $this->hasManyThrough(Document::class, DocumentPage::class);
     }
 
     /**

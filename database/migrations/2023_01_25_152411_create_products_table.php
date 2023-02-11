@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('demo_name');
             $table->string('name');
             $table->string('slug')->unique();
-            $table->string('description');
+            $table->text('description');
             $table->json('pages');
             $table->json('dedications');
             $table->json('barcodes');

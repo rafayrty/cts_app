@@ -11,7 +11,6 @@ class HandleProductAttatchment
     public function __invoke(Closure $set, Closure $get, $state)
     {
         $name = $state->getClientOriginalName();
-        $set('pdf_name', $name);
         //$s3_file = Storage::disk('local')->get($state->path());
         //$s3 = Storage::disk('local');
         //$filename = 'temp/'.time().'.pdf';
@@ -25,7 +24,8 @@ class HandleProductAttatchment
             $pdfs = [];
         }
         $images = [];
-        for ($i = 1; $i <= $pdf->getNumberOfPages(); $i++) {
+        $count = $this->getPDFPages($state->path());
+        for ($i = 1; $i <= $count; $i++) {
             $img_path = 'uploads/'.time().'.jpg';
             $pdf->setPage($i)
                 ->saveImage($img_path);
@@ -33,13 +33,27 @@ class HandleProductAttatchment
         }
         array_push($pdfs, ['filename' => $name, 'type' => $get('type'), 'name' => $get('name'), 'pdf' => $images]);
         $set('../../pdf_info', json_encode($pdfs));
-        //Set barcode Location
-        //if (count($pdfs) > 1) {
-        //$location = ['first' => 'First Page', 'last' => 'Last Page', 'both' => 'Both First & Last'];
-        //$set('barcode_settings.location', $location);
-        //} else {
-        //$location = ['first' => 'First Page', 'last' => 'Last Page'];
-        //$set('barcode_settings.location', $location);
-        //}
     }
+
+// Make a function for convenience
+public function getPDFPages($document)
+{
+    $cmd = '/opt/homebrew/bin/pdfinfo';           // Linux
+    //$cmd = "C:\\path\\to\\pdfinfo.exe";  // Windows
+
+    // Parse entire output
+    // Surround with double quotes if file name has spaces
+
+    exec("$cmd \"$document\" 2>&1", $output);
+    $pagecount = 0;
+    foreach ($output as $op) {
+        // Extract the number
+        if (preg_match("/Pages:\s*(\d+)/i", $op, $matches) === 1) {
+            $pagecount = intval($matches[1]);
+            break;
+        }
+    }
+
+    return $pagecount;
+}
 }

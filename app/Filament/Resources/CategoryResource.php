@@ -31,8 +31,7 @@ class CategoryResource extends Resource
                         ->maxLength(255),
                     FileUpload::make('image')
                         ->image()
-                        ->directory('uploads')
-                        ->disk('do'),
+                        ->directory('uploads'),
                 ]),
             ]);
     }

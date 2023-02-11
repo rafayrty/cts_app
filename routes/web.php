@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PDFController;
+use App\Http\Controllers\PersonalizationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,4 +19,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('fill-data-pdf', [PDFController::class, 'index']);
-Route::get('fill-data-pdf-product/{id}', [PDFController::class, 'product'])->name('preview.pdf');
+Route::get('fill-data-pdf-product/{id}', [PersonalizationController::class, 'generatePDF'])->name('preview.pdf');

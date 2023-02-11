@@ -13,7 +13,8 @@ class HandleDocumentOptions
             $json_pdfs = json_decode($get('../../pdf_info'), true);
             foreach ($json_pdfs as $pdf) {
                 if ($pdf['name']) {
-                    $array[] = $pdf['name'];
+                    //$array[] = $pdf['name'];
+                    $array[$pdf['name']] = $pdf['name'];
                 }
             }
 

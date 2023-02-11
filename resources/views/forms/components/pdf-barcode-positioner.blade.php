@@ -4,10 +4,10 @@
         $img_id = 'img-' . Str::random(20);
     @endphp
     <div x-data="{
-    state: $wire.entangle('{{ $getStatePath() }}'),
+    barcode_state: $wire.entangle('{{ $getStatePath() }}').defer,
         init() {
             let self = this;
-            interact('.draggable-element-barcode')
+            interact('.draggable-element-barcode-{{$img_id}}')
                 .resizable({
                     // resize from all edges and corners
                     edges: { left: true, right: true, bottom: false, top: false },
@@ -27,15 +27,19 @@
                             y += event.deltaRect.top
 
                             target.style.transform = 'translate(' + x + 'px,' + y + 'px)'
+                         target.setAttribute('data-x', x)
+                          target.setAttribute('data-y', y)
+                        },
 
-                            let data_id = target.getAttribute('data-id')
-                          if(self.state.barcode_info[data_id]){
-                            self.state.barcode_info[data_id]['value']['max_width'] = event.rect.width;
-                            self.state.barcode_info[data_id]['value']['width_percent'] = (event.rect.width / event.target.parentElement.clientWidth) * 100;
+                        end(event) {
+                            var target = event.target
+                          console.log(self.barcode_state);
+                          let data_id = target.getAttribute('data-id')
+                          if(self.barcode_state.barcode_info[data_id]){
+                            //console.log($wire.get(`{{$getStatePath()}}.predefined_texts.${data_id}.value.max_width`))
+                            self.barcode_state.barcode_info[data_id]['value']['max_width'] = event.rect.width;
+                            self.barcode_state.barcode_info[data_id]['value']['width_percent'] = (event.rect.width / event.target.parentElement.clientWidth) * 100;
                           }
-                            //updateValue(data_id,'max_width',event.rect.width);
-                            target.setAttribute('data-x', x)
-                            target.setAttribute('data-y', y)
                         }
                     },
                     modifiers: [
@@ -77,16 +81,16 @@
                             const valueX = (x / event.target.parentElement.clientWidth) * 100;
                             const valueY = (y / event.target.parentElement.clientHeight) * 100;
                             const screen_size = {height:window.innerHeight,width:window.innerWidth}
-                          console.log(self.state)
-                          if(self.state.barcode_info[data_id]){
+                          console.log(self.barcode_state)
+                          if(self.barcode_state.barcode_info[data_id]){
 
-                            self.state.barcode_info[data_id]['value']['screen_size'] = screen_size;
-                            self.state.barcode_info[data_id]['value']['X_coord_percent'] = valueX;
+                            self.barcode_state.barcode_info[data_id]['value']['screen_size'] = screen_size;
+                            self.barcode_state.barcode_info[data_id]['value']['X_coord_percent'] = valueX;
 
-                            self.state.barcode_info[data_id]['value']['width_percent'] = (event.rect.width / event.target.parentElement.clientWidth) * 100;
-                            self.state.barcode_info[data_id]['value']['Y_coord_percent'] = valueY;
-                            self.state.barcode_info[data_id]['value']['X_coord'] = x;
-                            self.state.barcode_info[data_id]['value']['Y_coord'] = y;
+                            self.barcode_state.barcode_info[data_id]['value']['width_percent'] = (event.rect.width / event.target.parentElement.clientWidth) * 100;
+                            self.barcode_state.barcode_info[data_id]['value']['Y_coord_percent'] = valueY;
+                            self.barcode_state.barcode_info[data_id]['value']['X_coord'] = x;
+                            self.barcode_state.barcode_info[data_id]['value']['Y_coord'] = y;
 
                             setTimeout(function() {
                                 target.focus()
@@ -103,7 +107,7 @@
                 var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
                 var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
                 // translate the element
-                //update state
+                //update barcode_state
 
                 const valueX = (x / event.target.parentElement.clientWidth) * 100;
                 const valueY = (y / event.target.parentElement.clientHeight) * 100;
@@ -131,10 +135,9 @@
   direction:rtl;
   transform:translate({{ $item['value']['X_coord'] }}px,{{ $item['value']['Y_coord'] }}px)
               "
-                        x-on:input.debounce.1000ms="state.barcode_info[{{ $key }}]['value']['text'] = $event.target.innerHTML"
                         data-x={{ $item['value']['X_coord'] }}
                         data-y={{ $item['value']['Y_coord'] }}
-                        class="draggable-element-barcode" data-id="{{ $key }}">
+                        class="draggable-element-barcode-{{$img_id}}" data-id="{{ $key }}">
 
 
                       <img src="{{asset('images/barcode.gif')}}"/>

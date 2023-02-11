@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c8c488c66285d1428fca1f77ae687508",
+    "content-hash": "b48fb72c506432c06d04f45fd7449c4e",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -1762,6 +1762,100 @@
             "time": "2022-10-26T14:07:24+00:00"
         },
         {
+            "name": "howtomakeaturn/pdfinfo",
+            "version": "1.1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/howtomakeaturn/pdfinfo.git",
+                "reference": "292e11fe1f0fa17c3b57dd52f29376e49c14c15e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/howtomakeaturn/pdfinfo/zipball/292e11fe1f0fa17c3b57dd52f29376e49c14c15e",
+                "reference": "292e11fe1f0fa17c3b57dd52f29376e49c14c15e",
+                "shasum": ""
+            },
+            "require-dev": {
+                "filp/whoops": "1.1.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Howtomakeaturn\\PDFInfo": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "simple php wrapper for pdfinfo",
+            "keywords": [
+                "pdf",
+                "pdfinfo"
+            ],
+            "support": {
+                "issues": "https://github.com/howtomakeaturn/pdfinfo/issues",
+                "source": "https://github.com/howtomakeaturn/pdfinfo/tree/master"
+            },
+            "time": "2019-01-10T02:45:07+00:00"
+        },
+        {
+            "name": "imal-h/pdf-box",
+            "version": "1.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/imalhasaranga/PDFLib.git",
+                "reference": "8d0005072e958f17a2130b8e93c1ec6bc7f1f749"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/imalhasaranga/PDFLib/zipball/8d0005072e958f17a2130b8e93c1ec6bc7f1f749",
+                "reference": "8d0005072e958f17a2130b8e93c1ec6bc7f1f749",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.*",
+                "scrutinizer/ocular": "~1.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ImalH\\PDFLib\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Imal hasaranga Perera",
+                    "email": "imal.hasaranga@gmail.com",
+                    "homepage": "http://www.treinetic.com",
+                    "role": "CEO"
+                }
+            ],
+            "description": "Current Release of PDFlib provide you methods to convert PDF to Images as well as Images to PDF.",
+            "homepage": "https://github.com/imalhasaranga/PDFLib.git",
+            "keywords": [
+                "Imal hasaranga",
+                "PDFlib for Php",
+                "PHP wrapper",
+                "convert",
+                "ghostscript",
+                "images to pdf",
+                "pdf to images"
+            ],
+            "support": {
+                "issues": "https://github.com/imalhasaranga/PDFLib/issues",
+                "source": "https://github.com/imalhasaranga/PDFLib/tree/master"
+            },
+            "time": "2020-02-28T05:21:45+00:00"
+        },
+        {
             "name": "laravel/framework",
             "version": "v9.48.0",
             "source": {
@@ -3389,6 +3483,55 @@
                 }
             ],
             "time": "2022-07-30T15:51:26+00:00"
+        },
+        {
+            "name": "propa/tcpdi",
+            "version": "v1.3.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kulbakin/tcpdi.git",
+                "reference": "da1dd8bfad71386e468daf3f7f070548c49e0835"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kulbakin/tcpdi/zipball/da1dd8bfad71386e468daf3f7f070548c49e0835",
+                "reference": "da1dd8bfad71386e468daf3f7f070548c49e0835",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0",
+                "tecnickcom/tcpdf": "^6.3"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "fpdf_tpl.php",
+                    "tcpdi.php",
+                    "tcpdi_parser.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Nicola Asuni",
+                    "email": "info@tecnick.com",
+                    "homepage": "http://nicolaasuni.tecnick.com"
+                }
+            ],
+            "description": "TCPDI is a PHP class for importing PDF to use with TCPDF",
+            "keywords": [
+                "TCPDF",
+                "pdf",
+                "tcpdi",
+                "tcpdi_parser"
+            ],
+            "support": {
+                "source": "https://github.com/kulbakin/tcpdi/tree/v1.3.2"
+            },
+            "time": "2021-05-03T11:16:04+00:00"
         },
         {
             "name": "psr/container",
@@ -6707,6 +6850,78 @@
                 }
             ],
             "time": "2022-12-22T17:55:15+00:00"
+        },
+        {
+            "name": "tecnickcom/tcpdf",
+            "version": "6.6.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tecnickcom/TCPDF.git",
+                "reference": "e3cffc9bcbc76e89e167e9eb0bbda0cab7518459"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/e3cffc9bcbc76e89e167e9eb0bbda0cab7518459",
+                "reference": "e3cffc9bcbc76e89e167e9eb0bbda0cab7518459",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "config",
+                    "include",
+                    "tcpdf.php",
+                    "tcpdf_parser.php",
+                    "tcpdf_import.php",
+                    "tcpdf_barcodes_1d.php",
+                    "tcpdf_barcodes_2d.php",
+                    "include/tcpdf_colors.php",
+                    "include/tcpdf_filters.php",
+                    "include/tcpdf_font_data.php",
+                    "include/tcpdf_fonts.php",
+                    "include/tcpdf_images.php",
+                    "include/tcpdf_static.php",
+                    "include/barcodes/datamatrix.php",
+                    "include/barcodes/pdf417.php",
+                    "include/barcodes/qrcode.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0-only"
+            ],
+            "authors": [
+                {
+                    "name": "Nicola Asuni",
+                    "email": "info@tecnick.com",
+                    "role": "lead"
+                }
+            ],
+            "description": "TCPDF is a PHP class for generating PDF documents and barcodes.",
+            "homepage": "http://www.tcpdf.org/",
+            "keywords": [
+                "PDFD32000-2008",
+                "TCPDF",
+                "barcodes",
+                "datamatrix",
+                "pdf",
+                "pdf417",
+                "qrcode"
+            ],
+            "support": {
+                "issues": "https://github.com/tecnickcom/TCPDF/issues",
+                "source": "https://github.com/tecnickcom/TCPDF/tree/6.6.2"
+            },
+            "funding": [
+                {
+                    "url": "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&currency_code=GBP&business=paypal@tecnick.com&item_name=donation%20for%20tcpdf%20project",
+                    "type": "custom"
+                }
+            ],
+            "time": "2022-12-17T10:28:59+00:00"
         },
         {
             "name": "tgalopin/html-sanitizer",

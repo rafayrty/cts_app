@@ -1,5 +1,12 @@
-<x-forms::field-wrapper :id="$getId()" :label="$getLabel()" :label-sr-only="$isLabelHidden()" :helper-text="$getHelperText()" :hint="$getHint()"
-    :hint-icon="$getHintIcon()" :required="$isRequired()" :state-path="$getStatePath()">
+<x-forms::field-wrapper
+:id="$getId()"
+:label="$getLabel()"
+:label-sr-only="$isLabelHidden()"
+:helper-text="$getHelperText()"
+:hint="$getHint()"
+:hint-icon="$getHintIcon()"
+:required="$isRequired()"
+:state-path="$getStatePath()">
     @php
         $img_id = 'img-' . Str::random(20);
     @endphp
@@ -7,9 +14,40 @@
 {
         state:$wire.entangle('{{ $getStatePath() }}'),
         init() {
-        console.log($wire.get(`{{$getStatePath()}}.predefined_texts[data_id][0]['max_width']`));
-            let self = this;
-            interact('.draggable-element')
+document.querySelector('form').addEventListener('submit', function(event) {
+    event.preventDefault();
+});
+   const debounce = (func, delay) => {
+        let debounceTimer
+        return function() {
+            const context = this
+            const args = arguments
+                clearTimeout(debounceTimer)
+                    debounceTimer
+                = setTimeout(() => func.apply(context, args), delay)
+                }
+        }
+        let self = this;
+        let elems = document.querySelectorAll('.draggable-element-{{$img_id}}');
+                            console.log($wire.get(`{{$getStatePath()}}.predefined_texts`),'wire get','{{$getStatePath()}}')
+        elems.forEach(elem=>{
+
+elem.addEventListener('paste', function(e) {
+    // cancel paste
+    e.preventDefault();
+
+    // get text representation of clipboard
+    var text = (e.originalEvent || e).clipboardData.getData('text/plain');
+
+    // insert text manually
+    document.execCommand('insertHTML', false, text);
+});
+          elem.addEventListener('input',debounce((e)=>{
+            let data_id = e.target.getAttribute('data-id')
+            self.state.predefined_texts[data_id]['value']['text'] = e.target.innerHTML;
+          },1000))
+        })
+            interact('.draggable-element-{{$img_id}}')
                 .resizable({
                     // resize from all edges and corners
                     edges: { left: true, right: true, bottom: false, top: false },
@@ -34,13 +72,32 @@
                         },
 
                         end(event) {
+
                             var target = event.target
-                          console.log(self.state);
-                          let data_id = target.getAttribute('data-id')
+                            var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
+                            var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
+                            let data_id = target.getAttribute('data-id')
+
+                            const valueX = (x / event.target.parentElement.clientWidth) * 100;
+                            const valueY = (y / event.target.parentElement.clientHeight) * 100;
+                            const screen_size = {height:window.innerHeight,width:window.innerWidth}
+                            //console.log(self.state.predefined_texts[parseInt(data_id)],data_id);
+                            //console.log($wire.get(`{{$getStatePath()}}.predefined_texts`),'wire get','{{$getStatePath()}}')
                           if(self.state.predefined_texts[data_id]){
+
                             //console.log($wire.get(`{{$getStatePath()}}.predefined_texts.${data_id}.value.max_width`))
                             self.state.predefined_texts[data_id]['value']['max_width'] = event.rect.width;
                             self.state.predefined_texts[data_id]['value']['width_percent'] = (event.rect.width / event.target.parentElement.clientWidth) * 100;
+
+                            //Also update the X and Y Values as they are also effected by the width
+                            self.state.predefined_texts[data_id]['value']['screen_size'] = screen_size;
+                            self.state.predefined_texts[data_id]['value']['X_coord_percent'] = valueX;
+                            self.state.predefined_texts[data_id]['value']['width_percent'] = (event.rect.width / event.target.parentElement.clientWidth) * 100;
+                            self.state.predefined_texts[data_id]['value']['Y_coord_percent'] = valueY;
+
+                            self.state.predefined_texts[data_id]['value']['X_coord'] = x;
+                            self.state.predefined_texts[data_id]['value']['Y_coord'] = y;
+                            console.log('should be updatig now')
                           }
                         }
                     },
@@ -83,22 +140,13 @@
                             const valueX = (x / event.target.parentElement.clientWidth) * 100;
                             const valueY = (y / event.target.parentElement.clientHeight) * 100;
                             const screen_size = {height:window.innerHeight,width:window.innerWidth}
-                          console.log(self.state);
                           if(self.state.predefined_texts[data_id]){
-
                             self.state.predefined_texts[data_id]['value']['screen_size'] = screen_size;
                             self.state.predefined_texts[data_id]['value']['X_coord_percent'] = valueX;
-
                             self.state.predefined_texts[data_id]['value']['width_percent'] = (event.rect.width / event.target.parentElement.clientWidth) * 100;
                             self.state.predefined_texts[data_id]['value']['Y_coord_percent'] = valueY;
                             self.state.predefined_texts[data_id]['value']['X_coord'] = x;
                             self.state.predefined_texts[data_id]['value']['Y_coord'] = y;
-//                           self.state.predefined_texts[data_id]['value']['Y_coord'] = y;
-//                            self.state.predefined_texts[data_id]['value']['X_coord'] = x;
-
-                            setTimeout(function() {
-                                target.focus()
-                            }, 0);
                           }
                         }
 
@@ -116,6 +164,7 @@
                 const valueX = (x / event.target.parentElement.clientWidth) * 100;
                 const valueY = (y / event.target.parentElement.clientHeight) * 100;
 
+              console.log('moving right now')
                 target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
 
                 // update the posiion attributes
@@ -138,7 +187,8 @@ $text_align = 'right';
       $text_align = "left";
     }else{
       $text_align = "right";
-    } @endphp
+ }
+ @endphp
   border:1px solid #000;
   background-color: {{$item['value']['bg_color']}};
   font-size:{{ $item['value']['font_size'] ? $item['value']['font_size'] . 'px' : 'auto' }};
@@ -148,13 +198,17 @@ $text_align = 'right';
   text-align:{{ $text_align }};
   position: absolute;
   direction:rtl;
+  padding-top:.1rem;
+  font-family:{{$item['value']['font_face']}};
+  padding-bottom:.1rem;
   transform:translate({{ $item['value']['X_coord'] }}px,{{ $item['value']['Y_coord'] }}px)
               "
-                        x-on:input.debounce.1000ms="state.predefined_texts[{{ $key }}]['value']['text'] = $event.target.innerHTML"
                         contenteditable="true"
-                        {{-- ondblclick="this.contentEditable=true;this.className='inEdit';" onblur="this.contentEditable=false;this.className='';" contenteditable="false"<] --}} data-x={{ $item['value']['X_coord'] }}
+                        data-x={{$item['value']['X_coord']}}
+
+                        data-font="{{$item['value']['font_face']}}"
                         data-y={{ $item['value']['Y_coord'] }}
-                        class="draggable-element" data-id="{{ $key }}">
+                        class="draggable-element-{{$img_id}}"  data-id="{{ $key }}" >
                         {!! $item['value']['text'] !!}
                     </div>
                 @endforeach
@@ -164,13 +218,3 @@ $text_align = 'right';
     </div>
 </x-forms::field-wrapper>
 <script src="https://unpkg.com/interactjs/dist/interact.min.js"></script>
-
-<script>
-
-    document.addEventListener('alpine:init', () => {
-    Alpine.data('pdf_positioner',(initialState={})=>({
-
-}))
-
-})
-</script>

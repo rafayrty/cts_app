@@ -9,6 +9,6 @@ class HandleDedicationOptions
 {
     public function __invoke(Closure $set, Closure $get, $state)
     {
-          return Dedication::all()->pluck('name','id');
+        return Dedication::all()->pluck('name', 'id');
     }
 }

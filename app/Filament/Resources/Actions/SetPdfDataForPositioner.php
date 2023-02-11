@@ -10,8 +10,8 @@ class SetPdfDataForPositioner
     {
         if ($get('page') != '') {
             $json_pdfs = json_decode($get('../../pdf_info'), true);
-            $key = array_search($get('document'), array_column($json_pdfs, 'filename'));
-            $json_pdfs[$key]['type'] = $get('page');
+            $search_key = $this->searchkey($json_pdfs, $get('document'));
+            $json_pdfs[$search_key]['type'] = $get('page');
             $img_page = (int) $get('page');
 
             $repeater_fields = $get('predefined_texts');
@@ -19,18 +19,23 @@ class SetPdfDataForPositioner
             foreach ($repeater_fields as $key => $field) {
                 array_push($new_fields, ['field_key' => $key, 'value' => $field]);
             }
+
             return [
                 'predefined_texts' => $new_fields,
-                'page' => asset($json_pdfs[0]['pdf'][$img_page]),
-                //'text_align' => $get('text_align'),
-                //'X' => $get('X_coord'),
-                //'Y' => $get('Y_coord'),
-                //'width' => $get('max_width'),
-                //'font_size' => $get('font_size'),
-                //'color' => $get('color'),
+                'page' => asset($json_pdfs[$search_key]['pdf'][$img_page]),
             ];
         }
 
         return [];
+    }
+
+    public function searchkey($array, $search)
+    {
+        $key = null;
+        foreach ($array as $key => $value) {
+            if ($value['name'] == $search) {
+                return $key;
+            }
+        }
     }
 }

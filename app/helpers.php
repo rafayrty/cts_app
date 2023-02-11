@@ -19,3 +19,21 @@ if (! function_exists('make_slug')) {
         return $slug;
     }
 }
+
+if (! function_exists('search_key')) {
+    /**
+     * Create a slug (Supports arabic)
+     *
+     * @param $array<mixed>,$search the string to be searched
+     * @return string
+     */
+    function search_key($array, $search)
+    {
+        $key = null;
+        foreach ($array as $key => $value) {
+            if ($value['name'] == $search) {
+                return $key;
+            }
+        }
+    }
+}
