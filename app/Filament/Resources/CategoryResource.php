@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\Actions\MakeSlug;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\FileUpload;
@@ -18,6 +20,8 @@ class CategoryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
+    protected static ?string $navigationGroup = 'Product Management';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -25,14 +29,21 @@ class CategoryResource extends Resource
                 Card::make()->schema([
                     Forms\Components\TextInput::make('name')
                         ->required()
+                        ->afterStateUpdated(Closure::fromCallable(new MakeSlug()))->reactive()
                         ->maxLength(255),
+                    Forms\Components\TextInput::make('slug')
+                        ->unique(ignorable: fn ($record) => $record)
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\Checkbox::make('featured')->label('Featured Category'),
                     Forms\Components\Textarea::make('description')
                         ->rows(5)
                         ->maxLength(255),
                     FileUpload::make('image')
+                        ->required()
                         ->image()
                         ->directory('uploads'),
-                ]),
+                ])->extraAttributes(['dir' => 'rtl']),
             ]);
     }
 

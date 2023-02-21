@@ -15,18 +15,23 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('demo_name');
-            $table->string('name');
+            $table->string('demo_name')->nullable();
+            $table->string('replace_name')->nullable();
+            $table->string('product_name');
             $table->string('slug')->unique();
+//            $table->string('name');
             $table->text('description');
             $table->json('pages');
             $table->json('dedications');
             $table->json('barcodes');
             $table->text('pdf_info');
+            $table->boolean('featured');
+            $table->integer('sold_amount')->default(0);
             //$table->text('pdf_name');
             $table->bigInteger('category_id')->unsigned();
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
-            $table->string('price');
+            $table->integer('price');
+            $table->integer('discount_percentage')->default(0);
             $table->json('images');
             $table->timestamps();
         });

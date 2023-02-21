@@ -14,7 +14,7 @@ class SetPdfFonts
             foreach ($fonts as $font) {
                 $array[$font->font_name] = $font->font_name;
             }
-            $array = array_merge($array, ['NotoSansArabic-Regular' => 'NotoSansArabic-Regular']);
+            $array = array_merge($array, ['GE-Dinar-Medium' => 'GE-Dinar-Medium']);
 
             return $array;
         }

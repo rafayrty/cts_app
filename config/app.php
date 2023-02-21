@@ -17,6 +17,9 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    'pdf_info_path' => env('PDF_INFO_PATH', '/opt/homebrew/bin/pdfinfo'),
+    'mupdf_path' => env('MUPDF_PATH', '/opt/homebrew/bin/mutool'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
@@ -70,6 +73,18 @@ return [
     */
 
     'timezone' => 'UTC',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Payme Information
+    |--------------------------------------------------------------------------
+    |
+    |
+    */
+
+    'seller_payme_id' => env('SELLER_PAYME_ID', ''),
+    'payme_url' => env('PAYME_URL', ''),
+    'payme_callback' => env('PAYME_CALLBACK', 'https://carder.app'),
 
     /*
     |--------------------------------------------------------------------------
@@ -181,6 +196,7 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
+        Milon\Barcode\BarcodeServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -210,6 +226,8 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
+        'DNS1D' => Milon\Barcode\Facades\DNS1DFacade::class,
+        'DNS2D' => Milon\Barcode\Facades\DNS2DFacade::class,
     ])->toArray(),
 
 ];

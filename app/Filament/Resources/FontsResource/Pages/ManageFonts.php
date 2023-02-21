@@ -5,6 +5,7 @@ namespace App\Filament\Resources\FontsResource\Pages;
 use App\Filament\Resources\FontsResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ManageRecords;
+use Illuminate\Database\Eloquent\Model;
 
 class ManageFonts extends ManageRecords
 {
@@ -13,7 +14,10 @@ class ManageFonts extends ManageRecords
     protected function getActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+            ->using(function (array $data): Model {
+                return static::getModel()::create($data);
+            }),
         ];
     }
 }

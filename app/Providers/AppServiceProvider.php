@@ -29,6 +29,10 @@ class AppServiceProvider extends ServiceProvider
             // Using Vite
             Filament::registerViteTheme('resources/css/filament.css');
         });
+        Filament::registerNavigationGroups([
+            'Product Management',
+            'Administration',
+        ]);
         //
     }
 }

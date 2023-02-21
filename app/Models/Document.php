@@ -9,11 +9,20 @@ class Document extends Model
 {
     protected $casts = [
         'pages' => 'array',
+        'gender' => 'array',
+        'dimensions' => 'array',
     ];
 
     use HasFactory;
 
     protected $guarded = [];
+
+    public $appends = ['genderParsed'];
+
+    public function getgenderParsedAttribute()
+    {
+        return is_array($this->gender) ? $this->gender : (array) json_decode($this->gender);
+    }
 
     /**
      * Get the documents for the product.

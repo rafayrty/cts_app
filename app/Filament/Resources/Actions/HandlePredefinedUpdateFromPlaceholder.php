@@ -23,6 +23,7 @@ class HandlePredefinedUpdateFromPlaceholder
             $set('image',
                 [
                     'predefined_texts' => $new_fields,
+                    'dimensions' => $json_pdfs[$search_key]['dimensions'],
                     'page' => asset($json_pdfs[$search_key]['pdf'][$img_page]),
                 ]);
         }

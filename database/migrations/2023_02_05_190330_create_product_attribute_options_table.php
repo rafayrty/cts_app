@@ -17,6 +17,9 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('product_attribute_id')->unsigned();
             $table->string('name');
+            $table->string('slug')->unique();
+            $table->text('description')->nullable();
+            $table->string('image')->nullable();
             $table->foreign('product_attribute_id')
                     ->references('id')
                     ->on('product_attributes')

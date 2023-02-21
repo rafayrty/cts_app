@@ -4,7 +4,7 @@
         $img_id = 'img-' . Str::random(20);
     @endphp
     <div x-data="{
-    barcode_state: $wire.entangle('{{ $getStatePath() }}').defer,
+    barcode_state: $wire.entangle('{{ $getStatePath() }}'),
         init() {
             let self = this;
             interact('.draggable-element-barcode-{{$img_id}}')
@@ -33,7 +33,6 @@
 
                         end(event) {
                             var target = event.target
-                          console.log(self.barcode_state);
                           let data_id = target.getAttribute('data-id')
                           if(self.barcode_state.barcode_info[data_id]){
                             //console.log($wire.get(`{{$getStatePath()}}.predefined_texts.${data_id}.value.max_width`))
@@ -125,7 +124,13 @@
     }" id="{{ $img_id }}">
         <h1 class="text-center font-semibold text-3xl my-4">Editing PDF Page</h1>
         @if (count($getData()) > 0)
-            <div id="editor-pdf" style="position:relative;">
+
+          @php
+        $width = pt2px(json_decode($getData()['dimensions'],true)['width']);
+        $height = pt2px(json_decode($getData()['dimensions'],true)['height']);
+        @endphp
+            <div id="editor-pdf" style="position:relative;overflow:auto">
+              <div style="width:{{$width}}px;height:{{$height}}px;margin:0 auto">
                 @foreach ($getData()['barcode_info'] as $key => $item)
                     <div style="
   border:1px solid #000;
@@ -139,12 +144,17 @@
                         data-y={{ $item['value']['Y_coord'] }}
                         class="draggable-element-barcode-{{$img_id}}" data-id="{{ $key }}">
 
-
                       <img src="{{asset('images/barcode.gif')}}"/>
                     </div>
                 @endforeach
 
-                <img draggable="false" src="{{ $getData()['page'] }}" />
+                <img draggable="false" src="{{ $getData()['page'] }}"
+style="
+width:{{$width}}px;
+height:{{$height}}px;
+max-width:none;"
+                />
+            </div>
             </div>
         @endif
     </div>

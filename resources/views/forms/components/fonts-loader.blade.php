@@ -2,16 +2,16 @@
 $fonts = \App\Models\Fonts::all();
 @endphp
 <style>
+/*@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@600&display=swap');*/
+@font-face{
+    font-family: GE-Dinar-Medium;
+    src: url('{{ asset('fonts/GE-Dinar-One-Medium.ttf') }}');
+}
 @foreach($fonts as $font)
-  @fontface{
+  @font-face{
     font-family: {{$font->font_name}};
-    src: url({{ Storage::path('public/'.$font->attatchment) }});
+    src: url('{{'/storage/'.$font->attatchment}}');
   }
 @endforeach
-  @fontface{
-    font-family: NotoSansArabic-Regular;
-    src: url({{ public_path('fonts/NotoSansArabic-Regular.ttf') }});
-  }
 </style>
 
-<h1>Hey</h1>

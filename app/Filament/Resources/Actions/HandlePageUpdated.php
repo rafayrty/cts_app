@@ -11,7 +11,6 @@ class HandlePageUpdated
         if ($get('document') != '' && $get('../../pdf_info') != '') {
             $json_pdfs = json_decode($get('../../pdf_info'), true);
             $search_key = $this->searchkey($json_pdfs, $get('document'));
-            $json_pdfs[$search_key]['type'] = $state;
             $img_page = (int) $get('page');
 
             $repeater_fields = $get('predefined_texts');
@@ -22,7 +21,9 @@ class HandlePageUpdated
             $set('image',
                 [
                     'predefined_texts' => $new_fields,
+                    'dimensions' => $json_pdfs[$search_key]['dimensions'],
                     'page' => asset($json_pdfs[$search_key]['pdf'][$img_page]),
+                    'page_number' => $get('page'),
                 ]);
         }
     }

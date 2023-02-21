@@ -18,6 +18,8 @@ class FontsResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-at-symbol';
 
+    protected static ?string $navigationGroup = 'Product Management';
+
     public static function form(Form $form): Form
     {
         return $form

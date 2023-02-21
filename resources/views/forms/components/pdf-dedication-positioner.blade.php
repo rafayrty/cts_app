@@ -4,11 +4,10 @@
         $img_id = 'img-' . Str::random(20);
     @endphp
     <div x-data="{
-    dedication_state: $wire.entangle('{{ $getStatePath() }}').defer,
+    dedication_state: $wire.entangle('{{ $getStatePath() }}'),
 
         init() {
         let self = this;
-        let dedication_elems = document.querySelectorAll('.draggable-element-dedication-{{$img_id}}');
 
    const debounce = (func, delay) => {
         let debounceTimer
@@ -20,13 +19,20 @@
                 = setTimeout(() => func.apply(context, args), delay)
                 }
         }
+        let dedication_elems = document.querySelectorAll('.draggable-element-dedication-{{$img_id}}');
+
         dedication_elems.forEach(elem=>{
-          elem.addEventListener('input',(e)=>{
+elem.addEventListener('paste', function(e) {
+    e.preventDefault();
+    var text = (e.originalEvent || e).clipboardData.getData('text/plain');
+    document.execCommand('insertHTML', false, text);
+});
+          elem.addEventListener('input',debounce((e)=>{
             let data_id = e.target.getattribute('data-id')
             self.dedication_state.dedication_texts[data_id]['value']['text'] = e.target.innerhtml;
-          })
+          },1000))
         })
-            interact('.draggable-element-dedication')
+            interact('.draggable-element-dedication-{{$img_id}}')
                 .resizable({
                     // resize from all edges and corners
                     edges: { left: true, right: true, bottom: false, top: false },
@@ -52,7 +58,6 @@
 
                         end(event) {
                             var target = event.target
-                          console.log(self.dedication_state);
                           let data_id = target.getAttribute('data-id')
                           if(self.dedication_state.dedication_texts[data_id]){
                             //console.log($wire.get(`{{$getStatePath()}}.predefined_texts.${data_id}.value.max_width`))
@@ -144,9 +149,14 @@
 
 
     }" id="{{ $img_id }}">
-        <h1 class="text-center font-semibold text-3xl my-4">Editing PDF Page</h1>
         @if (count($getData()) > 0)
-            <div id="editor-pdf" style="position:relative;">
+        <h1 class="text-center font-semibold text-3xl my-4">Editing PDF Page # {{$getData()['page_number']+1}}</h1>
+          @php
+        $width = pt2px(json_decode($getData()['dimensions'],true)['width']);
+        $height = pt2px(json_decode($getData()['dimensions'],true)['height']);
+        @endphp
+            <div id="editor-pdf" style="position:relative;overflow:auto;">
+              <div style="width:{{$width}}px;height:{{$height}}px;margin:0 auto">
                 @foreach ($getData()['dedication_texts'] as $key => $item)
                     <div style="
   @php
@@ -164,6 +174,7 @@ $text_align = 'right';
   color:{{ $item['value']['color'] ? $item['value']['color'] : '#000' }};
   width:{{ $item['value']['max_width'] }}px;
   cursor: move;
+  font-family:{{$item['value']['font_face']}};
   text-align:{{ $text_align }};
   position: absolute;
   direction:rtl;
@@ -176,7 +187,14 @@ $text_align = 'right';
                         {!! $item['value']['text'] !!}
                     </div>
                 @endforeach
-                <img draggable="false" src="{{ $getData()['page'] }}" />
+                <img draggable="false"
+style="
+width:{{$width}}px;
+height:{{$height}}px;
+max-width:none;"
+src="{{ $getData()['page'] }}"
+                />
+            </div>
             </div>
         @endif
     </div>

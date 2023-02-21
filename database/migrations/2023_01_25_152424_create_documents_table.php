@@ -15,11 +15,14 @@ return new class extends Migration
     {
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->unique();
+            $table->string('pdf_name')->nullable();
             $table->integer('type')->comment('1. Cover,2. Book');
+            $table->json('gender');
             $table->string('attatchment');
             $table->json('pages')->nullable();
             $table->json('dedications')->nullable();
+            $table->json('dimensions')->nullable();
             $table->json('barcodes')->nullable();
             $table->bigInteger('product_id')->unsigned();
             $table->foreign('product_id')

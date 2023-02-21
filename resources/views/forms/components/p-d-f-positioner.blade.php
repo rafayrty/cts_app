@@ -12,7 +12,7 @@
     @endphp
     <div x-data="
 {
-        state:$wire.entangle('{{ $getStatePath() }}'),
+        state:$wire.entangle('{{ $getStatePath() }}').defer,
         init() {
 document.querySelector('form').addEventListener('submit', function(event) {
     event.preventDefault();
@@ -29,7 +29,6 @@ document.querySelector('form').addEventListener('submit', function(event) {
         }
         let self = this;
         let elems = document.querySelectorAll('.draggable-element-{{$img_id}}');
-                            console.log($wire.get(`{{$getStatePath()}}.predefined_texts`),'wire get','{{$getStatePath()}}')
         elems.forEach(elem=>{
 
 elem.addEventListener('paste', function(e) {
@@ -80,17 +79,12 @@ elem.addEventListener('paste', function(e) {
 
                             const valueX = (x / event.target.parentElement.clientWidth) * 100;
                             const valueY = (y / event.target.parentElement.clientHeight) * 100;
-                            const screen_size = {height:window.innerHeight,width:window.innerWidth}
-                            //console.log(self.state.predefined_texts[parseInt(data_id)],data_id);
-                            //console.log($wire.get(`{{$getStatePath()}}.predefined_texts`),'wire get','{{$getStatePath()}}')
                           if(self.state.predefined_texts[data_id]){
 
-                            //console.log($wire.get(`{{$getStatePath()}}.predefined_texts.${data_id}.value.max_width`))
                             self.state.predefined_texts[data_id]['value']['max_width'] = event.rect.width;
                             self.state.predefined_texts[data_id]['value']['width_percent'] = (event.rect.width / event.target.parentElement.clientWidth) * 100;
 
                             //Also update the X and Y Values as they are also effected by the width
-                            self.state.predefined_texts[data_id]['value']['screen_size'] = screen_size;
                             self.state.predefined_texts[data_id]['value']['X_coord_percent'] = valueX;
                             self.state.predefined_texts[data_id]['value']['width_percent'] = (event.rect.width / event.target.parentElement.clientWidth) * 100;
                             self.state.predefined_texts[data_id]['value']['Y_coord_percent'] = valueY;
@@ -137,11 +131,13 @@ elem.addEventListener('paste', function(e) {
                             var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
                             let data_id = target.getAttribute('data-id')
 
-                            const valueX = (x / event.target.parentElement.clientWidth) * 100;
+                            //const valueX = (x / event.target.parentElement.clientWidth) * 100;
+                            //const valueY = (y / event.target.parentElement.clientHeight) * 100;
+
+                            const valueX = (x / event.target.parentElement.scrollWidth) * 100;
+                            console.log(event.target.parentElement.clientHeight);
                             const valueY = (y / event.target.parentElement.clientHeight) * 100;
-                            const screen_size = {height:window.innerHeight,width:window.innerWidth}
                           if(self.state.predefined_texts[data_id]){
-                            self.state.predefined_texts[data_id]['value']['screen_size'] = screen_size;
                             self.state.predefined_texts[data_id]['value']['X_coord_percent'] = valueX;
                             self.state.predefined_texts[data_id]['value']['width_percent'] = (event.rect.width / event.target.parentElement.clientWidth) * 100;
                             self.state.predefined_texts[data_id]['value']['Y_coord_percent'] = valueY;
@@ -174,12 +170,19 @@ elem.addEventListener('paste', function(e) {
         }
 }
     " id="{{ $img_id }}">
-        <h1 class="text-center font-semibold text-3xl my-4">Editing PDF Page</h1>
         @if (count($getData()) > 0)
-            <div id="editor-pdf" style="position:relative;">
+        <h1 class="text-center font-semibold text-3xl my-4">Editing PDF Page # {{$getData()['page_number']+1}}</h1>
+
+          @php
+        $width = pt2px(json_decode($getData()['dimensions'],true)['width']);
+        $height = pt2px(json_decode($getData()['dimensions'],true)['height']);
+        @endphp
+            <div id="editor-pdf" style="position:relative;overflow:auto;">
+              <div style="width:{{$width}}px;height:{{$height}}px;margin:0 auto">
                 @foreach ($getData()['predefined_texts'] as $key => $item)
                     <div style="
   @php
+
 $text_align = 'right';
     if($item['value']['text_align'] === 'C'){
       $text_align = "center";
@@ -198,21 +201,23 @@ $text_align = 'right';
   text-align:{{ $text_align }};
   position: absolute;
   direction:rtl;
-  padding-top:.1rem;
   font-family:{{$item['value']['font_face']}};
-  padding-bottom:.1rem;
   transform:translate({{ $item['value']['X_coord'] }}px,{{ $item['value']['Y_coord'] }}px)
-              "
+  "
                         contenteditable="true"
                         data-x={{$item['value']['X_coord']}}
-
                         data-font="{{$item['value']['font_face']}}"
                         data-y={{ $item['value']['Y_coord'] }}
                         class="draggable-element-{{$img_id}}"  data-id="{{ $key }}" >
                         {!! $item['value']['text'] !!}
                     </div>
                 @endforeach
-                <img draggable="false" src="{{ $getData()['page'] }}" />
+                <img draggable="false" style="
+width:{{$width}}px;
+height:{{$height}}px;
+max-width:none;"
+src="{{ $getData()['page'] }}" />
+            </div>
             </div>
         @endif
     </div>

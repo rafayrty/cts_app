@@ -10,8 +10,7 @@ class HandlePageDedicationUpdated
     {
         if ($get('document') != '' && $get('../../pdf_info') != '') {
             $json_pdfs = json_decode($get('../../pdf_info'), true);
-            $key = array_search($get('document'), array_column($json_pdfs, 'filename'));
-            $json_pdfs[$key]['type'] = $state;
+            $search_key = $this->searchkey($json_pdfs, $get('document'));
             $img_page = (int) $get('page');
 
             $repeater_fields = $get('dedication_texts');
@@ -22,8 +21,20 @@ class HandlePageDedicationUpdated
             $set('image',
                 [
                     'dedication_texts' => $new_fields,
-                    'page' => asset($json_pdfs[0]['pdf'][$img_page]),
+                    'dimensions' => $json_pdfs[$search_key]['dimensions'],
+                    'page' => asset($json_pdfs[$search_key]['pdf'][$img_page]),
+                    'page_number' => $get('page'),
                 ]);
+        }
+    }
+
+    public function searchkey($array, $search)
+    {
+        $key = null;
+        foreach ($array as $key => $value) {
+            if ($value['name'] == $search) {
+                return $key;
+            }
         }
     }
 }

@@ -37,3 +37,16 @@ if (! function_exists('search_key')) {
         }
     }
 }
+
+if (! function_exists('pt2px')) {
+    /**
+     * Convert pt to px
+     *
+     * @param $points,$dpi the dpi
+     * @return string
+     */
+    function pt2px($points, $dpi = 96)
+    {
+        return $points * $dpi / 72;
+    }
+}
