@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\OrderProcessRequest;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -33,7 +34,7 @@ class OrdersController extends Controller
                 'order_numeric_id' => 1000 + $increment,
                 'address' => $request->address,
                 'address_id' => $request->address['id'],
-                'customer_id' => $request->user()->id,
+                'user_id' => $request->user()->id,
                 'discount_total' => $request->discount_total,
                 'sub_total' => $request->subtotal,
                 'shipping' => 0,
@@ -47,18 +48,24 @@ class OrdersController extends Controller
             foreach ($order_items as $item) {
                 $barcode_path = $this->barcode_generator($order->order_numeric_id, $item['id']);
 
+                //Update product sold
+                $prd = Product::find($item['id']);
+                $prd = $prd->update(['sold_amount' => $prd->sold_amount + 1]);
+
                 OrderItem::create([
                     'order_id' => $order->id,
                     'barcode_number' => $order->id.'-'.$item['id'],
                     'barcode_path' => $barcode_path,
                     'product_info' => $item,
                     'product_id' => $item['id'],
+                    'gender' => $item['gender'],
                     'name' => $item['product_name'],
                     'image' => $item['image'],
                     'discount_total' => 0,
                     'price' => $item['price'],
                     'total' => $item['total'],
                 ]);
+
             }
 
             DB::commit();

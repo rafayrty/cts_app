@@ -18,7 +18,7 @@ class GetFontsStylesheetAction
             $css .= "
         @font-face{
             font-family: '".$font->font_name."';
-            src: url('".$font->attatchment."');
+            src: url('".public_path($font->attatchment)."');
         }
       ";
         }

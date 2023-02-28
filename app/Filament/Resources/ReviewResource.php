@@ -3,19 +3,16 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReviewResource\Pages;
+use App\Models\Product;
 use App\Models\Review;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Select;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Select;
-use App\Models\Product;
-use App\Models\User;
 
 class ReviewResource extends Resource
 {
@@ -27,6 +24,7 @@ class ReviewResource extends Resource
     {
         return static::getModel()::count();
     }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -48,7 +46,7 @@ class ReviewResource extends Resource
                         ->maxValue(5)
                         ->minValue(1)
                         ->required(),
-                    Forms\Components\Toggle::make('status')->label("Published")
+                    Forms\Components\Toggle::make('status')->label('Published')
                         ->required(),
                 ]),
             ]);

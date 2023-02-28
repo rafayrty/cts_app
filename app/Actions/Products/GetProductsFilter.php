@@ -24,6 +24,18 @@ class GetProductsFilter
             $products->whereBetween('price', [$request->min_price, $request->max_price]);
         }
 
+        if ($request->sort && $request->sort != '') {
+            if ($request->sort == 'high-to-low') {
+                $products->orderBy('price', 'DESC');
+            }
+            if ($request->sort == 'low-to-high') {
+                $products->orderBy('price', 'ASC');
+            }
+            if ($request->sort == 'most-popular') {
+                $products->orderBy('sold_amount', 'DESC');
+            }
+        }
+
         return $products->paginate(12);
     }
 }

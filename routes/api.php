@@ -33,14 +33,18 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     //Address Routes
     Route::resource('address', AddressController::class);
     Route::get('/address', [AddressController::class, 'index']);
-    Route::post('/review/{product_id}', [ReviewController::class, 'index']);
-    Route::delete('/review/{id}', [ReviewController::class, 'index']);
 
-    //Route::post('/wishlist/{product_id}', [WishListController::class, 'add_wishlist'])->name('wishlist.add-wishlist');
-    //Route::delete('/wishlist/{wishlist_id}', [WishListController::class, 'remove_wishlist'])->name('wishlist.remove-wishlist');
-    //Route::get('/wishlist', [WishListController::class, 'get_wishlist'])->name('wishlist.get-wishlist');
+    Route::post('/review/{product_id}', [ReviewController::class, 'add_review']);
+    Route::get('/review/{id}', [ReviewController::class, 'edit_review']);
+    Route::delete('/review/{id}', [ReviewController::class, 'delete_review']);
+    Route::put('/review/{id}', [ReviewController::class, 'update_review']);
+
+    Route::post('/wishlist/{product_id}', [WishListController::class, 'add_wishlist'])->name('wishlist.add-wishlist');
+    Route::delete('/wishlist/{product_id}', [WishListController::class, 'remove_wishlist'])->name('wishlist.remove-wishlist');
+    Route::get('/wishlist', [WishListController::class, 'get_wishlist'])->name('wishlist.get-wishlist');
 });
 
+Route::get('/wishlist/check_in_wishlist/{product_id}', [WishListController::class, 'check_in_wishlist'])->name('wishlist.check-in-wishlist');
 /*
 |--------------------------------------------------------------------------
 | Products Routes
@@ -48,6 +52,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 */
 Route::get('/products/most-sold-products', [ProductsController::class, 'get_most_sold_products'])->name('products.most-sold-products');
 Route::get('/products/get-featured-products', [ProductsController::class, 'get_featured_products'])->name('products.featured-products');
+Route::get('/products/get-related-products/{producT_id}/{category_id}', [ProductsController::class, 'get_related_products'])->name('products.related-products');
 Route::get('/products/get-product-slugs', [ProductsController::class, 'get_product_slugs'])->name('products.get-product-slugs');
 Route::get('/products/get-product-attribute-options/{id}/{limit}', [ProductsController::class, 'get_product_attribute_options'])->name('products.get-product-attribute-options');
 Route::get('/products/attributes/get-all-attributes', [AttributesController::class, 'get_all_attributes'])->name('attributes.get-all-attributes');
@@ -63,7 +68,8 @@ Route::get('/categories/get-all-categories', [CategoriesController::class, 'get_
 Route::get('/documents/product/{slug}', [PersonalizationController::class, 'get_document_product_slug'])->name('documents.get-document-product-slug');
 Route::get('/documents/{slug}', [PersonalizationController::class, 'get_document_info'])->name('documents.get-document-info');
 
-Route::get('/review/{id}', [ReviewsController::class, 'get_product_reviews'])->name('review-');
+//Get Reviews
+Route::get('/review/{id}', [ReviewController::class, 'get_product_reviews'])->name('review.get-product-reviews');
 /*
 |--------------------------------------------------------------------------
 | Auth Routes
@@ -76,7 +82,7 @@ Route::name('auth.')->group(function () {
     Route::post('resend', [AuthController::class, 'resend'])->name('resend');
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-    Route::post('forgot', [ForgotPasswordController::class, 'forgotPassword'])->name('ForgotPassword');
+    //Route::post('forgot', [ForgotPasswordController::class, 'forgotPassword'])->name('ForgotPassword');
 
     //Order Routes
     //Checkout

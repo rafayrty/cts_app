@@ -30,18 +30,17 @@ class PersonalizationController extends Controller
        $pages_array = [];
        foreach ($pages as  &$page) {
            foreach ($page['image']['predefined_texts'] as &$page_data) {
-               $page_data['value']['text'] = str_replace('&nbsp;', ' ', strip_tags(str_replace('</div>', "\n ", str_replace('<div>', "\n ", trim(preg_replace('/\s\s+/', ' ', str_replace('{basmti}', $replace_name, $page_data['value']['text'])))))));
+               $page_data['value']['text'] =trim(str_replace('&nbsp;', ' ', str_replace('{basmti}', $replace_name, $page_data['value']['text'])));
                $page_data = $page_data['value'];
            }
            if ($page['document'] == $document->name) {
                $pages_array[] = ['page' => $page['page'], 'predefined_texts' => $page['image']['predefined_texts']];
            }
        }
-
        $dedications_array = [];
        foreach ($dedications as  &$dedication) {
            foreach ($dedication['image']['dedication_texts'] as &$dedication_data) {
-               $dedication_data['value']['text'] = str_replace('</div>', " \n", str_replace('<div>', " \n", trim(preg_replace('/\s\s+/', ' ', str_replace('{basmti}', $replace_name, $dedication_data['value']['text'])))));
+               $dedication_data['value']['text'] = trim(str_replace('{basmti}', $replace_name, $dedication_data['value']['text']));
                $dedication_data = $dedication_data['value'];
            }
            if ($dedication['document'] == $document->name) {

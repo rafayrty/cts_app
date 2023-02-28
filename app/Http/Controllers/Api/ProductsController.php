@@ -29,6 +29,13 @@ class ProductsController extends Controller
         return Product::all()->pluck('slug');
     }
 
+    public function get_related_products($product_id, $category_id)
+    {
+        return Product::whereHas('category', function ($query) use ($category_id) {
+            $query->where('category_id', $category_id);
+        })->where('id', '!=', $product_id)->get();
+    }
+
     public function get_products_filter(Request $request)
     {
         return ($this->getProductsFilter)($request);
@@ -36,7 +43,9 @@ class ProductsController extends Controller
 
     public function get_product($slug)
     {
-        return Product::where('slug', $slug)->get()->first();
+        $product = Product::where('slug', $slug)->get()->first();
+
+        return $product;
     }
 
     public function get_product_covers($id)

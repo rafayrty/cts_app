@@ -24,8 +24,8 @@ class ReviewRequest extends FormRequest
     public function rules()
     {
         return [
-            'review'=>'required',
-            'star'=>'numeric|required|digits_between:1,5'
+            'review' => 'required|max:280',
+            'stars' => 'numeric|required|min:1|max:5',
         ];
     }
 }

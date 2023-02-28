@@ -143,7 +143,8 @@ return [
         'path' => app_path('Filament/Widgets'),
         'register' => [
             Widgets\AccountWidget::class,
-            //App\Filament\Resources\UserResource\Widgets\UsersOverview::class,
+            App\Filament\Resources\UserResource\Widgets\UsersOverview::class,
+            App\Filament\Resources\OrderResource\Widgets\OrdersChart::class,
             //Widgets\FilamentInfoWidget::class,
         ],
     ],

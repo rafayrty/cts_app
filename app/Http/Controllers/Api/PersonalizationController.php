@@ -38,11 +38,10 @@ class PersonalizationController extends Controller
         }
         //Get Product Documents
         $gender = request()->gender;
-        $type = request()->type;
         $name = request()->name == '' ? $product->replace_name : request()->name;
         $document = null;
 
-        if ($gender == '' || $type == '' || $name == '') {
+        if ($gender == '' || $name == '') {
             abort(404);
         }
 
@@ -56,14 +55,19 @@ class PersonalizationController extends Controller
 
         $documents = $product->getMaleDocument();
         $found_document = null;
+        $found_cover = null;
         //Find Type of the document
         foreach ($documents as $document) {
-            if ($document->type == (int) $type) {
+            if ($document->type == 2) {
                 $found_document = $document;
+            }
+            if ($document->type == 1) {
+                $found_cover = $document;
             }
         }
         //Get Pages from Product
         $document = $found_document;
+        $cover = $found_cover;
         $product = $found_document->product;
 
         if (! $product) {
@@ -71,21 +75,49 @@ class PersonalizationController extends Controller
         }
 
         $pages = $product->pagesParsed;
+        $cover_pages = $product->pagesParsed;
         $dedications = $product->dedicationsParsed;
+        $cover_dedications = $product->dedicationsParsed;
 
         $replace_name = $name;
         //Filtered Pages
         $filtered_pages = [];
         $filtered_dedications = [];
+        $filtered_cover_pages = [];
+        $filtered_cover_dedications = [];
+
         foreach ($pages as $page) {
             if ($page['document'] == $document->name) {
-                $filtered_pages[] = ['page' => $page['page'], 'image' => $page['image']['page'], 'dimensions' => $page['image']['dimensions'], 'predefined_texts' => $page['image']['predefined_texts']];
+                $filtered_pages[] = [
+                    'page' => $page['page'],
+                    'image' => $page['image']['page'],
+                    'dimensions' => $page['image']['dimensions'],
+                    'predefined_texts' => $page['image']['predefined_texts'],
+                ];
             }
         }
 
+        //Filtering Cover Pages
+        foreach ($cover_pages as $cover_page) {
+            if ($cover_page['document'] == $cover->name) {
+                $filtered_cover_pages[] = [
+                    'page' => $cover_page['page'],
+                    'image' => $cover_page['image']['page'],
+                    'dimensions' => $cover_page['image']['dimensions'],
+                    'predefined_texts' => $cover_page['image']['predefined_texts'],
+                ];
+            }
+        }
+        //Filtering Dedications
         foreach ($dedications as $dedication) {
             if ($dedication['document'] == $document->name) {
                 $filtered_dedications[] = ['page' => $dedication['page'], 'image' => $dedication['image']['page'], 'dimensions' => $dedication['image']['dimensions'], 'dedication_texts' => $dedication['image']['dedication_texts']];
+            }
+        }
+        //Filtering Cover Dedications
+        foreach ($cover_dedications as $cover_dedication) {
+            if ($cover_dedication['document'] == $document->name) {
+                $filtered_cover_dedications[] = ['page' => $cover_dedication['page'], 'image' => $cover_dedication['image']['page'], 'dimensions' => $cover_dedication['image']['dimensions'], 'dedication_texts' => $cover_dedication['image']['dedication_texts']];
             }
         }
 
@@ -106,18 +138,31 @@ class PersonalizationController extends Controller
                 }
             }
         }
-
         //Filter pdfinfo
         $pdf_info = json_decode($product->pdf_info, true);
         $found_pdf = null;
         foreach ($pdf_info as $pdf) {
-            if ($pdf['name'] == $document->name) {
+            if ($pdf['name'] == $found_document->name) {
                 $found_pdf = $pdf;
             }
         }
+
+        //Filter pdfinfo
+        $pdf_info = json_decode($product->pdf_info, true);
+        $found_pdf_cover = null;
+        foreach ($pdf_info as $pdf) {
+            if ($pdf['name'] == $found_cover->name) {
+                $found_pdf_cover = $pdf;
+            }
+        }
         //Replace Names
-        return ['pages' => $found_pdf, 'pages_predefined_texts' => $filtered_pages];
-        //return ['pages' => $filtered_pages, 'dedications' => $filtered_dedications];
+        return [
+            'pages' => $found_pdf,
+            'cover_pages' => $found_pdf_cover,
+            'pages_predefined_texts' => $filtered_pages,
+            'pages_dedication_texts' => $filtered_dedications,
+            'cover_pages_predefined_texts' => $filtered_cover_dedications,
+        ];
     }
 
     public function get_fonts()

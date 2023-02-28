@@ -11,6 +11,8 @@ class Review extends Model
 
     protected $guarded = [];
 
+    protected $appends = ['profile_image', 'name'];
+
     /**
      * Get the product for the review.
      */
@@ -25,5 +27,15 @@ class Review extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getNameAttribute()
+    {
+        return $this->user->first_name.' '.$this->user->last_name;
+    }
+
+    public function getProfileImageAttribute()
+    {
+        return 'https://ui-avatars.com/api/?name='.$this->user->first_name.' '.$this->user->last_name;
     }
 }

@@ -8,29 +8,60 @@ use App\Models\Review;
 
 class ReviewController extends Controller
 {
+    public function get_product_reviews($product_id)
+    {
+        $review = Review::where('product_id', $product_id)->where('status', true)->get();
 
-    public function get_product_reviews($product_id){
-      $review = Review::where('product_id',$product_id)->get();
-
-      return $review;
+        return $review;
     }
 
-    public function add_review(ReviewRequest $request,$product_id){
+    public function add_review(ReviewRequest $request, $product_id)
+    {
         $review = Review::create([
-          'product_id'=>$product_id,
-          'user_id'=>$request->user()->id,
-          'review'=>$request->review,
-          'star'=>$request->star,
+            'product_id' => $product_id,
+            'user_id' => $request->user()->id,
+            'review' => $request->review,
+            'stars' => $request->stars,
         ]);
 
-      return $review;
+        return $review;
     }
 
-    public function delete_review($id){
+    /**
+     * Delete the review
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function delete_review($id)
+    {
+        $review = Review::findOrFail($id)->where('user_id', request()->user()->id)->get();
 
-      $review = Review::findOrFail($id)->where('user_id',request()->user()->id)->get();
+        Review::findOrFail($id)->delete();
 
-      return $review;
+        return $review;
     }
 
+    public function edit_review($id)
+    {
+        $review = Review::findOrFail($id);
+
+        if ($review->user_id != request()->user()->id) {
+            abort(404);
+        }
+
+        return $review;
+    }
+
+    public function update_review(ReviewRequest $request, $id)
+    {
+        $review = Review::findOrFail($id);
+
+        $review->update([
+            'review' => $request->review,
+            'stars' => $request->stars,
+        ]);
+
+        return $review;
+    }
 }

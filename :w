@@ -1,14 +1,22 @@
-<x-forms::field-wrapper :id="$getId()" :label="$getLabel()" :label-sr-only="$isLabelHidden()" :helper-text="$getHelperText()" :hint="$getHint()"
-    :hint-icon="$getHintIcon()" :required="$isRequired()" :state-path="$getStatePath()">
+<x-forms::field-wrapper
+:id="$getId()"
+:label="$getLabel()"
+:label-sr-only="$isLabelHidden()"
+:helper-text="$getHelperText()"
+:hint="$getHint()"
+:hint-icon="$getHintIcon()"
+:required="$isRequired()"
+:state-path="$getStatePath()">
     @php
         $img_id = 'img-' . Str::random(20);
     @endphp
-    <div x-data="{
-    dedication_state: $wire.entangle('{{ $getStatePath() }}').defer,
-
+    <div x-data="
+{
+        state:$wire.entangle('{{ $getStatePath() }}').defer,
         init() {
-        let self = this;
-
+document.querySelector('form').addEventListener('submit', function(event) {
+    event.preventDefault();
+});
    const debounce = (func, delay) => {
         let debounceTimer
         return function() {
@@ -19,20 +27,26 @@
                 = setTimeout(() => func.apply(context, args), delay)
                 }
         }
-        let dedication_elems = document.querySelectorAll('.draggable-element-dedication-{{$img_id}}');
+        let self = this;
+        let elems = document.querySelectorAll('.draggable-element-{{$img_id}}');
+        elems.forEach(elem=>{
 
-        dedication_elems.forEach(elem=>{
 elem.addEventListener('paste', function(e) {
+    // cancel paste
     e.preventDefault();
+
+    // get text representation of clipboard
     var text = (e.originalEvent || e).clipboardData.getData('text/plain');
+
+    // insert text manually
     document.execCommand('insertHTML', false, text);
 });
           elem.addEventListener('input',debounce((e)=>{
             let data_id = e.target.getAttribute('data-id')
-            self.dedication_state.dedication_texts[data_id]['value']['text'] = e.target.innerhtml;
+            self.state.predefined_texts[data_id]['value']['text'] = e.target.innerHTML;
           },1000))
         })
-            interact('.draggable-element-dedication-{{$img_id}}')
+            interact('.draggable-element-{{$img_id}}')
                 .resizable({
                     // resize from all edges and corners
                     edges: { left: true, right: true, bottom: false, top: false },
@@ -57,12 +71,27 @@ elem.addEventListener('paste', function(e) {
                         },
 
                         end(event) {
+
                             var target = event.target
-                          let data_id = target.getAttribute('data-id')
-                          if(self.dedication_state.dedication_texts[data_id]){
-                            //console.log($wire.get(`{{$getStatePath()}}.predefined_texts.${data_id}.value.max_width`))
-                            self.dedication_state.dedication_texts[data_id]['value']['max_width'] = event.rect.width;
-                            self.dedication_state.dedication_texts[data_id]['value']['width_percent'] = (event.rect.width / event.target.parentElement.clientWidth) * 100;
+                            var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
+                            var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
+                            let data_id = target.getAttribute('data-id')
+
+                            const valueX = (x / event.target.parentElement.clientWidth) * 100;
+                            const valueY = (y / event.target.parentElement.clientHeight) * 100;
+                          if(self.state.predefined_texts[data_id]){
+
+                            self.state.predefined_texts[data_id]['value']['max_width'] = event.rect.width;
+                            self.state.predefined_texts[data_id]['value']['width_percent'] = (event.rect.width / event.target.parentElement.clientWidth) * 100;
+
+                            //Also update the X and Y Values as they are also effected by the width
+                            self.state.predefined_texts[data_id]['value']['X_coord_percent'] = valueX;
+                            self.state.predefined_texts[data_id]['value']['width_percent'] = (event.rect.width / event.target.parentElement.clientWidth) * 100;
+                            self.state.predefined_texts[data_id]['value']['Y_coord_percent'] = valueY;
+
+                            self.state.predefined_texts[data_id]['value']['X_coord'] = x;
+                            self.state.predefined_texts[data_id]['value']['Y_coord'] = y;
+                            console.log('should be updatig now')
                           }
                         }
                     },
@@ -102,25 +131,18 @@ elem.addEventListener('paste', function(e) {
                             var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
                             let data_id = target.getAttribute('data-id')
 
-                            const valueX = (x / event.target.parentElement.clientWidth) * 100;
+                            //const valueX = (x / event.target.parentElement.clientWidth) * 100;
+                            //const valueY = (y / event.target.parentElement.clientHeight) * 100;
+
+                            const valueX = (x / event.target.parentElement.scrollWidth) * 100;
+                            console.log(event.target.parentElement.clientHeight);
                             const valueY = (y / event.target.parentElement.clientHeight) * 100;
-                            const screen_size = {height:window.innerHeight,width:window.innerWidth}
-                          console.log(self.dedication_state)
-                          if(self.dedication_state.dedication_texts[data_id]){
-
-                            self.dedication_state.dedication_texts[data_id]['value']['screen_size'] = screen_size;
-                            self.dedication_state.dedication_texts[data_id]['value']['X_coord_percent'] = valueX;
-
-                            self.dedication_state.dedication_texts[data_id]['value']['width_percent'] = (event.rect.width / event.target.parentElement.clientWidth) * 100;
-                            self.dedication_state.dedication_texts[data_id]['value']['Y_coord_percent'] = valueY;
-                            self.dedication_state.dedication_texts[data_id]['value']['X_coord'] = x;
-                            self.dedication_state.dedication_texts[data_id]['value']['Y_coord'] = y;
-//                           self.dedication_state.dedication_texts[data_id]['value']['Y_coord'] = y;
-//                            self.dedication_state.dedication_texts[data_id]['value']['X_coord'] = x;
-
-                            setTimeout(function() {
-                                target.focus()
-                            }, 0);
+                          if(self.state.predefined_texts[data_id]){
+                            self.state.predefined_texts[data_id]['value']['X_coord_percent'] = valueX;
+                            self.state.predefined_texts[data_id]['value']['width_percent'] = (event.rect.width / event.target.parentElement.clientWidth) * 100;
+                            self.state.predefined_texts[data_id]['value']['Y_coord_percent'] = valueY;
+                            self.state.predefined_texts[data_id]['value']['X_coord'] = x;
+                            self.state.predefined_texts[data_id]['value']['Y_coord'] = y;
                           }
                         }
 
@@ -133,11 +155,12 @@ elem.addEventListener('paste', function(e) {
                 var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
                 var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
                 // translate the element
-                //update dedication_state
+                //update state
 
                 const valueX = (x / event.target.parentElement.clientWidth) * 100;
                 const valueY = (y / event.target.parentElement.clientHeight) * 100;
 
+              console.log('moving right now')
                 target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
 
                 // update the posiion attributes
@@ -145,10 +168,8 @@ elem.addEventListener('paste', function(e) {
                 target.setAttribute('data-y', y)
             }
         }
-
-
-
-    }" id="{{ $img_id }}">
+}
+    " id="{{ $img_id }}">
         @if (count($getData()) > 0)
         <h1 class="text-center font-semibold text-3xl my-4">Editing PDF Page # {{$getData()['page_number']+1}}</h1>
           @php
@@ -157,9 +178,10 @@ elem.addEventListener('paste', function(e) {
         @endphp
             <div id="editor-pdf" style="position:relative;overflow:auto;">
               <div style="width:{{$width}}px;height:{{$height}}px;margin:0 auto">
-                @foreach ($getData()['dedication_texts'] as $key => $item)
+                @foreach ($getData()['predefined_texts'] as $key => $item)
                     <div style="
   @php
+
 $text_align = 'right';
     if($item['value']['text_align'] === 'C'){
       $text_align = "center";
@@ -167,36 +189,36 @@ $text_align = 'right';
       $text_align = "left";
     }else{
       $text_align = "right";
-    } @endphp
+ }
+ @endphp
   border:1px solid #000;
   background-color: {{$item['value']['bg_color']}};
   font-size:{{ $item['value']['font_size'] ? $item['value']['font_size'] . 'px' : 'auto' }};
   color:{{ $item['value']['color'] ? $item['value']['color'] : '#000' }};
   width:{{ $item['value']['max_width'] }}px;
   cursor: move;
-  font-family:{{$item['value']['font_face']}};
   text-align:{{ $text_align }};
   position: absolute;
   direction:rtl;
+  font-family:{{$item['value']['font_face']}};
   transform:translate({{ $item['value']['X_coord'] }}px,{{ $item['value']['Y_coord'] }}px)
-              "
-                        contenteditable="true"
-                        data-x={{ $item['value']['X_coord'] }}
+  "
+                        contenteditable="plaintext-only"
+                        data-x={{$item['value']['X_coord']}}
+                        data-font="{{$item['value']['font_face']}}"
                         data-y={{ $item['value']['Y_coord'] }}
-                        class="draggable-element-dedication-{{$img_id}}" data-id="{{ $key }}">{{$item['value']['text']}}
+                        class="draggable-element-{{$img_id}}"  data-id="{{ $key }}" >
+                        {!! $item['value']['text'] !!}
                     </div>
                 @endforeach
-                <img draggable="false"
-style="
+                <img draggable="false" style="
 width:{{$width}}px;
 height:{{$height}}px;
 max-width:none;"
-src="{{ $getData()['page'] }}"
-                />
+src="{{ $getData()['page'] }}" />
             </div>
             </div>
         @endif
     </div>
 </x-forms::field-wrapper>
 <script src="https://unpkg.com/interactjs/dist/interact.min.js"></script>
-

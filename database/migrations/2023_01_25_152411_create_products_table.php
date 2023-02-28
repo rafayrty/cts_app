@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('demo_name')->nullable();
             $table->string('replace_name')->nullable();
             $table->string('product_name');
+            $table->text('excerpt')->nullable();
             $table->string('slug')->unique();
 //            $table->string('name');
             $table->text('description');

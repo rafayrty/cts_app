@@ -20,7 +20,7 @@ class Product extends Model
 
     protected $hidden = ['pagesParsed', 'dedicationsParsed'];
 
-    public $appends = ['pagesParsed', 'dedicationsParsed', 'has_male', 'has_female', 'age_groups'];
+    public $appends = ['pagesParsed', 'dedicationsParsed', 'has_sale', 'front_price', 'has_male', 'has_female', 'age_groups', 'is_in_wishlist'];
 
     public function getpagesParsedAttribute()
     {
@@ -37,6 +37,30 @@ class Product extends Model
         $attributes = $this->product_attributes()->where('product_attribute_id', 2)->get();
 
         return $attributes;
+    }
+
+    /**
+     * Check if the product is discounted
+     */
+    public function getHasSaleAttribute()
+    {
+        if ($this->discount_percentage) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * The Product Price after Calculations
+     */
+    public function getFrontPriceAttribute()
+    {
+        if ($this->discount_percentage) {
+            return $this->price - ($this->discount_percentage / 100) * $this->price;
+        }
+
+        return $this->price;
     }
 
     /**
@@ -113,6 +137,18 @@ class Product extends Model
         return false;
     }
 
+    public function getIsInWishlistAttribute()
+    {
+        if (request()->user()) {
+            $wishlist = Wishlist::where('product_id', $this->id)->where('user_id', request()->user()->id)->get()->count();
+            if ($wishlist > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Get the documents for the product.
      */
@@ -126,7 +162,7 @@ class Product extends Model
      */
     public function wishlist()
     {
-        return $this->belongsTo(Wishlist::class);
+        return $this->hasMany(Wishlist::class);
     }
 
     /**

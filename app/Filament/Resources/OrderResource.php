@@ -12,6 +12,7 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\ViewField;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -25,6 +26,8 @@ class OrderResource extends Resource
     protected static ?string $model = Order::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
+
+    protected static ?string $navigationGroup = 'Order Management';
 
     public function __construct(RegisterService $registerService)
     {
@@ -40,6 +43,10 @@ class OrderResource extends Resource
      {
          return $form
              ->schema([
+              Grid::make(4)->schema([
+                Card::make([
+                  ViewField::make('order_info')->view('forms.order_info')
+                 ])->columnSpan(1),
                  Card::make([
                      Grid::make(3)->schema([
                          TextInput::make('order_numeric_id')->label('Order ID #')->disabled(true),
@@ -77,6 +84,7 @@ class OrderResource extends Resource
                                  TextInput::make('address.apartment_no')->required(),
                                  Textarea::make('address.message')->rows(2),
                              ])->columns(3),
+                 ])->columnSpan(3),
                  ]),
              ]);
      }
@@ -142,6 +150,7 @@ class OrderResource extends Resource
              'index' => Pages\ListOrders::route('/'),
              //'create' => Pages\CreateOrder::route('/create'),
              //'view' => Pages\ViewOrder::route('/{record}'),
+             //'order_scan' => Pages\OrderScan::route('/order_scan'),
              'edit' => Pages\EditOrder::route('/{record}/edit'),
              'generate_pdf' => Pages\GeneratePDFPage::route('/generate_pdf/{id}'),
          ];

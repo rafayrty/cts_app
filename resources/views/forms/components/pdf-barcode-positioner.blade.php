@@ -4,7 +4,7 @@
         $img_id = 'img-' . Str::random(20);
     @endphp
     <div x-data="{
-    barcode_state: $wire.entangle('{{ $getStatePath() }}'),
+    barcode_state: $wire.entangle('{{ $getStatePath() }}').defer,
         init() {
             let self = this;
             interact('.draggable-element-barcode-{{$img_id}}')

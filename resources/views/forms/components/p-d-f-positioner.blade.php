@@ -172,7 +172,6 @@ elem.addEventListener('paste', function(e) {
     " id="{{ $img_id }}">
         @if (count($getData()) > 0)
         <h1 class="text-center font-semibold text-3xl my-4">Editing PDF Page # {{$getData()['page_number']+1}}</h1>
-
           @php
         $width = pt2px(json_decode($getData()['dimensions'],true)['width']);
         $height = pt2px(json_decode($getData()['dimensions'],true)['height']);
@@ -204,13 +203,11 @@ $text_align = 'right';
   font-family:{{$item['value']['font_face']}};
   transform:translate({{ $item['value']['X_coord'] }}px,{{ $item['value']['Y_coord'] }}px)
   "
-                        contenteditable="true"
+                        contenteditable="plaintext-only"
                         data-x={{$item['value']['X_coord']}}
                         data-font="{{$item['value']['font_face']}}"
                         data-y={{ $item['value']['Y_coord'] }}
-                        class="draggable-element-{{$img_id}}"  data-id="{{ $key }}" >
-                        {!! $item['value']['text'] !!}
-                    </div>
+                        class="draggable-element-{{$img_id}}"  data-id="{{ $key }}" >{{$item['value']['text'] }}</div>
                 @endforeach
                 <img draggable="false" style="
 width:{{$width}}px;

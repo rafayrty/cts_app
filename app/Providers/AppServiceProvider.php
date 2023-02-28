@@ -30,9 +30,9 @@ class AppServiceProvider extends ServiceProvider
             Filament::registerViteTheme('resources/css/filament.css');
         });
         Filament::registerNavigationGroups([
+            'Order Management',
             'Product Management',
             'Administration',
         ]);
-        //
     }
 }
