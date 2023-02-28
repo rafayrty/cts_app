@@ -13,14 +13,8 @@ class HandlePageUpdated
             $search_key = $this->searchkey($json_pdfs, $get('document'));
             $img_page = (int) $get('page');
 
-            $repeater_fields = $get('predefined_texts');
-            $new_fields = [];
-            foreach ($repeater_fields as $key => $field) {
-                array_push($new_fields, ['field_key' => $key, 'value' => $field]);
-            }
-            $set('image',
+            $set('pages',
                 [
-                    'predefined_texts' => $new_fields,
                     'dimensions' => $json_pdfs[$search_key]['dimensions'],
                     'page' => asset($json_pdfs[$search_key]['pdf'][$img_page]),
                     'page_number' => $get('page'),

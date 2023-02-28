@@ -181,7 +181,6 @@ elem.addEventListener('paste', function(e) {
                 @foreach ($getData()['predefined_texts'] as $key => $item)
                     <div style="
   @php
-
 $text_align = 'right';
     if($item['value']['text_align'] === 'C'){
       $text_align = "center";

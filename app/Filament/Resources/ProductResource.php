@@ -21,6 +21,7 @@ use App\Filament\Resources\Actions\SetPdfFonts;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Forms\Components\PdfBarcodePositioner;
 use App\Forms\Components\PdfDedicationPositioner;
+use App\Forms\Components\PDFEditor;
 use App\Forms\Components\PDFPositioner;
 use App\Models\Category;
 use App\Models\Dedication;
@@ -199,36 +200,37 @@ class ProductResource extends Resource
                                                  return new HtmlString('<h1 class="bg-gray-200 p-2 rounded-md font-semibold dark:bg-gray-900">Please put this code {basmti} in the position that will be modified by the user</h1>');
                                              }),
                                              //Textarea::make('predefined_text')->rows(5)->extraAttributes(['dir' => 'rtl'])->reactive(),
-                                             Repeater::make('predefined_texts')
-                                               ->schema([
-                                                   Grid::make(9)
-                                                   ->schema([
-                                                       Hidden::make('text')->default('Enter Text')->required(),
-                                                       Hidden::make('X_scroll')->default(0)->reactive(),
-                                                       Hidden::make('width_percent')->default('')->reactive(),
-                                                       Hidden::make('X_coord_percent')->default(0)->reactive(),
-                                                       Hidden::make('Y_coord_percent')->default(0)->reactive(),
-                                                       TextInput::make('X_coord')->default(0)->numeric()->reactive()->required(),
-                                                       TextInput::make('Y_coord')->default(0)->numeric()->reactive()->required(),
-                                                       ColorPicker::make('color')->rgb()->default('rgb(0,0,0)')->reactive()->required(),
-                                                       ColorPicker::make('bg_color')->default('rgba(0,0,0,0)')
-                                                              ->rgba()->reactive()->required(),
-                                                       TextInput::make('max_width')->default(100)
-                                                       ->minValue(100)->suffix('PX')->reactive()->numeric()->required(),
-                                                       TextInput::make('font_size')->default(16)->reactive()->numeric()->required(),
-                                                       Select::make('font_face')
-                                                       ->options(Closure::fromCallable(new SetPdfFonts()))->default('GE-Dinar-Medium')->searchable()->reactive()->required()->columnSpan(2),
-                                                       Select::make('text_align')
-                                                                       ->options([
-                                                                           'C' => 'Center',
-                                                                           'L' => 'Left',
-                                                                           'R' => 'Right',
-                                                                       ])
-                                                             ->default('R')->reactive()->required(),
-                                                   ]),
-                                               ])->minItems(1)->reactive(),
-                                             PDFPositioner::make('image')->set_pdf_data(Closure::fromCallable(new SetPdfDataForPositioner()))
-                                             ->reactive()->afterStateUpdated(Closure::fromCallable(new HandlePdfPositionerUpdate())),
+                                             //Repeater::make('predefined_texts')
+                                               //->schema([
+                                                   //Grid::make(9)
+                                                   //->schema([
+                                                       //Hidden::make('text')->default('Enter Text')->required(),
+                                                       //Hidden::make('X_scroll')->default(0)->reactive(),
+                                                       //Hidden::make('width_percent')->default('')->reactive(),
+                                                       //Hidden::make('X_coord_percent')->default(0)->reactive(),
+                                                       //Hidden::make('Y_coord_percent')->default(0)->reactive(),
+                                                       //TextInput::make('X_coord')->default(0)->numeric()->reactive()->required(),
+                                                       //TextInput::make('Y_coord')->default(0)->numeric()->reactive()->required(),
+                                                       //ColorPicker::make('color')->rgb()->default('rgb(0,0,0)')->reactive()->required(),
+                                                       //ColorPicker::make('bg_color')->default('rgba(0,0,0,0)')
+                                                              //->rgba()->reactive()->required(),
+                                                       //TextInput::make('max_width')->default(100)
+                                                       //->minValue(100)->suffix('PX')->reactive()->numeric()->required(),
+                                                       //TextInput::make('font_size')->default(16)->reactive()->numeric()->required(),
+                                                       //Select::make('font_face')
+                                                       //->options(Closure::fromCallable(new SetPdfFonts()))->default('GE-Dinar-Medium')->searchable()->reactive()->required()->columnSpan(2),
+                                                       //Select::make('text_align')
+                                                                       //->options([
+                                                                           //'C' => 'Center',
+                                                                           //'L' => 'Left',
+                                                                           //'R' => 'Right',
+                                                                       //])
+                                                             //->default('R')->reactive()->required(),
+                                                   //]),
+                                               //])->minItems(1)->reactive(),
+                                             //PDFPositioner::make('image')->set_pdf_data(Closure::fromCallable(new SetPdfDataForPositioner()))
+                                             //->reactive()->afterStateUpdated(Closure::fromCallable(new HandlePdfPositionerUpdate())),
+                                              PDFEditor::make('predefined_texts')->options(Closure::fromCallable(new SetPdfDataForPositioner()))->reactive()
                                          ])->minItems(1)->collapsible()->itemLabel(function (array $state) {
                                              if ($state['page'] && $state['document']) {
                                                  return 'Page #'.($state['page'] + 1).' Of '.$state['document'];
@@ -382,7 +384,7 @@ class ProductResource extends Resource
                                              ->reactive()->afterStateUpdated(Closure::fromCallable(new HandlePdfBarcodePositionerUpdate())),
                                          ])->minItems(1)->collapsible(),
                                 ]),
-                    ]),
+                    ])->startOnStep(2),
                 ]),
             ]);
     }

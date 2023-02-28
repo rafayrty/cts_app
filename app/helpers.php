@@ -50,3 +50,10 @@ if (! function_exists('pt2px')) {
         return $points * $dpi / 72;
     }
 }
+
+function component_exists($class)
+{
+    $manifest = app(\Livewire\LivewireComponentsFinder::class)->getManifest();
+
+    return (bool) array_search($class, $manifest);
+}

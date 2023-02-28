@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\PersonalizationController as ApiPersonalization;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\PersonalizationController;
 use Illuminate\Support\Facades\Route;
+use Livewire\LivewireComponentsFinder;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,9 +17,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
 Route::get('fill-data-pdf', [PDFController::class, 'index']);
 //Route::get('fill-data-pdf-product/{id}', [PersonalizationController::class, 'generatePDF'])->name('preview.pdf');
 Route::get('fill-data-pdf-document/{id}', [PersonalizationController::class, 'generatePDFFromDocument'])->name('preview.pdf');
