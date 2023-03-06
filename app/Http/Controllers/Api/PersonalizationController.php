@@ -53,7 +53,6 @@ class PersonalizationController extends Controller
             $documents = $product->getFemaleDocument();
         }
 
-        $documents = $product->getMaleDocument();
         $found_document = null;
         $found_cover = null;
         //Find Type of the document
@@ -90,9 +89,9 @@ class PersonalizationController extends Controller
             if ($page['document'] == $document->name) {
                 $filtered_pages[] = [
                     'page' => $page['page'],
-                    'image' => $page['image']['page'],
-                    'dimensions' => $page['image']['dimensions'],
-                    'predefined_texts' => $page['image']['predefined_texts'],
+                    'image' => $page['pages']['page'],
+                    'dimensions' => $page['pages']['dimensions'],
+                    'predefined_texts' => $page['pages']['predefined_texts'],
                 ];
             }
         }
@@ -102,42 +101,61 @@ class PersonalizationController extends Controller
             if ($cover_page['document'] == $cover->name) {
                 $filtered_cover_pages[] = [
                     'page' => $cover_page['page'],
-                    'image' => $cover_page['image']['page'],
-                    'dimensions' => $cover_page['image']['dimensions'],
-                    'predefined_texts' => $cover_page['image']['predefined_texts'],
+                    'image' => $cover_page['pages']['page'],
+                    'dimensions' => $cover_page['pages']['dimensions'],
+                    'predefined_texts' => $cover_page['pages']['predefined_texts'],
                 ];
             }
         }
         //Filtering Dedications
         foreach ($dedications as $dedication) {
             if ($dedication['document'] == $document->name) {
-                $filtered_dedications[] = ['page' => $dedication['page'], 'image' => $dedication['image']['page'], 'dimensions' => $dedication['image']['dimensions'], 'dedication_texts' => $dedication['image']['dedication_texts']];
+                $filtered_dedications[] = ['page' => $dedication['page'], 'image' => $dedication['dedications']['page'], 'dimensions' => $dedication['dedications']['dimensions'], 'dedication_texts' => $dedication['dedications']['dedication_texts']];
             }
         }
         //Filtering Cover Dedications
         foreach ($cover_dedications as $cover_dedication) {
             if ($cover_dedication['document'] == $document->name) {
-                $filtered_cover_dedications[] = ['page' => $cover_dedication['page'], 'image' => $cover_dedication['image']['page'], 'dimensions' => $cover_dedication['image']['dimensions'], 'dedication_texts' => $cover_dedication['image']['dedication_texts']];
+                $filtered_cover_dedications[] = ['page' => $cover_dedication['page'], 'image' => $cover_dedication['dedications']['page'], 'dimensions' => $cover_dedication['dedications']['dimensions'], 'dedication_texts' => $cover_dedication['dedications']['dedication_texts']];
             }
         }
 
+        //Replacing {basmti}
         if ($filtered_pages) {
             foreach ($filtered_pages as &$pages) {
                 foreach ($pages['predefined_texts'] as &$page_data) {
-                    $page_data['value']['text'] = trim(preg_replace('/\s\s+/', ' ', str_replace('{basmti}', $replace_name, $page_data['value']['text'])));
-                    $page_data = $page_data['value'];
+                    $page_data['text'] = trim(str_replace('{basmti}', $replace_name, $page_data['text']));
                 }
             }
         }
 
+        //Replacing {basmti}
         if ($filtered_dedications) {
             foreach ($filtered_dedications as &$dedications) {
                 foreach ($dedications['dedication_texts'] as &$dedication_data) {
-                    $dedication_data['value']['text'] = trim(preg_replace('/\s\s+/', ' ', str_replace('{basmti}', $replace_name, $dedication_data['value']['text'])));
-                    $dedication_data = $dedication_data['value'];
+                    $dedication_data['text'] = trim(str_replace('{basmti}', $replace_name, $dedication_data['text']));
                 }
             }
         }
+
+        //Replacing {basmti}
+        if ($filtered_cover_pages) {
+            foreach ($filtered_cover_pages as &$pages) {
+                foreach ($pages['predefined_texts'] as &$page_data) {
+                    $page_data['text'] = trim(str_replace('{basmti}', $replace_name, $page_data['text']));
+                }
+            }
+        }
+
+        //Replacing {basmti}
+        if ($filtered_cover_dedications) {
+            foreach ($filtered_cover_dedications as &$dedications) {
+                foreach ($dedications['dedication_texts'] as &$dedication_data) {
+                    $dedication_data['text'] = trim(str_replace('{basmti}', $replace_name, $dedication_data['text']));
+                }
+            }
+        }
+
         //Filter pdfinfo
         $pdf_info = json_decode($product->pdf_info, true);
         $found_pdf = null;
@@ -161,7 +179,8 @@ class PersonalizationController extends Controller
             'cover_pages' => $found_pdf_cover,
             'pages_predefined_texts' => $filtered_pages,
             'pages_dedication_texts' => $filtered_dedications,
-            'cover_pages_predefined_texts' => $filtered_cover_dedications,
+            'cover_pages_predefined_texts' => $filtered_cover_pages,
+            'cover_pages_dedication_texts' => $filtered_cover_dedications,
         ];
     }
 

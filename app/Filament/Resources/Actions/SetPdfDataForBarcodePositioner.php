@@ -15,16 +15,19 @@ class SetPdfDataForBarcodePositioner
             if ($search_key) {
                 $img_page = (int) $get('page');
 
-                $repeater_fields = $get('barcode_info');
-                $new_fields = [];
-                foreach ($repeater_fields as $key => $field) {
-                    array_push($new_fields, ['field_key' => $key, 'value' => $field]);
+                $barcodes = [];
+
+                if ($get('barcodes')) {
+                    if (array_key_exists('barcodes', $get('barcodes'))) {
+                        $barcodes = $get('barcodes')['barcodes'];
+                    }
                 }
 
                 return [
-                    'barcode_info' => $new_fields,
                     'dimensions' => $json_pdfs[$search_key]['dimensions'],
                     'page' => asset($json_pdfs[$search_key]['pdf'][$img_page]),
+                    'page_number' => $get('page'),
+                    'barcodes' => $barcodes,
                 ];
             }
         }

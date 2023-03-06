@@ -16,7 +16,7 @@ class UsersOverview extends BaseWidget
             Card::make('Total Customers', User::count()),
             Card::make('Total Products', Product::count()),
             Card::make('Total Orders', Order::count()),
-            Card::make('Total Sales', "₪".Order::sum('total')),
+            Card::make('Total Sales', '₪'.Order::sum('total')),
         ];
     }
 }

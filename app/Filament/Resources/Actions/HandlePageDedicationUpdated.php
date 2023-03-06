@@ -13,17 +13,19 @@ class HandlePageDedicationUpdated
             $search_key = $this->searchkey($json_pdfs, $get('document'));
             $img_page = (int) $get('page');
 
-            $repeater_fields = $get('dedication_texts');
-            $new_fields = [];
-            foreach ($repeater_fields as $key => $field) {
-                array_push($new_fields, ['field_key' => $key, 'value' => $field]);
+            $dedication_texts = [];
+            if ($get('dedications')) {
+                if (array_key_exists('dedication_texts', $get('dedications'))) {
+                    $dedication_texts = $get('dedications')['dedication_texts'];
+                }
             }
-            $set('image',
+            $set('dedications',
                 [
-                    'dedication_texts' => $new_fields,
                     'dimensions' => $json_pdfs[$search_key]['dimensions'],
                     'page' => asset($json_pdfs[$search_key]['pdf'][$img_page]),
+                    'type' => $json_pdfs[$search_key]['type'],
                     'page_number' => $get('page'),
+                    'dedication_texts' => $dedication_texts,
                 ]);
         }
     }

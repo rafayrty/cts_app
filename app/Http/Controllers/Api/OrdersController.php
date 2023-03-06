@@ -38,6 +38,7 @@ class OrdersController extends Controller
                 'discount_total' => $request->discount_total,
                 'sub_total' => $request->subtotal,
                 'shipping' => 0,
+                'COUPON' => $request->coupon,
                 'total' => $request->total,
                 'status' => 'PENDING',
                 'payment_status' => 'PENDING',
@@ -45,18 +46,21 @@ class OrdersController extends Controller
 
             $order_items = $request->items;
 
+            $barcodes = [];
             foreach ($order_items as $item) {
-                $barcode_path = $this->barcode_generator($order->order_numeric_id, $item['id']);
-
+                $original_product = Product::findOrFail($item['id']);
+                //Get Documents
+                foreach ($original_product->documents as $document) {
+                    $number = $order->order_numeric_id.'-'.$original_product->id.'-'.$document['id'];
+                    $barcodes[] = ['barcode_path' => $this->barcode_generator($number), 'barcode_number' => $number];
+                }
                 //Update product sold
                 $prd = Product::find($item['id']);
                 $prd = $prd->update(['sold_amount' => $prd->sold_amount + 1]);
 
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'barcode_number' => $order->id.'-'.$item['id'],
-                    'barcode_path' => $barcode_path,
-                    'product_info' => $item,
+                    'product_info' => $original_product,
                     'product_id' => $item['id'],
                     'gender' => $item['gender'],
                     'name' => $item['product_name'],
@@ -65,9 +69,8 @@ class OrdersController extends Controller
                     'price' => $item['price'],
                     'total' => $item['total'],
                 ]);
-
             }
-
+            $order->update(['barcodes' => $barcodes]);
             DB::commit();
         } catch (Throwable $e) {
             throw $e;
@@ -78,11 +81,11 @@ class OrdersController extends Controller
         return $request->all();
     }
 
-      public function barcode_generator($order_id, $product_id)
+      public function barcode_generator($number)
       {
-          $file_name = 'barcodes/'.time().$order_id.'-'.$product_id.'.png';
+          $file_name = 'barcodes/'.time().$number.'.png';
 
-          Storage::disk('public')->put($file_name, base64_decode(DNS2DFacade::getBarcodePNG($order_id.'-'.$product_id, 'PDF417')));
+          Storage::disk('public')->put($file_name, base64_decode(DNS2DFacade::getBarcodePNG($number, 'PDF417')));
 
           return $file_name;
       }

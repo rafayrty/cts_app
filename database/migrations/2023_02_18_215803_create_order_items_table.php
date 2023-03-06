@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->json('product_info')->nullable();
             $table->bigInteger('product_id')->unsigned();
-            $table->json('barcodes')->nullable();
             $table->integer('quantity')->default(1);
             $table->integer('discount_total')->default(0);
             $table->string('gender');

@@ -11,12 +11,13 @@ class Order extends Model
 
     protected $guarded = [];
 
-    protected $casts = ['product_info' => 'array', 'address' => 'array'];
+    protected $casts = ['product_info' => 'array', 'address' => 'array', 'barcodes' => 'array'];
 
     public function items()
     {
         return $this->hasMany(OrderItem::class);
     }
+
     public function user()
     {
         return $this->belongsTo(User::class);

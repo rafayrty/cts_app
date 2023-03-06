@@ -13,17 +13,20 @@ class HandlePageBarcodeUpdated
             $search_key = $this->searchkey($json_pdfs, $get('document'));
             //$json_pdfs[$search_key]['type'] = $state;
             $img_page = (int) $get('page');
-
-            $repeater_fields = $get('barcode_info');
-            $new_fields = [];
-            foreach ($repeater_fields as $key => $field) {
-                array_push($new_fields, ['field_key' => $key, 'value' => $field]);
+            $barcodes = [];
+            if ($get('barcodes')) {
+                if (array_key_exists('barcodes', $get('barcodes'))) {
+                    $barcodes = $get('barcodes')['barcodes'];
+                }
             }
-            $set('image',
+
+            $set('barcodes',
                 [
-                    'barcode_info' => $new_fields,
                     'dimensions' => $json_pdfs[$search_key]['dimensions'],
                     'page' => asset($json_pdfs[$search_key]['pdf'][$img_page]),
+                    'type' => $json_pdfs[$search_key]['type'],
+                    'page_number' => $get('page'),
+                    'barcodes' => $barcodes,
                 ]);
         }
     }

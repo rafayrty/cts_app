@@ -20,8 +20,8 @@ class DatabaseSeeder extends Seeder
             'name' => 'الجنس',
         ];
         $product_attribute = ProductAttribute::create($data);
-        ProductAttributeOption::create(['product_attribute_id' => $product_attribute->id, 'name' => 'ذكر', 'slug' => 'ذكر']);
-        ProductAttributeOption::create(['product_attribute_id' => $product_attribute->id, 'name' => 'انثى', 'slug' => 'انثى']);
+        ProductAttributeOption::create(['product_attribute_id' => $product_attribute->id, 'name' => 'ذكر', 'slug' => 'Male']);
+        ProductAttributeOption::create(['product_attribute_id' => $product_attribute->id, 'name' => 'انثى', 'slug' => 'Female']);
 
         $data = [
             'name' => 'العمر',

@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('coupons', function (Blueprint $table) {
             $table->id();
             $table->integer('min_amount')->default(0.00);
+            $table->integer('discount_percentage')->default(0.00);
             $table->string('coupon_name');
             $table->date('expiry');
             $table->timestamps();

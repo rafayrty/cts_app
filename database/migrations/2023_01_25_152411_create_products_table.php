@@ -32,7 +32,7 @@ return new class extends Migration
             $table->bigInteger('category_id')->unsigned();
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
             $table->integer('price');
-            $table->integer('discount_percentage')->default(0);
+            $table->integer('discount_percentage')->nullable()->default(0);
             $table->json('images');
             $table->timestamps();
         });

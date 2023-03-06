@@ -4,7 +4,6 @@ use App\Http\Controllers\Api\PersonalizationController as ApiPersonalization;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\PersonalizationController;
 use Illuminate\Support\Facades\Route;
-use Livewire\LivewireComponentsFinder;
 
 /*
 |--------------------------------------------------------------------------

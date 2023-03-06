@@ -2,12 +2,11 @@
 
 namespace App\Http\Livewire;
 
-use Livewire\Component;
-
+use Closure;
 //namespace Filament\Forms\Components;
 
-use Closure;
-use \Filament\Support\Concerns\HasExtraAlpineAttributes;
+use Filament\Support\Concerns\HasExtraAlpineAttributes;
+use Livewire\Component;
 
 //class ColorPicker extends \Filament\Forms\Components\Field
 class ColorPicker extends Component
@@ -20,9 +19,10 @@ class ColorPicker extends Component
     protected string $view = 'livewire.color-picker';
 
     public $value = '';
-    protected string | Closure $format = 'hex';
 
-    public function format(string | Closure $format): static
+    protected string|Closure $format = 'hex';
+
+    public function format(string|Closure $format): static
     {
         $this->format = $format;
 

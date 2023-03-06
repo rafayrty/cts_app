@@ -20,6 +20,7 @@ use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
 
 class OrderResource extends Resource
 {
@@ -43,48 +44,48 @@ class OrderResource extends Resource
      {
          return $form
              ->schema([
-              Grid::make(4)->schema([
-                Card::make([
-                  ViewField::make('order_info')->view('forms.order_info')
-                 ])->columnSpan(1),
-                 Card::make([
-                     Grid::make(3)->schema([
-                         TextInput::make('order_numeric_id')->label('Order ID #')->disabled(true),
-                         TextInput::make('total')->disabled(true),
-                         TextInput::make('sub_total')->disabled(true),
-                         TextInput::make('shipping')->disabled(true),
-                         Select::make('status')->options([
-                             'DELIVERED' => 'Delivered',
-                             'PENDING' => 'Pending',
-                             'PROCESSING' => 'Processing',
-                             'DELIVERING' => 'Delivering',
-                             'CANCELLED' => 'Cancelled',
-                         ])->required(),
+                 Grid::make(4)->schema([
+                     Card::make([
+                         ViewField::make('order_info')->view('forms.order_info'),
+                     ])->columnSpan(1),
+                     Card::make([
+                         Grid::make(3)->schema([
+                             TextInput::make('order_numeric_id')->label('Order ID #')->disabled(true),
+                             TextInput::make('total')->disabled(true),
+                             TextInput::make('sub_total')->disabled(true),
+                             TextInput::make('shipping')->disabled(true),
+                             Select::make('status')->options([
+                                 'DELIVERED' => 'Delivered',
+                                 'PENDING' => 'Pending',
+                                 'PROCESSING' => 'Processing',
+                                 'DELIVERING' => 'Delivering',
+                                 'CANCELLED' => 'Cancelled',
+                             ])->required(),
 
-                         Select::make('payment_status')->options([
-                             'FAILED' => 'Failed',
-                             'PENDING' => 'Pending',
-                             'COMPLETED' => 'Completed',
-                         ])->required(),
-                         TextInput::make('coupon')->disabled(true),
-                         TextInput::make('discount_total')->disabled(true),
-                     ]),
-                     Fieldset::make('Address')
-                             ->schema([
-                                 TextInput::make('address.first_name')->required(),
-                                 TextInput::make('address.last_name')->required(),
-                                 TextInput::make('address.email')->required(),
-                                 Grid::make(4)->schema([
-                                     TextInput::make('address.country_code')->required(),
-                                     TextInput::make('address.phone')->required(),
-                                     Select::make('address.country')->searchable()->options(RegisterService::$countries_static_list)->required(),
-                                     TextInput::make('address.state')->required(),
-                                 ]),
-                                 TextInput::make('address.street')->required(),
-                                 TextInput::make('address.apartment_no')->required(),
-                                 Textarea::make('address.message')->rows(2),
-                             ])->columns(3),
-                 ])->columnSpan(3),
+                             Select::make('payment_status')->options([
+                                 'FAILED' => 'Failed',
+                                 'PENDING' => 'Pending',
+                                 'COMPLETED' => 'Completed',
+                             ])->required(),
+                             TextInput::make('coupon')->disabled(true),
+                             TextInput::make('discount_total')->disabled(true),
+                         ]),
+                         Fieldset::make('Address')
+                                 ->schema([
+                                     TextInput::make('address.first_name')->required(),
+                                     TextInput::make('address.last_name')->required(),
+                                     TextInput::make('address.email')->required(),
+                                     Grid::make(4)->schema([
+                                         TextInput::make('address.country_code')->required(),
+                                         TextInput::make('address.phone')->required(),
+                                         Select::make('address.country')->searchable()->options(RegisterService::$countries_static_list)->required(),
+                                         TextInput::make('address.state')->required(),
+                                     ]),
+                                     TextInput::make('address.street')->required(),
+                                     TextInput::make('address.apartment_no')->required(),
+                                     Textarea::make('address.message')->rows(2),
+                                 ])->columns(3),
+                     ])->columnSpan(3),
                  ]),
              ]);
      }
@@ -108,8 +109,12 @@ class OrderResource extends Resource
                  Tables\Columns\TextColumn::make('total')->label('Total')->money('ils')->sortable(),
                  Tables\Columns\TextColumn::make('items.barcode_number')->label('Barcodes')->hidden()->searchable(),
                  Tables\Columns\TextColumn::make('items_count')->counts('items')->sortable(),
+                 //Tables\Columns\TextColumn::make('barcodes')->searchable(),
+                 //->searchable(query:function (Builder $query, string $search): Builder {
+                 //return $query->whereJsonContains('barcodes->*', ['barcode_number' => $search]);
+                 //}),
                  Tables\Columns\TextColumn::make('created_at')
-                     ->dateTime(),
+                      ->dateTime(),
              ])
              ->filters([
                  SelectFilter::make('status')
@@ -120,10 +125,27 @@ class OrderResource extends Resource
                          'DELIVERING' => 'Delivering',
                          'CANCELLED' => 'Cancelled',
                      ]),
-                 Filter::make('barcode')
+
+                 Filter::make('barcodes')
                      ->form([
-                         Forms\Components\TextInput::make('barcode'),
-                     ]),
+                         Forms\Components\TextInput::make('barcodes'),
+                     ])
+                   ->query(function (Builder $query, array $data): Builder {
+                       return $query
+                           ->when(
+                               $data['barcodes'],
+                               function (Builder $query, $data): Builder {
+                                   return $query->whereJsonContains('barcodes', ['barcode_number' => $data]);
+                               }
+                           );
+                   }),
+                 //Filter::make('barcodes')
+                 //->form([
+                 //Forms\Components\TextInput::make('barcodes'),
+                 //])
+                 //->query(function (Builder $query, array $data): Builder {
+                 //return $query->whereJsonContains('barcodes->*', ['barcode_number' => $data])->get();
+                 //}),
              ])
              ->actions([
                  //Tables\Actions\ViewAction::make(),

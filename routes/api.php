@@ -4,11 +4,17 @@ use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\AttributesController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoriesController;
+use App\Http\Controllers\Api\CouponController;
+use App\Http\Controllers\Api\ForgotPasswordController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OrdersController;
 use App\Http\Controllers\Api\PersonalizationController;
 use App\Http\Controllers\Api\ProductsController;
 use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\WishListController;
+use App\Models\FilamentPage as ModelsFilamentPage;
+use Beier\FilamentPages\Models\FilamentPage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -42,9 +48,13 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/wishlist/{product_id}', [WishListController::class, 'add_wishlist'])->name('wishlist.add-wishlist');
     Route::delete('/wishlist/{product_id}', [WishListController::class, 'remove_wishlist'])->name('wishlist.remove-wishlist');
     Route::get('/wishlist', [WishListController::class, 'get_wishlist'])->name('wishlist.get-wishlist');
+
+    //Order Routes
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
 });
 
 Route::get('/wishlist/check_in_wishlist/{product_id}', [WishListController::class, 'check_in_wishlist'])->name('wishlist.check-in-wishlist');
+Route::post('/coupon', [CouponController::class, 'apply'])->name('coupon.apply');
 /*
 |--------------------------------------------------------------------------
 | Products Routes
@@ -70,6 +80,12 @@ Route::get('/documents/{slug}', [PersonalizationController::class, 'get_document
 
 //Get Reviews
 Route::get('/review/{id}', [ReviewController::class, 'get_product_reviews'])->name('review.get-product-reviews');
+
+
+
+//Get Settings
+Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+
 /*
 |--------------------------------------------------------------------------
 | Auth Routes
@@ -78,13 +94,20 @@ Route::get('/review/{id}', [ReviewController::class, 'get_product_reviews'])->na
 
 Route::name('auth.')->group(function () {
     Route::post('register', [AuthController::class, 'register'])->name('register');
-    Route::post('verification', [AuthController::class, 'verification'])->name('verification');
-    Route::post('resend', [AuthController::class, 'resend'])->name('resend');
+    Route::post('verification/phone', [AuthController::class, 'phone_verification'])->name('verification.phone');
+    Route::post('verification/email', [AuthController::class, 'email_verification'])->name('verification.email');
+    Route::post('resend/email', [AuthController::class, 'resend_email'])->name('resend.email');
+    Route::post('resend/phone', [AuthController::class, 'resend_phone'])->name('resend.phone');
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-    //Route::post('forgot', [ForgotPasswordController::class, 'forgotPassword'])->name('ForgotPassword');
+    Route::post('forgot', [ForgotPasswordController::class, 'forgot_password'])->name('forgot.password');
+    Route::post('pass/reset', [ForgotPasswordController::class, 'reset_password'])->name('forgot.reset');
 
     //Order Routes
     //Checkout
     Route::post('orders/process_order', [OrdersController::class, 'process_order'])->name('orders.process-order');
+});
+
+Route::get('/cms/{page_slug}',function($page_slug){
+    return ModelsFilamentPage::with('seo')->where('slug',$page_slug)->get()->first();
 });

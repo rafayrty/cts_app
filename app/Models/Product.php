@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use RalphJSmit\Laravel\SEO\Support\HasSEO;
 
 class Product extends Model
 {
@@ -14,6 +15,7 @@ class Product extends Model
         'dedications' => 'array',
     ];
 
+    use HasSEO;
     use HasFactory;
 
     protected $guarded = [];
@@ -116,7 +118,7 @@ class Product extends Model
         $documents = $this->documents()->get();
         $filtered_documents = collect([]);
         foreach ($documents as $document) {
-            if (in_array('Male', $document->genderParsed)) {
+            if (in_array('Female', $document->genderParsed)) {
                 $filtered_documents->push($document);
             }
         }

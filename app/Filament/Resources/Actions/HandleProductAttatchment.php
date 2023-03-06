@@ -44,8 +44,9 @@ class HandleProductAttatchment
             $img = $pdf->setPage(1)->saveImage($img_path);
             $images = $this->getSplittedImages($img_path);
 
-            $dimensions['width'] = getimagesize($images[0])[0];
-            $dimensions['height'] = getimagesize($images[0])[1];
+            $dimensions['width'] = $dimensions['width'] / 2;
+            //$dimensions['width'] = getimagesize($images[0])[0];
+            //$dimensions['height'] = getimagesize($images[0])[1];
 
             array_push($pdfs, ['filename' => $name, 'dimensions' => json_encode($dimensions), 'type' => $get('type'), 'name' => $get('name'), 'pdf' => $images]);
         } else {

@@ -3,12 +3,22 @@
 namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
+use Filament\Notifications\Notification;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Validation\ValidationException;
 
 class CreateProduct extends CreateRecord
 {
     protected static string $resource = ProductResource::class;
+
+    protected function onValidationError(ValidationException $exception): void
+    {
+        Notification::make()
+            ->title($exception->getMessage())
+            ->danger()
+            ->send();
+    }
 
     protected function getFormActions(): array
     {
@@ -26,7 +36,7 @@ class CreateProduct extends CreateRecord
         return [
             $this->getSubmitFormAction(),
             Action::make('preview_product')
-            ->url('http://localhost:3000/product/preview?'.http_build_query($array), true),
+            ->url('https://frontend.basmti.com/product/preview?'.http_build_query($array), true),
             $this->getCancelFormAction(),
         ];
     }

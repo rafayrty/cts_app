@@ -24,50 +24,30 @@ table td{
 table th{
   text-align:center;
   font-size:.8rem;
+  margin-bottom:.8rem;
+}
+table tr{
   margin-bottom:.5rem;
 }
 </style>
     <div x-data="{
-        state:$wire.{{ $applyStateBindingModifiers('entangle(\'' . $getStatePath() . '\')') }} ,
-        fields:[],
+        state:$wire.entangle('{{ $getStatePath() }}').defer,
         init(){
+          this.setup_editor();
         },
-        img_id:'draggable-element-editor',
-        addNewField() {
-            this.fields.push({
-                X_coord: 0,
-                Y_coord: 0,
-                X_coord_percent: 0,
-                Y_coord_percent: 0,
-                text: 'أدخل النص',
-                color: '#000',
-                bg_color: '#000',
-                max_width: 100,
-                text_align:'R',
-                width_percent: 0,
-                line_height: 1.5,
-                font_size:16,
-                font_face:'GE-Dinar-Medium'
-             });
-
-              this.setup_editor(this.fields.length - 1)
-          },
-          removeField(index) {
-             this.fields.splice(index, 1);
-           },
+        img_id:'draggable-element-editor-{{$img_id}}',
            getAlignment(alignment){
               if(alignment == 'R') return 'right';
               if(alignment == 'C') return 'center';
               if(alignment == 'L') return 'left';
            },
            update_state(){
-            //self.state = {...self.state,predefined_texts:self.fields}
-            console.log(self,'new_state')
+            this.state = {...this.state,predefined_texts:this.fields}
            },
-           setup_editor(index){
+           setup_editor(){
 
             let self = this;
-            interact('.draggable-element-editor')
+            interact('.draggable-element-editor-{{$img_id}}')
                 .resizable({
                     // resize from all edges and corners
                     edges: { left: true, right: true, bottom: false, top: false },
@@ -80,25 +60,26 @@ table th{
 
                             // update the element's style
                             target.style.width = event.rect.width + 'px'
-                            console.log(event.rect.width);
                             // translate when resizing from top or left edges
                             x += event.deltaRect.left
                             y += event.deltaRect.top
 
-                            target.style.transform = 'translate(' + x + 'px,' + y + 'px)'
+                          target.style.transform = 'translate(' + x + 'px,' + y + 'px)'
                           target.setAttribute('data-x', x)
                           target.setAttribute('data-y', y)
                         },
 
                         end(event) {
                             var target = event.target
-                            console.log(event);
                             var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
                             var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
 
-                            const valueX = (x / event.target.parentElement.clientWidth) * 100;
+                            let index = target.getAttribute('data-id')
+                            //If Cover
+                            const multiplier = self.state.type == 1 ? 2 : 1;
+                            const valueX = (x / (event.target.parentElement.clientWidth * multiplier)) * 100;
                             const valueY = (y / event.target.parentElement.clientHeight) * 100;
-                            //console.log(self.fields[index].X_coord,x,'fields')
+                        if(self.fields.hasOwnProperty(index)){
                             self.fields[index].X_coord = x;
                             self.fields[index].Y_coord = y;
 
@@ -108,6 +89,7 @@ table th{
                             self.fields[index].width_percent = (event.rect.width / event.target.parentElement.clientWidth) * 100;
                             self.fields[index].max_width = event.rect.width;
                             self.update_state()
+                        }
                         }
                     },
                     modifiers: [
@@ -144,10 +126,15 @@ table th{
                             var target = event.target
                             var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
                             var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
-                            let data_id = target.getAttribute('data-id')
+                            let index = target.getAttribute('data-id')
 
-                            const valueX = (x / event.target.parentElement.scrollWidth) * 100;
+                            //If Cover
+                            const multiplier = self.state.type == 1 ? 2 : 1;
+                            console.log(event.rect.width,'rect width')
+                            const valueX = (x / (event.target.parentElement.clientWidth * multiplier)) * 100;
                             const valueY = (y / event.target.parentElement.clientHeight) * 100;
+
+                        //if(self.fields.hasOwnProperty(index)){
 
                             self.fields[index].X_coord = x;
                             self.fields[index].Y_coord = y;
@@ -158,6 +145,8 @@ table th{
                             self.fields[index].width_percent = (event.rect.width / event.target.parentElement.clientWidth) * 100;
                             self.fields[index].max_width = event.rect.width;
                             self.update_state()
+                        //}
+
                         }
 
                     }
@@ -171,17 +160,61 @@ table th{
 
                 const valueX = (x / event.target.parentElement.clientWidth) * 100;
                 const valueY = (y / event.target.parentElement.clientHeight) * 100;
-
                 target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
-
                 // update the posiion attributes
                 target.setAttribute('data-x', x)
                 target.setAttribute('data-y', y)
             }
            }
 }">
+<div x-data="{
+        fields:[],
+        init(){
+            if(this.state){
+              if(this.state.predefined_texts){
+                  if(!this.once){
+                  this.state.predefined_texts.forEach((txt)=>{
+                    this.fields.push(txt)
+                  })
+                  }
+                  this.setup_editor();
+              }
+            }
+          },
+        update_text(text,index){
+            this.fields[index].text =text;
+            this.update_state()
+        },
+        addNewField() {
+            this.fields.push({
+                X_coord: 0,
+                Y_coord: 0,
+                X_coord_percent: 0,
+                Y_coord_percent: 0,
+                text: 'أدخل النص',
+                color: '#000',
+                bg_color: '#000',
+                max_width: 100,
+                text_align:'R',
+                width_percent: 0,
+                line_height: 1.5,
+                font_size:16,
+                font_face:'GE-Dinar-Medium'
+             });
+
+              this.setup_editor();
+             //this.fields.forEach((e,index)=>this.setup_editor())
+          },
+          removeField(index) {
+             this.fields.splice(index, 1);
+             this.fields.forEach((e,index)=>this.setup_editor())
+             console.log(index,'index')
+             this.update_state()
+           },
+}">
       <div>
-<table class="table table-bordered align-items-center table-sm">
+        @if (count($getData()) > 0)
+<table class="table table-bordered align-items-center table-sm" >
   <thead class="thead-light">
    <tr>
      <th>#</th>
@@ -202,15 +235,13 @@ table th{
      <tr>
       <td x-text="index + 1"></td>
       <td>
-        <input type="hidden" x-model="field.X__cord_percent"/>
-        <input x-model="field.X_coord" type="number" name="X_coord[]" class="form-control block w-full transition duration-75 rounded-lg shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-inset focus:ring-primary-500 disabled:opacity-70 dark:bg-gray-700 dark:text-white dark:focus:border-primary-500 border-gray-300 dark:border-gray-600">
+        <input x-model="field.X_coord" step="any" type="number" name="X_coord[]" class="form-control block w-full transition duration-75 rounded-lg shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-inset focus:ring-primary-500 disabled:opacity-70 dark:bg-gray-700 dark:text-white dark:focus:border-primary-500 border-gray-300 dark:border-gray-600">
       </td>
       <td>
-        <input type="hidden" x-model="field.Y__cord_percent"/>
-        <input x-model="field.Y_coord"  type="number" name="Y_coord[]" class="form-control block w-full transition duration-75 rounded-lg shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-inset focus:ring-primary-500 disabled:opacity-70 dark:bg-gray-700 dark:text-white dark:focus:border-primary-500 border-gray-300 dark:border-gray-600">
+        <input x-model="field.Y_coord"  step="any" type="number" name="Y_coord[]" class="form-control block w-full transition duration-75 rounded-lg shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-inset focus:ring-primary-500 disabled:opacity-70 dark:bg-gray-700 dark:text-white dark:focus:border-primary-500 border-gray-300 dark:border-gray-600">
       </td>
       <td>
-        <input x-model="field.max_width" type="number" name="max_width[]" class="form-control block w-full transition duration-75 rounded-lg shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-inset focus:ring-primary-500 disabled:opacity-70 dark:bg-gray-700 dark:text-white dark:focus:border-primary-500 border-gray-300 dark:border-gray-600">
+        <input x-model="field.max_width" step="any" type="number" name="max_width[]" class="form-control block w-full transition duration-75 rounded-lg shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-inset focus:ring-primary-500 disabled:opacity-70 dark:bg-gray-700 dark:text-white dark:focus:border-primary-500 border-gray-300 dark:border-gray-600">
       </td>
       <td width="100">
         <input x-model="field.color" type="color" name="color[]" class="form-control block w-full transition duration-75 rounded-lg shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-inset focus:ring-primary-500 disabled:opacity-70 dark:bg-gray-700 dark:text-white dark:focus:border-primary-500 border-gray-300 dark:border-gray-600">
@@ -239,7 +270,7 @@ table th{
         </select>
       </td>
       <td>
-        <input x-model="field.line_height" type="number" name="line_height[]" class="form-control block w-full transition duration-75 rounded-lg shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-inset focus:ring-primary-500 disabled:opacity-70 dark:bg-gray-700 dark:text-white dark:focus:border-primary-500 border-gray-300 dark:border-gray-600">
+        <input x-model="field.line_height" step=".01" type="number" name="line_height[]" class="form-control block w-full transition duration-75 rounded-lg shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-inset focus:ring-primary-500 disabled:opacity-70 dark:bg-gray-700 dark:text-white dark:focus:border-primary-500 border-gray-300 dark:border-gray-600">
       </td>
       <td width="6">
         <button title="Delete" @click="removeField(index)" type="button" class="flex items-center justify-center flex-none w-4 h-4 text-danger-600 transition hover:text-danger-500 dark:text-danger-500 dark:hover:text-danger-400">
@@ -260,17 +291,15 @@ table th{
   @click="addNewField()">+ Add Text</button>
 </div>
       </div>
-      <div x-text="JSON.stringify(state)"></div>
         <!-- If There are Options -->
-        @if (count($getOptions()) > 0)
-            <h1 class="text-center font-semibold text-3xl my-4">Editing PDF Page # {{ $getOptions()['page_number'] + 1 }}
+            <h1 class="text-center font-semibold text-3xl my-4">Editing PDF Page # {{ $getData()['page_number'] + 1 }}
             </h1>
+            <p x-text="JSON.stringify(fields)"></p>
             @php
-                $width = pt2px(json_decode($getOptions()['dimensions'], true)['width']);
-                $height = pt2px(json_decode($getOptions()['dimensions'], true)['height']);
+                $width = pt2px(json_decode($getData()['dimensions'], true)['width']);
+                $height = pt2px(json_decode($getData()['dimensions'], true)['height']);
             @endphp
 
-                      <div x-text="JSON.stringify(fields)"></div>
         <div id="editor-pdf">
                 <div style="width:{{ $width }}px;height:{{ $height }}px;margin:0 auto">
                       {{--  Image Of The Page  --}}
@@ -286,17 +315,24 @@ table th{
                               color:field.color,
                               fontFamily:field.font_face,
                               fontSize:field.font_size+'px',
-                              lineHeight:field.line_height
+                              lineHeight:field.line_height,
+                              width:field.max_width+'px',
+                              transform:`translate(${field.X_coord}px,${field.Y_coord}px)`
                             }"
-                            @input="field.text = $event.target.textContent" x-text="field.text"></div>
+                            :data-id="index"
+                            :data-x="field.X_coord"
+                            :data-y="field.Y_coord"
+                            {{--@input="field.text = $event.target.textContent"--}}
+                            @input.debounce="update_text($event.target.textContent,index)" x-text="field.text"></div>
                         </template>
                     <img draggable="false"
                         style="height:100%;width:100%;max-width:none;"
-                        src="{{ $getOptions()['page'] }}" />
+                        src="{{ $getData()['page'] }}" />
                 </div>
             </div>
         @endif
     </div>
+  </div>
 </x-dynamic-component>
 
 <script src="https://unpkg.com/interactjs/dist/interact.min.js"></script>

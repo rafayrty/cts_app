@@ -35,6 +35,92 @@ class AuthController extends Controller
     }
 
     /**
+     * Resend Email
+     *
+     * @param  Request  $request
+     * @return \App\Models\User
+     */
+    public function resend_email(Request $request)
+    {
+        $this->validate($request, [
+            'email' => 'required|email',
+        ]);
+        $user = User::where('email', $request->email)->get()->first();
+
+        if (! $user) {
+            abort(404);
+        }
+
+        return $this->registerService->verifyEmail(User::findOrFail($user->id));
+    }
+
+    /**
+     * Resend Phone
+     *
+     * @param  Request  $request
+     * @return \App\Models\User
+     */
+    public function resend_phone(Request $request)
+    {
+        $this->validate($request, [
+            'number' => 'required|max:255|min:3',
+            'country_code' => 'required',
+        ]);
+
+        $user = User::where('phone', $request->number)->where('country_code', $request->country_code)->get()->first();
+
+        if (! $user) {
+            abort(404);
+        }
+
+        return $this->registerService->verifyPhone(User::findOrFail($user->id));
+    }
+
+    /**
+     * Register a New User in storage.
+     *
+     * @param  Request  $request
+     * @return \App\Models\User
+     */
+    public function email_validation(Request $request)
+    {
+        return $this->registerService->register($request);
+    }
+
+    /**
+     * Verify a user using email
+     *
+     * @param  Request  $request
+     * @return \App\Models\User
+     */
+    public function email_verification(Request $request)
+    {
+        $this->validate($request, [
+            'email' => 'required|email',
+            'verification_code' => 'required',
+        ]);
+
+        return $this->registerService->email_verification($request);
+    }
+
+    /**
+     * Register a New User in storage.
+     *
+     * @param  \App\Http\Requests\RegisterRequest  $request
+     * @return \App\Models\User
+     */
+    public function phone_verification(RegisterRequest $request)
+    {
+        $this->validate($request, [
+            'number' => 'required|max:255|min:3',
+            'country_code' => 'required',
+            'verifcation_code' => 'required',
+        ]);
+
+        return $this->registerService->phone_verification($request);
+    }
+
+    /**
      * Login a New User.
      *
      * @param  \App\Http\Requests\LoginRequest  $request
@@ -47,6 +133,8 @@ class AuthController extends Controller
 
             if ($login['status'] == 200) {
                 return response()->json($login['user'], 200);
+            } elseif ($login['status'] == 412) {
+                return response()->json(['message' => $login['message'], 'user' => $login['user']], $login['status']);
             }
 
             return response()->json(['message' => $login['message']], $login['status']);

@@ -21,7 +21,8 @@ return new class extends Migration
             $table->string('email');
             $table->string('country');
             $table->string('state');
-            $table->text('address');
+            $table->string('country_code');
+            $table->text('street');
             $table->string('apartment_no')->nullable();
             $table->string('message')->nullable();
             $table->bigInteger('user_id')->unsigned();

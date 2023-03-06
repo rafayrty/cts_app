@@ -8,19 +8,26 @@ use Filament\Forms\Components\Field;
 class PDFEditor extends Field
 {
     protected string $view = 'forms.components.p-d-f-editor';
-    public array | Closure $options = [];
+
+    public array|Closure $data = [];
 
     //Define Model
     // ['predefined_texts'=>[],'page'=>'image_url','page_number'=>'','dimensions'=>'']
-    public function options(array | Closure $options): static
+
+    public function set_pdf_data(array|Closure $data): static
     {
-        $this->options = $options;
+        $this->data = $data;
 
         return $this;
     }
 
-   public function getOptions(): array
+    public function update_pdf_data($data)
     {
-        return $this->evaluate($this->options);
+        dd($data);
     }
+
+   public function getData(): array
+   {
+       return $this->evaluate($this->data);
+   }
 }

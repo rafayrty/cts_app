@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('coupon')->nullable();
             $table->string('status');
             $table->string('payment_status');
+            $table->json('barcodes')->nullable();
             $table->json('payment_info')->nullable();
             $table->timestamps();
         });

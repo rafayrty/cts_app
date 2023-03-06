@@ -6,6 +6,7 @@ use App\Actions\GeneratePDF;
 use App\Actions\GeneratePDFOrder;
 use App\Models\Document;
 use App\Models\Fonts;
+use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -29,22 +30,20 @@ class PersonalizationController extends Controller
        $found = null;
        $pages_array = [];
        foreach ($pages as  &$page) {
-           foreach ($page['image']['predefined_texts'] as &$page_data) {
-               $page_data['value']['text'] =trim(str_replace('&nbsp;', ' ', str_replace('{basmti}', $replace_name, $page_data['value']['text'])));
-               $page_data = $page_data['value'];
+           foreach ($page['pages']['predefined_texts'] as &$page_data) {
+               $page_data['text'] = trim(str_replace('&nbsp;', ' ', str_replace('{basmti}', $replace_name, $page_data['text'])));
            }
            if ($page['document'] == $document->name) {
-               $pages_array[] = ['page' => $page['page'], 'predefined_texts' => $page['image']['predefined_texts']];
+               $pages_array[] = ['page' => $page['page'], 'predefined_texts' => $page['pages']['predefined_texts']];
            }
        }
        $dedications_array = [];
        foreach ($dedications as  &$dedication) {
-           foreach ($dedication['image']['dedication_texts'] as &$dedication_data) {
-               $dedication_data['value']['text'] = trim(str_replace('{basmti}', $replace_name, $dedication_data['value']['text']));
-               $dedication_data = $dedication_data['value'];
+           foreach ($dedication['dedications']['dedication_texts'] as &$dedication_data) {
+               $dedication_data['text'] = trim(str_replace('{basmti}', $replace_name, $dedication_data['text']));
            }
            if ($dedication['document'] == $document->name) {
-               $dedications_array[] = ['page' => $dedication['page'], 'dedication_texts' => $dedication['image']['dedication_texts']];
+               $dedications_array[] = ['page' => $dedication['page'], 'dedication_texts' => $dedication['dedications']['dedication_texts']];
            }
        }
 
@@ -83,32 +82,38 @@ class PersonalizationController extends Controller
        $found = null;
        $pages_array = [];
        $barcodes_array = [];
-       $order_item = OrderItem::find($order_item_id);
-
+       $order_item = OrderItem::find($order_item_id)->order_id;
+       $order = Order::findOrFail($order_item);
+       //Search for the correct barcode
+       $barcode_found = null;
+       foreach ($order->barcodes as $bar) {
+           $parts = explode('-', $bar['barcode_number']);
+           $lastPart = end($parts);
+           if ($lastPart == $id) {
+               $barcode_found = $bar;
+           }
+       }
        foreach ($barcodes as  &$barcode) {
            if ($barcode['document'] == $document->name) {
-               $barcode_array[] = ['barcode_path' => Storage::path('public/'.$order_item->barcode_path), 'page' => $barcode['page'], 'barcode_info' => $barcode['image']['barcode_info'][0]['value']];
+               $barcode_array[] = ['barcode_path' => Storage::path('public/'.$barcode_found['barcode_path']), 'page' => $barcode['page'], 'barcode_info' => $barcode['barcodes']['barcodes'][0]];
            }
        }
 
        foreach ($pages as  &$page) {
-           foreach ($page['image']['predefined_texts'] as &$page_data) {
-               $page_data['value']['text'] = str_replace('&nbsp;', ' ', strip_tags(str_replace('</div>', "\n ", str_replace('<div>', "\n ", trim(preg_replace('/\s\s+/', ' ', str_replace('{basmti}', $replace_name, $page_data['value']['text'])))))));
-               $page_data = $page_data['value'];
+           foreach ($page['pages']['predefined_texts'] as &$page_data) {
+               $page_data['text'] = trim(str_replace('&nbsp;', ' ', str_replace('{basmti}', $replace_name, $page_data['text'])));
            }
            if ($page['document'] == $document->name) {
-               $pages_array[] = ['page' => $page['page'], 'predefined_texts' => $page['image']['predefined_texts']];
+               $pages_array[] = ['page' => $page['page'], 'predefined_texts' => $page['pages']['predefined_texts']];
            }
        }
-
        $dedications_array = [];
        foreach ($dedications as  &$dedication) {
-           foreach ($dedication['image']['dedication_texts'] as &$dedication_data) {
-               $dedication_data['value']['text'] = str_replace('</div>', " \n", str_replace('<div>', " \n", trim(preg_replace('/\s\s+/', ' ', str_replace('{basmti}', $replace_name, $dedication_data['value']['text'])))));
-               $dedication_data = $dedication_data['value'];
+           foreach ($dedication['dedications']['dedication_texts'] as &$dedication_data) {
+               $dedication_data['text'] = trim(str_replace('{basmti}', $replace_name, $dedication_data['text']));
            }
            if ($dedication['document'] == $document->name) {
-               $dedications_array[] = ['page' => $dedication['page'], 'dedication_texts' => $dedication['image']['dedication_texts']];
+               $dedications_array[] = ['page' => $dedication['page'], 'dedication_texts' => $dedication['dedications']['dedication_texts']];
            }
        }
 

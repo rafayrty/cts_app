@@ -30,6 +30,11 @@ class CouponResource extends Resource
                         ->numeric()
                         ->minValue(0)
                         ->required(),
+                    Forms\Components\TextInput::make('discount_percentage')
+                        ->numeric()
+                        ->minValue(1)
+                        ->maxValue(99)
+                        ->required(),
                     Forms\Components\DatePicker::make('expiry')
                         ->required(),
                 ]),

@@ -9,5 +9,5 @@ class Coupon extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['coupon_name', 'min_amount', 'expiry'];
+    protected $fillable = ['coupon_name', 'min_amount', 'expiry', 'discount_percentage'];
 }

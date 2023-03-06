@@ -12,20 +12,21 @@ class SetPdfDataForDedicationPositioner
             $json_pdfs = json_decode($get('../../pdf_info'), true);
             $search_key = $this->searchkey($json_pdfs, $get('document'));
             if ($search_key != '') {
-                //$json_pdfs[$search_key]['type'] = $get('page');
                 $img_page = (int) $get('page');
 
-                $repeater_fields = $get('dedication_texts');
-                $new_fields = [];
-                foreach ($repeater_fields as $key => $field) {
-                    array_push($new_fields, ['field_key' => $key, 'value' => $field]);
+                $dedication_texts = [];
+
+                if ($get('dedications')) {
+                    if (array_key_exists('dedication_texts', $get('dedications'))) {
+                        $dedication_texts = $get('dedications')['dedication_texts'];
+                    }
                 }
 
                 return [
-                    'dedication_texts' => $new_fields,
                     'dimensions' => $json_pdfs[$search_key]['dimensions'],
                     'page' => asset($json_pdfs[$search_key]['pdf'][$img_page]),
                     'page_number' => $get('page'),
+                    'dedication_texts' => $dedication_texts,
                 ];
             }
         }
