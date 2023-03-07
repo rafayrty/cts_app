@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
+use Filament\Forms\Components\Component;
 use Filament\Notifications\Notification;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
@@ -37,6 +38,7 @@ class CreateProduct extends CreateRecord
             $this->getSubmitFormAction(),
             Action::make('preview_product')
             ->url('https://frontend.basmti.com/product/preview?'.http_build_query($array), true),
+            Action::make('settings')->action('openSettingsModal'),
             $this->getCancelFormAction(),
         ];
     }

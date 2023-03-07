@@ -294,7 +294,6 @@ table tr{
         <!-- If There are Options -->
             <h1 class="text-center font-semibold text-3xl my-4">Editing PDF Page # {{ $getData()['page_number'] + 1 }}
             </h1>
-            <p x-text="JSON.stringify(fields)"></p>
             @php
                 $width = pt2px(json_decode($getData()['dimensions'], true)['width']);
                 $height = pt2px(json_decode($getData()['dimensions'], true)['height']);

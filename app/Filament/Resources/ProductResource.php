@@ -14,6 +14,7 @@ use App\Filament\Resources\Actions\MakeSlug;
 use App\Filament\Resources\Actions\SetPdfDataForDedicationPositioner;
 use App\Filament\Resources\Actions\SetPdfDataForPositioner;
 use App\Filament\Resources\ProductResource\Pages;
+use App\Forms\Components\CustomRepeater;
 use App\Forms\Components\PDFBarcodeEditor;
 use App\Forms\Components\PDFDedicationEditor;
 use App\Forms\Components\PDFEditor;
@@ -28,6 +29,7 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -50,11 +52,9 @@ class ProductResource extends Resource
 
     protected static ?string $navigationGroup = 'Product Management';
 
-    protected static $pdfs = [];
 
     public static function form(Form $form): Form
     {
-        $pdfs = self::$pdfs;
 
         return $form
             ->schema([
@@ -63,7 +63,6 @@ class ProductResource extends Resource
                     Wizard::make([
                         Wizard\Step::make('Add Product')
                         ->schema([
-                            SEO::make(),
                             ViewField::make('fonts')->dehydrated(false)->view('forms.components.fonts-loader'),
                             Placeholder::make('Info')
                             ->extraAttributes(['dir' => 'rtl'])
@@ -106,12 +105,14 @@ class ProductResource extends Resource
                                 ->uploadProgressIndicatorPosition('left')
                                 ->directory('uploads')
                                 ->multiple(),
+                            Placeholder::make('Seo')->content(new HtmlString('<h1 class="bg-gray-200 p-2 rounded-md font-semibold dark:bg-gray-900">SEO For Product</h1>')),
+                            SEO::make(),
                         ]),
                         /* Step2 */
                         Wizard\Step::make('Add Documents')
                          ->schema([
                              Hidden::make('pdf_info'),
-                             Repeater::make('Documents')
+                             CustomRepeater::make('Documents')
                              ->relationship('documents')
                                  ->schema([
                                      Grid::make(3)
@@ -142,8 +143,8 @@ class ProductResource extends Resource
                                          ->required()
                                          ->reactive()
                                          ->afterStateUpdated(Closure::fromCallable(new HandleProductAttatchment())),
-                                 ])->minItems(1),
-                         ]),
+                                 ])->minItems(1)
+                        ]),
                         /* Step3 */
                         Wizard\Step::make('Add Content')
                                 ->schema([
@@ -168,7 +169,8 @@ class ProductResource extends Resource
                                               PDFEditor::make('pages')->set_pdf_data(Closure::fromCallable(new SetPdfDataForPositioner()))
                                               ->reactive(),
                                           ])->minItems(1)->collapsible()->itemLabel(function (array $state) {
-                                              if ($state['page'] && $state['document']) {
+                                              //return "Page #";
+                                              if ($state['document']) {
                                                   return 'Page #'.($state['page'] + 1).' Of '.$state['document'];
                                               }
                                           }),
@@ -217,7 +219,7 @@ class ProductResource extends Resource
                                              ->reactive(),
                                          ])->minItems(1)->collapsible(),
                                 ]),
-                    ]),
+                    ])->startOnStep(2),
                 ]),
             ]);
     }

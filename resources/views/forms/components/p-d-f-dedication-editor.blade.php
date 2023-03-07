@@ -34,6 +34,8 @@ table tr{
         state:$wire.entangle('{{ $getStatePath() }}').defer,
         init(){
           this.setup_editor();
+          //$wire.dispatchFormEvent('auto_save')
+          //console.log($wire.dispatchFormEvent)
         },
         img_id:'draggable-element-editor-dedication-{{$img_id}}',
            getAlignment(alignment){
