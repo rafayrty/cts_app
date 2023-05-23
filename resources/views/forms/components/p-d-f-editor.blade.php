@@ -33,6 +33,7 @@ table tr{
     <div x-data="{
         state:$wire.entangle('{{ $getStatePath() }}').defer,
         init(){
+          //console.log(this.state);
           this.setup_editor();
         },
         img_id:'draggable-element-editor-{{$img_id}}',
@@ -76,7 +77,7 @@ table tr{
 
                             let index = target.getAttribute('data-id')
                             //If Cover
-                            const multiplier = self.state.type == 1 ? 2 : 1;
+                            const multiplier = self.state.type != 2 ? 2 : 1;
                             const valueX = (x / (event.target.parentElement.clientWidth * multiplier)) * 100;
                             const valueY = (y / event.target.parentElement.clientHeight) * 100;
                         if(self.fields.hasOwnProperty(index)){
@@ -113,6 +114,7 @@ table tr{
                     modifiers: [
                         interact.modifiers.restrictRect({
                             restriction: 'parent',
+                            //elementRect: { top: -4.4, left: -1.13, bottom: -4.4, right: -1.13 },
                         })
                     ],
                     // enable autoScroll
@@ -129,7 +131,7 @@ table tr{
                             let index = target.getAttribute('data-id')
 
                             //If Cover
-                            const multiplier = self.state.type == 1 ? 2 : 1;
+                            const multiplier = self.state.type != 2 ? 2 : 1;
                             console.log(event.rect.width,'rect width')
                             const valueX = (x / (event.target.parentElement.clientWidth * multiplier)) * 100;
                             const valueY = (y / event.target.parentElement.clientHeight) * 100;
@@ -170,13 +172,27 @@ table tr{
 <div x-data="{
         fields:[],
         init(){
+        let self = this;
+          $watch('state', (value,oldvalue) => {
+          if(value == undefined){
+              self.fields = [];
+              self.setup_editor()
+          }else{
+          console.log('should not be called')
+            value.predefined_texts.forEach(text=>console.log(text))
+            value?.predefined_texts?.forEach((text,index)=>{
+           if(text.font_face != oldvalue.predefined_texts[index].font_face){
+                  self.fields = [];
+                  self.init();
+            }
+          })
+        }
+          })
             if(this.state){
               if(this.state.predefined_texts){
-                  if(!this.once){
                   this.state.predefined_texts.forEach((txt)=>{
                     this.fields.push(txt)
                   })
-                  }
                   this.setup_editor();
               }
             }
@@ -187,8 +203,8 @@ table tr{
         },
         addNewField() {
             this.fields.push({
-                X_coord: 0,
-                Y_coord: 0,
+                X_coord: 114,
+                Y_coord: 114,
                 X_coord_percent: 0,
                 Y_coord_percent: 0,
                 text: 'أدخل النص',
@@ -199,7 +215,7 @@ table tr{
                 width_percent: 0,
                 line_height: 1.5,
                 font_size:16,
-                font_face:'GE-Dinar-Medium'
+                font_face:'GE-Dinar-Medium',
              });
 
               this.setup_editor();
@@ -214,7 +230,7 @@ table tr{
 }">
       <div>
         @if (count($getData()) > 0)
-<table class="table table-bordered align-items-center table-sm" >
+<table class="table table-bordered align-items-center table-sm">
   <thead class="thead-light">
    <tr>
      <th>#</th>
@@ -230,7 +246,8 @@ table tr{
      <th></th>
     </tr>
   </thead>
-  <tbody>
+  <tbody >
+    <template  x-if="fields != undefined">
     <template x-for="(field, index) in fields" :key="index">
      <tr>
       <td x-text="index + 1"></td>
@@ -262,7 +279,7 @@ table tr{
           @endforeach
         </select>
       </td>
-      <td width="150">
+      <td width="120">
         <select x-model="field.text_align" name="text_align[]" class="text-gray-900 block w-full transition duration-75 rounded-lg shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-inset focus:ring-primary-500 disabled:opacity-70 dark:bg-gray-700 dark:text-white dark:focus:border-primary-500 border-gray-300 dark:border-gray-600">
           <option value="R">Right</option>
           <option value="C">Center</option>
@@ -284,6 +301,7 @@ table tr{
       </td>
     </tr>
    </template>
+   </template>
   </tbody>
 </table>
 <div class="add-btn flex flex-col justify-center items-center mt-4">
@@ -302,6 +320,7 @@ table tr{
         <div id="editor-pdf">
                 <div style="width:{{ $width }}px;height:{{ $height }}px;margin:0 auto">
                       {{--  Image Of The Page  --}}
+                        <template x-if="fields != undefined">
                         <template x-for="(field, index) in fields" :key="index">
                           <div
                             :class="img_id"
@@ -322,9 +341,11 @@ table tr{
                             :data-x="field.X_coord"
                             :data-y="field.Y_coord"
                             {{--@input="field.text = $event.target.textContent"--}}
-                            @input.debounce="update_text($event.target.textContent,index)" x-text="field.text"></div>
+                            @input.debounce.3000="update_text($event.target.textContent,index)" x-text="field.text"></div>
                         </template>
+                      </template>
                     <img draggable="false"
+                        loading="lazy"
                         style="height:100%;width:100%;max-width:none;"
                         src="{{ $getData()['page'] }}" />
                 </div>
@@ -334,4 +355,3 @@ table tr{
   </div>
 </x-dynamic-component>
 
-<script src="https://unpkg.com/interactjs/dist/interact.min.js"></script>

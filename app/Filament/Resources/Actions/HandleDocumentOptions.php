@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Actions;
 
 use Closure;
+use Illuminate\Support\Facades\Log;
 
 class HandleDocumentOptions
 {
@@ -11,10 +12,12 @@ class HandleDocumentOptions
         if ($get('../../pdf_info') != '') {
             $array = [];
             $json_pdfs = json_decode($get('../../pdf_info'), true);
-            foreach ($json_pdfs as $pdf) {
-                if ($pdf['name']) {
-                    //$array[] = $pdf['name'];
-                    $array[$pdf['name']] = $pdf['name'];
+            if ($json_pdfs) {
+                foreach ($json_pdfs as $pdf) {
+                    if ($pdf['name']) {
+                        //$array[] = $pdf['name'];
+                        $array[$pdf['name']] = $pdf['name'];
+                    }
                 }
             }
 

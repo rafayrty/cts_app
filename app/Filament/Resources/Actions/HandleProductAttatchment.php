@@ -19,14 +19,7 @@ class HandleProductAttatchment
             unset($pdfs[$key]);
             $set('../../pdf_info', json_encode($pdfs));
         }
-        //$s3_file = Storage::disk('local')->get($state->path());
-        //$s3 = Storage::disk('local');
-        //$filename = 'temp/'.time().'.pdf';
-        //$s3->put($filename, $s3_file);
         $path = Storage::disk('local')->path($state->path());
-        //$pdf = new ConvertToImage($path);
-        //$pdf = new ConvertToImage($state->path());
-        //$pdf = new Pdf($state->path(),'/opt/homebrew/bin/mutool');
         $pdf = new Pdf($state->path(), config('app.mupdf_path'));
         $set('pdf_name', $name);
         if ($get('../../pdf_info') != '') {
@@ -39,8 +32,9 @@ class HandleProductAttatchment
         $set('dimensions', $dimensions);
         $images = [];
 
-        if ($get('type') == 1) {
+        if ($get('type') != 2) {
             $img_path = 'uploads/'.time().$get('type').'-'.'actual-cover'.'.png';
+
             $img = $pdf->setPage(1)->saveImage($img_path);
             $images = $this->getSplittedImages($img_path);
 
@@ -58,14 +52,51 @@ class HandleProductAttatchment
                 $images[] = $img_path;
             }
 
-            array_push($pdfs, ['filename' => $name, 'dimensions' => json_encode($get('dimensions')), 'type' => $get('type'), 'name' => $get('name'), 'pdf' => $images]);
+            //array_push($pdfs, ['filename' => $name, 'dimensions' => json_encode($get('dimensions')), 'type' => $get('type'), 'name' => $get('name'), 'pdf' => $images]);
+            array_push($pdfs, ['filename' => $name, 'dimensions' => json_encode($dimensions), 'type' => $get('type'), 'name' => $get('name'), 'pdf' => $images]);
         }
 
         $set('../../pdf_info', json_encode($pdfs));
+
+
+
+
+        //$pages = $get('../../pages');
+        //$new_pages = [];
+        //$pdf_info = $pdfs;
+        //$documents = [];
+
+        //$found_document = [];
+
+        //foreach($pdfs as $pdf){
+            //if($pdf['name']==$get('name')){
+                 //$found_document = $pdf;
+            //}
+        //}
+
+        //foreach ($pages as $key => $page) {
+            //if ($page['document'] == $get('name')) {
+                //$page['pages']['dimensions'] = $get('dimensions');
+                //$new_pages[] = $page;
+            //}
+         //}
+            ////Splicing the pages
+        ////$new_pages = array_splice($new_pages,0,count($found_document));
+        //$total_pages = count($found_document['pdf']);
+        //$new_updated_pages = [];
+        //foreach($new_pages as $page){
+            //if($page['document']==$found_document['name']){
+                //if($page['pages']['page_number']<$total_pages){
+                        //$new_updated_pages[] = $page;
+                //}
+            //}
+        //}
+        //$set('pages', $new_updated_pages);
+        //$set('pages', $get('pages'));
     }
 
-public function getDimensions($document)
-{
+    public function getDimensions($document)
+    {
     $cmd = config('app.pdf_info_path');
     exec("$cmd \"$document\" 2>&1", $output);
 
@@ -128,8 +159,8 @@ public function getDimensions($document)
 
       // Save the two new images
 
-      $left_path = time().'left.png';
-      $right_path = time().'right.png';
+      $left_path = 'uploads/'.time().'left.png';
+      $right_path = 'uploads/'.time().'right.png';
 
       imagepng($leftImage, $left_path);
       imagepng($rightImage, $right_path);

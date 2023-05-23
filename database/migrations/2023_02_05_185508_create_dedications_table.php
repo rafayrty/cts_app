@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('dedication');
+            $table->string('gender')->nullable();
             $table->timestamps();
         });
     }

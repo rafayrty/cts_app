@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Actions\SendPhoneVerification;
+use App\Actions\SendWelcomeEmail;
 use App\Mail\EmailVerification;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -778,9 +779,10 @@ class RegisterService
         263 => 'ZW',
     ];
 
-    public function __construct(SendPhoneVerification $sendPhoneVerification)
+    public function __construct(SendPhoneVerification $sendPhoneVerification, SendWelcomeEmail $sendWelcomeEmail)
     {
         $this->sendPhoneVerification = $sendPhoneVerification;
+        $this->sendWelcomeEmail = $sendWelcomeEmail;
     }
 
     /**
@@ -801,6 +803,7 @@ class RegisterService
             'country_code' => $request->country_code,
         ]);
 
+        $this->verifyPhone($user);
         return $user;
     }
 
@@ -821,6 +824,8 @@ class RegisterService
         if ($verifier) {
             User::findOrFail($user->id)->update(['verified_at' => now()]);
             DB::table('user_verifications')->where('id', $verifier->id)->delete();
+
+            ($this->sendWelcomeEmail)($user);
 
             return true;
         }
@@ -846,6 +851,8 @@ class RegisterService
             User::findOrFail($user->id)->update(['verified_at' => now()]);
             DB::table('user_verifications')->where('id', $verifier->id)->delete();
 
+            ($this->sendWelcomeEmail)($user);
+
             return true;
         }
         abort(404, 'The Entered code is invalid or expired');
@@ -853,29 +860,27 @@ class RegisterService
 
     /**
      * Send a Verification Email to the User
-     *
-     * @param  \App\Models\User  $user
-     * @return void
      */
     public function verifyPhone(User $user): void
     {
-        //Generate Email Token
+        //Generate Validation Token
         $verification_code = rand(1000, 9999);
-        DB::table('user_verifications')->insert(['user_id' => $user->id, 'type' => 1, 'verification_code' => $verification_code, 'created_at' => now(), 'expiry' => now()->addMinutes(10)]);
+        $expiry_time = now()->addMinutes(10);
+        DB::table('user_verifications')->where('user_id', $user->id)->delete();
+        DB::table('user_verifications')->insert(['user_id' => $user->id, 'type' => 1, 'verification_code' => $verification_code, 'created_at' => now(), 'expiry' => $expiry_time]);
 
         ($this->sendPhoneVerification)($user, $verification_code);
     }
 
     /**
      * Send a Verification Email to the User
-     *
-     * @param  \App\Models\User  $user
-     * @return void
      */
     public function verifyEmail(User $user): void
     {
         // Generate Email Token
         $verification_code = rand(1000, 9999);
+        $expiry_time = now()->addMinutes(10);
+        DB::table('user_verifications')->where('user_id', $user->id)->delete();
         DB::table('user_verifications')->insert(['user_id' => $user->id, 'type' => 2, 'verification_code' => $verification_code, 'created_at' => now(), 'expiry' => now()->addMinutes(10)]);
         Mail::to($user->email)->queue(new EmailVerification($user, $verification_code));
     }

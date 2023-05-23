@@ -43,7 +43,7 @@ table tr{
                 Y_coord: 0,
                 X_coord_percent: 0,
                 Y_coord_percent: 0,
-                max_width: 100,
+                max_width: 120,
                 width_percent: 0,
              });
 
@@ -67,62 +67,6 @@ table tr{
 
             let self = this;
             interact('.draggable-element-editor-{{$img_id}}')
-                .resizable({
-                    // resize from all edges and corners
-                    edges: { left: true, right: true, bottom: false, top: false },
-
-                    listeners: {
-                        move(event) {
-                            var target = event.target
-                            var x = (parseFloat(target.getAttribute('data-x')) || 0)
-                            var y = (parseFloat(target.getAttribute('data-y')) || 0)
-
-                            // update the element's style
-                            target.style.width = event.rect.width + 'px'
-                            // translate when resizing from top or left edges
-                            x += event.deltaRect.left
-                            y += event.deltaRect.top
-
-                            target.style.transform = 'translate(' + x + 'px,' + y + 'px)'
-                          target.setAttribute('data-x', x)
-                          target.setAttribute('data-y', y)
-                        },
-
-                        end(event) {
-                            var target = event.target
-                            var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
-                            var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
-
-                            let index = target.getAttribute('data-id')
-                            //If Cover
-                            const multiplier = self.state.type == 1 ? 2 : 1;
-                            const valueX = (x / (event.target.parentElement.clientWidth * multiplier)) * 100;
-                            const valueY = (y / event.target.parentElement.clientHeight) * 100;
-                              self.fields[index].X_coord = x;
-                              self.fields[index].Y_coord = y;
-
-                              self.fields[index].X_coord_percent = valueX;
-                              self.fields[index].Y_coord_percent = valueY;
-
-                              self.fields[index].width_percent = (event.rect.width / event.target.parentElement.clientWidth) * 100;
-                              self.fields[index].max_width = event.rect.width;
-                              self.update_state()
-                        }
-                    },
-                    modifiers: [
-                        // keep the edges inside the parent
-                        interact.modifiers.restrictEdges({
-                           outer: 'parent'
-                        }),
-
-                        // minimum size
-                        interact.modifiers.restrictSize({
-                           min: { width: 100 }
-                        })
-                    ],
-
-                    inertia: true
-                })
                 .draggable({
                     // enable inertial throwing
                     inertia: true,
@@ -146,7 +90,7 @@ table tr{
                             let index = target.getAttribute('data-id')
 
                             //If Cover
-                            const multiplier = self.state.type == 1 ? 2 : 1;
+                            const multiplier = self.state.type != 2 ? 2 : 1;
                             const valueX = (x / (event.target.parentElement.clientWidth * multiplier)) * 100;
                             const valueY = (y / event.target.parentElement.clientHeight) * 100;
 
@@ -180,16 +124,15 @@ table tr{
             }
            }
 }">
-<div x-data="{        fields:[],
+<div x-data="{
+        fields:[],
         init(){
             if(this.state){
               if(this.state.barcodes){
-                  if(!this.once){
-                  this.state.barcodes.forEach((txt)=>{
+                this.state.barcodes.forEach((txt)=>{
                     this.fields.push(txt)
-                  })
-                  }
-                  this.setup_editor();
+                })
+                this.setup_editor();
               }
             }
           },
@@ -206,7 +149,7 @@ table tr{
                 text: 'أدخل النص',
                 color: '#000',
                 bg_color: '#000',
-                max_width: 100,
+                max_width: 200,
                 text_align:'R',
                 width_percent: 0,
                 line_height: 1.5,
@@ -224,6 +167,8 @@ table tr{
 }">
       <div>
         @if (count($getData()) > 0)
+
+                      <template x-if="fields">
 <table class="table table-bordered align-items-center table-sm" >
   <thead class="thead-light">
    <tr>
@@ -247,6 +192,7 @@ table tr{
       <td>
         <input x-model="field.max_width" step="any" type="number" name="max_width[]" class="form-control block w-full transition duration-75 rounded-lg shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-inset focus:ring-primary-500 disabled:opacity-70 dark:bg-gray-700 dark:text-white dark:focus:border-primary-500 border-gray-300 dark:border-gray-600">
       </td>
+
       <td width="6">
         <button title="Delete" @click="removeField(index)" type="button" class="flex items-center justify-center flex-none w-4 h-4 text-danger-600 transition hover:text-danger-500 dark:text-danger-500 dark:hover:text-danger-400">
             <span class="sr-only">
@@ -260,6 +206,7 @@ table tr{
     </tr>
    </template>
   </tbody>
+  </template>
 </table>
 <div class="add-btn flex flex-col justify-center items-center mt-4">
 <button type="button" class="text-center filament-button filament-button-size-sm inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors focus:outline-none focus:ring-offset-2 focus:ring-2 focus:ring-inset dark:focus:ring-offset-0 min-h-[2rem] px-3 text-sm text-white shadow focus:ring-white border-transparent bg-primary-600 hover:bg-primary-500 focus:bg-primary-700 focus:ring-offset-primary-700"
@@ -278,6 +225,7 @@ table tr{
                 <div style="width:{{ $width }}px;height:{{ $height }}px;margin:0 auto">
                       {{--  Image Of The Page  --}}
 
+                      <template x-if="fields">
                         <template x-for="(field, index) in fields" :key="index">
                           <div
                             :class="img_id"
@@ -295,7 +243,9 @@ table tr{
                               <img src="{{asset('images/barcode.gif')}}"/>
                           </div>
                         </template>
+                      </template>
                     <img draggable="false"
+                        loading="lazy"
                         style="height:100%;width:100%;max-width:none;"
                         src="{{ $getData()['page'] }}" />
                 </div>

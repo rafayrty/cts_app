@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('country_code');
             $table->string('email')->unique();
             $table->timestamp('verified_at')->nullable();
-            $table->boolean('status');
+            $table->boolean('status')->default(false);
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

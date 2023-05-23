@@ -26,14 +26,23 @@ class ProductsController extends Controller
 
     public function get_product_slugs()
     {
-        return Product::all()->pluck('slug');
+        return Product::where('is_published', 1)->get()->pluck('slug');
     }
 
-    public function get_related_products($product_id, $category_id)
+    public function get_related_products($product_id, $category_id,$gender='')
     {
-        return Product::whereHas('category', function ($query) use ($category_id) {
+        $products = Product::whereHas('categories', function ($query) use ($category_id) {
             $query->where('category_id', $category_id);
-        })->where('id', '!=', $product_id)->get();
+        })->where('id', '!=', $product_id);
+
+
+        if($gender!=''){
+            $products->whereHas('product_attributes', function ($q) use ($gender) {
+                    $q->where('slug', $gender);
+            });
+        }
+         $products->where('is_published', 1)->take(8)->get();
+        return $products->get();
     }
 
     public function get_products_filter(Request $request)
@@ -43,7 +52,10 @@ class ProductsController extends Controller
 
     public function get_product($slug)
     {
-        $product = Product::where('slug', $slug)->get()->first();
+        $product = Product::where('slug', $slug)->where('is_published', 1)->with('tags')->get()->first();
+        if (! $product) {
+            abort(404);
+        }
 
         return $product;
     }
@@ -73,3 +85,4 @@ class ProductsController extends Controller
         return ($this->getProductAttributeOptionsAction)($id, $limit);
     }
 }
+

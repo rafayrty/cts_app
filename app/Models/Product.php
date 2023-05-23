@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use GeneaLabs\LaravelModelCaching\Traits\Cachable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use RalphJSmit\Laravel\SEO\Support\HasSEO;
 
 class Product extends Model
 {
+    use Cachable;
+
     protected $casts = [
         'images' => 'array',
         'pages' => 'array',
@@ -17,6 +20,23 @@ class Product extends Model
 
     use HasSEO;
     use HasFactory;
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($model) {
+            clear_cgi_cache();
+        });
+
+        static::updated(function ($model) {
+            clear_cgi_cache();
+        });
+
+        static::deleted(function ($model) {
+            clear_cgi_cache();
+        });
+    }
 
     protected $guarded = [];
 
@@ -59,7 +79,7 @@ class Product extends Model
     public function getFrontPriceAttribute()
     {
         if ($this->discount_percentage) {
-            return $this->price - ($this->discount_percentage / 100) * $this->price;
+            return ceil($this->price - ($this->discount_percentage / 100) * $this->price);
         }
 
         return $this->price;
@@ -167,12 +187,17 @@ class Product extends Model
         return $this->hasMany(Wishlist::class);
     }
 
-    /**
-     * Get the category for the product.
-     */
-    public function category()
+    public function tags()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsToMany(Tags::class);
+    }
+
+    /**
+     * Get the categories for the product.
+     */
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class);
     }
 
     /**
@@ -182,4 +207,41 @@ class Product extends Model
     {
         return $this->hasMany(Review::class);
     }
+
+/**
+ * Scope a query to only exclude specific Columns.
+ *
+ * @author Manojkiran.A <manojkiran10031998@gmail.com>
+ *
+ * @param  \Illuminate\Database\Eloquent\Builder  $query
+ * @return \Illuminate\Database\Eloquent\Builder
+ */
+public function scopeExclude($query, ...$columns)
+{
+    if ($columns !== []) {
+        if (count($columns) !== count($columns, COUNT_RECURSIVE)) {
+            $columns = iterator_to_array(new \RecursiveIteratorIterator(new \RecursiveArrayIterator($columns)));
+        }
+
+        return $query->select(array_diff($this->getTableColumns(), $columns));
+    }
+
+    return $query;
+}
+
+/**
+ * Shows All the columns of the Corresponding Table of Model
+ *
+ * @author Manojkiran.A <manojkiran10031998@gmail.com>
+ * If You need to get all the Columns of the Model Table.
+ * Useful while including the columns in search
+ *
+ * @return array
+ **/
+public function getTableColumns()
+{
+    return \Illuminate\Support\Facades\Cache::rememberForever('MigrMod:'.filemtime(database_path('migrations')).':'.$this->getTable(), function () {
+        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
+    });
+}
 }

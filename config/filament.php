@@ -1,5 +1,10 @@
 <?php
 
+use App\Filament\Widgets\CustomersChart;
+use App\Filament\Widgets\OrdersChart;
+use App\Filament\Widgets\OrderStatusChart;
+use App\Filament\Widgets\PopularProductsChart;
+use App\Filament\Widgets\SalesChart;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Http\Middleware\MirrorConfigToSubpackages;
@@ -144,7 +149,12 @@ return [
         'register' => [
             Widgets\AccountWidget::class,
             App\Filament\Resources\UserResource\Widgets\UsersOverview::class,
-            App\Filament\Resources\OrderResource\Widgets\OrdersChart::class,
+            //App\Filament\Resources\OrderResource\Widgets\OrdersChart::class,
+            SalesChart::class,
+            CustomersChart::class,
+            OrdersChart::class,
+            OrderStatusChart::class,
+            PopularProductsChart::class,
             //Widgets\FilamentInfoWidget::class,
         ],
     ],

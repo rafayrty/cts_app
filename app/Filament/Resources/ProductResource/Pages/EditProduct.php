@@ -14,8 +14,17 @@ class EditProduct extends EditRecord
     protected function getActions(): array
     {
         return [
+            $this->getSaveFormAction(),
             Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function getSaveFormAction(): Action
+    {
+        return Action::make('save')
+              ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+              ->action(fn () => $this->save())
+              ->keyBindings(['command+s', 'ctrl+s']);
     }
 
 protected function getFormActions(): array

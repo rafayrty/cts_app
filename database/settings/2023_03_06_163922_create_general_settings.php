@@ -13,5 +13,7 @@ return new class extends SettingsMigration
         $this->migrator->add('general.email', '');
         $this->migrator->add('general.address', '');
         $this->migrator->add('general.social_medias', '');
+        $this->migrator->add('general.shipping_fee', '');
+        $this->migrator->add('general.faqs', '');
     }
 };

@@ -2,16 +2,14 @@
 
 namespace App\Forms\Components;
 
-use Filament\Forms\Components\Repeater;
-use Filament\Pages\Actions\Action;
-use Filament\Pages\Contracts\HasFormActions;
-
+use Closure;
 use function Filament\Forms\array_move_after;
 use function Filament\Forms\array_move_before;
+use Filament\Forms\Components\Repeater;
 use Illuminate\Support\Str;
-use Livewire\Component;
-class CustomRepeater extends Repeater {
 
+class CustomRepeater extends Repeater
+{
     protected function setUp(): void
     {
         parent::setUp();
@@ -52,11 +50,16 @@ class CustomRepeater extends Repeater {
                     }
 
                     $items = $component->getState();
+                    $livewire = $component->getLivewire();
 
                     unset($items[$uuidToDelete]);
 
                     $livewire = $component->getLivewire();
+
                     data_set($livewire, $statePath, $items);
+
+                    $this->updated_documents($component);
+                    //dd(data_get($livewire,'data.Documents'));
                 },
             ],
             'repeater::cloneItem' => [
@@ -136,6 +139,70 @@ class CustomRepeater extends Repeater {
         $this->mutateDehydratedStateUsing(static function (?array $state): array {
             return array_values($state ?? []);
         });
+    }
+
+
+    public function updated_documents(Repeater $component){
+
+        $livewire = $component->getLivewire();
+
+         $documents = data_get($livewire,'data.Documents');
+         $file_names = [];
+         foreach ($documents as $document) {
+             $file_names[] = $document['pdf_name'];
+         }
+         $pdf_info = json_decode(data_get($livewire,'data.pdf_info'), true);
+
+        if ($pdf_info) {
+            $found_key = null;
+            $new_array = [];
+            $pages = data_get($livewire,'data.pages');
+            $new_pages = [];
+            $dedications = data_get($livewire,'data.dedications');
+            $new_dedications = [];
+            $barcodes = data_get($livewire,'data.barcodes');
+            $new_barcodes = [];
+            foreach ($pdf_info as $pdf_in) {
+                foreach ($documents as $key => $document) {
+                    if (array_key_exists('pdf_name', $document)) {
+                        if ($pdf_in['filename'] == $document['pdf_name']) {
+                            $new_array[] = $pdf_in;
+                        }
+                    }
+                }
+            }
+            if (count($documents) != count($pdf_info)) {
+                foreach($new_array as $document){
+                    foreach ($pages as $key => $page) {
+                        if ($page['document'] == $document['name']) {
+                            $new_pages[$key] = $page;
+                        }
+                    }
+                    data_set($livewire,'data.pages', $new_pages);
+                    foreach ($dedications as $key => $dedication) {
+                        if ($dedication['document'] == $document['name']) {
+                            $new_dedications[$key] = $dedication;
+                        }
+                    }
+
+                    data_set($livewire,'data.dedications', $new_dedications);
+
+                    foreach ($barcodes as $key => $barcode) {
+                        if ($barcode['document'] == $document['name']) {
+                            $new_barcodes[$key] = $barcode;
+                        }
+                    }
+                    data_set($livewire,'data.barcodes', $new_barcodes);
+                }
+                if(count($new_array)==0){
+                    data_set($livewire,'data.pages', []);
+                    data_set($livewire,'data.dedications', []);
+                    data_set($livewire,'data.barcodes', []);
+
+                }
+            }
+            data_set($livewire,'data.pdf_info', (count($new_array) > 0) ? json_encode($new_array) : "");
+        }
     }
 
 }

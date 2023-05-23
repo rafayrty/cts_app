@@ -33,7 +33,7 @@ class ForgotPassword extends Mailable
     {
         return new Envelope(
             from: new Address(config('mail.from.address'), config('mail.from.name')),
-            subject: 'ForgotPassword Request From Basmti',
+            subject: 'Hi, '.$this->user->first__name.' Forgot Password Request From Basmti',
         );
     }
 

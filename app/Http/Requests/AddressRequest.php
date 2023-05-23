@@ -26,13 +26,12 @@ class AddressRequest extends FormRequest
         return [
             'first_name' => 'required|string|max:50',
             'last_name' => 'required|string|max:50',
-            'email' => 'required|email',
             'phone' => 'required',
             'country_code' => 'required',
-            'state' => 'required|string|max:50',
-            'country' => 'required|string|max:50',
-            'street' => 'required|string|max:255',
-            'apartment_no' => 'required|string|max:50',
+            'city' => 'required|string|max:50',
+            'street_name' => 'required|string|max:255',
+            'street_number' => 'required|string|max:255',
+            'home_no' => 'required|string|max:50',
         ];
     }
 }

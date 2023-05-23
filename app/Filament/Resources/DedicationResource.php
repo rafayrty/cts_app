@@ -31,8 +31,12 @@ class DedicationResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->extraAttributes(['dir' => 'rtl'])
                     ->required(),
+                Forms\Components\Radio::make('gender')
+                    ->inlineLabel()
+                    ->options(['Male' => 'Male', 'Female' => 'Female'])->required(),
                 TextArea::make('dedication')
                     ->extraAttributes(['dir' => 'rtl'])
+                    ->maxLength(400)
                     ->rows(10)
                     ->columnSpanFull()
                     ->required(),
@@ -44,6 +48,7 @@ class DedicationResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->limit(20),
+                Tables\Columns\TextColumn::make('gender')->limit(20),
                 Tables\Columns\TextColumn::make('dedication')->limit(45),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime(),

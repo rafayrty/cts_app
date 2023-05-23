@@ -18,7 +18,11 @@ class GeneralSettings extends Settings
 
     public string $about;
 
-    public array | string $social_medias;
+    public array|string $social_medias;
+
+    public array|string $faqs;
+
+    public string $shipping_fee;
 
     public static function group(): string
     {

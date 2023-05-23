@@ -9,9 +9,9 @@ class GetProductsFilter
 {
     public function __invoke(Request $request)
     {
-        $products = Product::whereHas('category', function ($q) use ($request) {
-            if ($request->category) {
-                $q->whereIn('slug', explode(',', $request->category));
+        $products = Product::whereHas('categories', function ($q) use ($request) {
+            if ($request->categories) {
+                $q->whereIn('slug', explode(',', $request->categories));
             }
         })
         ->whereHas('product_attributes', function ($q) use ($request) {
@@ -20,11 +20,17 @@ class GetProductsFilter
             }
         });
 
-        if ($request->min_price && $request->max_price) {
+        if ($request->input('query') != '') {
+            $products->where('product_name', 'like', '%'.$request->input('query').'%');
+        }
+        if ($request->min_price != '' && $request->max_price != '') {
             $products->whereBetween('price', [$request->min_price, $request->max_price]);
         }
 
-        if ($request->sort && $request->sort != '') {
+        //Check if published
+        $products->where('is_published', 1);
+
+        if ($request->sort != '') {
             if ($request->sort == 'high-to-low') {
                 $products->orderBy('price', 'DESC');
             }
@@ -36,6 +42,8 @@ class GetProductsFilter
             }
         }
 
-        return $products->paginate(12);
+        $products->exclude(['pages', 'barcodes', 'dedications', 'pdf_info']);
+
+        return $products->paginate($request->count ?? 6);
     }
 }

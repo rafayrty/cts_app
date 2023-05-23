@@ -1,6 +1,9 @@
 <?php
 
+use App\Filament\FilamentPageTemplates\AboutPage;
+use App\Filament\FilamentPageTemplates\ContactPage;
 use App\Filament\FilamentPageTemplates\HomePage;
+use App\Filament\FilamentPageTemplates\PoliciesPage;
 use App\Filament\Resources\CustomPageResource;
 use App\Models\FilamentPage as ModelsFilamentPage;
 use Beier\FilamentPages\Filament\FilamentPageTemplates\DefaultTemplate;
@@ -95,7 +98,7 @@ return [
             | you should rather change the translation files.
             |
             */
-            'sort' =>1,
+            'sort' => 1,
         ],
     ],
     /*
@@ -111,6 +114,9 @@ return [
     'templates' => [
         DefaultTemplate::class,
         HomePage::class,
+        PoliciesPage::class,
+        AboutPage::class,
+        ContactPage::class,
     ],
 
     /*

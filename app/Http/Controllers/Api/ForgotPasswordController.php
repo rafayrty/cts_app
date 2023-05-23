@@ -21,32 +21,45 @@ class ForgotPasswordController extends Controller
     public function forgot_password(Request $request)
     {
         $this->validate($request, [
-            'identifier' => 'required',
+            'phone' => 'required',
+            'country_code' => 'required',
         ]);
 
-        $user_email = User::where('email', $request->identifier)->get()->first();
-
-        if ($user_email) {
-            $this->sendForgotEmail($user_email);
-        }
-        $user_phone = User::where(DB::raw('CONCAT("+",country_code,phone)'), $request->identifier)->get()->first();
+        $user_phone = User::where('phone', $request->phone)->where('country_code', $request->country_code)->get()->first();
 
         if ($user_phone) {
             $this->sendForgotPhone($user_phone);
 
-            return ['type' => 'phone'];
+            return true;
         }
         abort(404, 'No Account was Found');
     }
 
-    public function sendForgotEmail(User $user)
-    {
-        $forgot_code = rand(1000, 9999);
-        DB::table('forgot_passwords')->insert(['user_id' => $user->id, 'type' => 2, 'forgot_code' => $forgot_code, 'created_at' => now(), 'expiry' => now()->addMinutes(10)]);
-        Mail::to($user->email)->queue(new ForgotPassword($user, $forgot_code));
+    //public function forgot_password(Request $request)
+    //{
+        //$this->validate($request, [
+            //'email' => 'required',
+        //]);
 
-        return true;
-    }
+        //$user_email = User::where('email', $request->email)->get()->first();
+
+        //if ($user_email) {
+            //$this->sendForgotEmail($user_email);
+
+            //return true;
+        //}
+
+        //abort(404, 'No Account was Found');
+    //}
+
+    //public function sendForgotEmail(User $user)
+    //{
+        //$forgot_code = rand(1000, 9999);
+        //DB::table('forgot_passwords')->insert(['user_id' => $user->id, 'type' => 2, 'forgot_code' => $forgot_code, 'created_at' => now(), 'expiry' => now()->addMinutes(10)]);
+        //Mail::to($user->email)->queue(new ForgotPassword($user, $forgot_code));
+
+        //return true;
+    //}
 
     public function sendForgotPhone(User $user)
     {
@@ -57,22 +70,47 @@ class ForgotPasswordController extends Controller
         return true;
     }
 
+    //public function reset_password(Request $request)
+    //{
+        //$this->validate($request, [
+            //'email' => 'required|min:2|max:64',
+            //'forgot_code' => 'required',
+            //'password' => 'required|min:6|max:64',
+        //]);
+
+        //$user_id = null;
+
+        //$user_email = User::where('email', $request->email)->get()->first();
+        //if ($user_email) {
+            //$user_id = $user_email->id;
+        //}
+
+        //if ($user_id == null) {
+            //abort(404, 'Code Entered is Incorrect or Expired');
+        //}
+
+        //$forgot_pass = DB::table('forgot_passwords')->where('user_id', $user_id)->where('forgot_code', $request->forgot_code)->get()->first();
+        //DB::table('forgot_passwords')->where('user_id', $user_id)->delete();
+
+        //if (! $forgot_pass) {
+            //abort(404, 'Code Entered is Incorrect or Expired');
+        //}
+
+        //return User::findOrFail($user_id)->update(['password' => Hash::make($request->password)]);
+    //}
+
     public function reset_password(Request $request)
     {
         $this->validate($request, [
-            'identifier' => 'required|min:2|max:64',
+            'phone' => 'required|min:2|max:64',
+            'country_code' => 'required|min:2|max:64',
             'forgot_code' => 'required',
             'password' => 'required|min:6|max:64',
         ]);
 
         $user_id = null;
 
-        $user_email = User::where('email', $request->identifier)->get()->first();
-        if ($user_email) {
-            $user_id = $user_email->id;
-        }
-
-        $user_phone = User::where(DB::raw('CONCAT("+",country_code,phone)'), $request->identifier)->get()->first();
+        $user_phone = User::where('phone', $request->phone)->where('country_code', $request->country_code)->get()->first();
         if ($user_phone) {
             $user_id = $user_phone->id;
         }
@@ -80,7 +118,9 @@ class ForgotPasswordController extends Controller
             abort(404, 'Code Entered is Incorrect or Expired');
         }
 
-        $forgot_pass = DB::table('forgot_passwords')->where('user_id', $user_id)->where('forgot_code', $request->forgot_code)->where('expiry', '>', now())->get()->first();
+        $forgot_pass = DB::table('forgot_passwords')->where('user_id', $user_id)->where('forgot_code', $request->forgot_code)->get()->first();
+        DB::table('forgot_passwords')->where('user_id', $user_id)->delete();
+        //$forgot_pass = DB::table('forgot_passwords')->where('user_id', $user_id)->where('forgot_code', $request->forgot_code)->where('expiry', '>', now())->get()->first();
 
         if (! $forgot_pass) {
             abort(404, 'Code Entered is Incorrect or Expired');

@@ -22,13 +22,15 @@ class SetPdfDataForPositioner
                     }
                 }
 
-                return [
-                    'dimensions' => $json_pdfs[$search_key]['dimensions'],
-                    'page' => asset($json_pdfs[$search_key]['pdf'][$img_page]),
-                    'type' => $json_pdfs[$search_key]['type'],
-                    'page_number' => $get('page'),
-                    'predefined_texts' => $predefined_texts,
-                ];
+                if (array_key_exists($img_page, $json_pdfs[$search_key]['pdf'])) {
+                    return [
+                        'dimensions' => $json_pdfs[$search_key]['dimensions'],
+                        'page' => asset($json_pdfs[$search_key]['pdf'][$img_page]),
+                        'type' => $json_pdfs[$search_key]['type'],
+                        'page_number' => $get('page'),
+                        'predefined_texts' => $predefined_texts,
+                    ];
+                }
             }
         }
 
@@ -38,9 +40,11 @@ class SetPdfDataForPositioner
     public function searchkey($array, $search)
     {
         $key = null;
-        foreach ($array as $key => $value) {
-            if ($value['name'] == $search) {
-                return $key;
+        if($array){
+            foreach ($array as $key => $value) {
+                if ($value['name'] == $search) {
+                    return $key;
+                }
             }
         }
     }

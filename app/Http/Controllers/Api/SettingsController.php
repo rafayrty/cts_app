@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Settings\GeneralSettings;
-use Illuminate\Http\Request;
 
 class SettingsController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $settings = [
             'promotion_text' => app(GeneralSettings::class)->promotion_text,
             'promotion_link' => app(GeneralSettings::class)->promotion_link,
@@ -17,8 +17,9 @@ class SettingsController extends Controller
             'address' => app(GeneralSettings::class)->address,
             'email' => app(GeneralSettings::class)->email,
             'social_medias' => app(GeneralSettings::class)->social_medias,
+            'faqs' => app(GeneralSettings::class)->faqs,
         ];
 
-      return $settings;
+        return $settings;
     }
 }

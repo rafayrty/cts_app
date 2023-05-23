@@ -46,6 +46,7 @@ class ProductAttributeResource extends Resource
                                         ->maxLength(255),
                                 FileUpload::make('image')
                                     ->image()
+                                    //->disk('do')
                                     ->directory('uploads'),
                             ]),
                         ]),

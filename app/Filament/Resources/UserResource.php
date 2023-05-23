@@ -24,6 +24,11 @@ class UserResource extends Resource
 
     protected static ?string $navigationLabel = 'Customers';
 
+    protected static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -41,7 +46,8 @@ class UserResource extends Resource
                             ->unique(ignorable: fn ($record) => $record)
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\DateTimePicker::make('email_verified_at'),
+                        //Forms\Components\DateTimePicker::make('email_verified_at'),
+                        Forms\Components\DateTimePicker::make('verified_at'),
                         Select::make('country_code')->searchable()->options(RegisterService::$countries_phone_list)->required(),
                         Forms\Components\TextInput::make('phone')
                         ->tel()

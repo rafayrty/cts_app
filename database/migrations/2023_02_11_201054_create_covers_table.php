@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('covers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('type')->comment('1. Hard Cover,2. Soft Cover');
             $table->string('price');
             $table->string('description')->nullable();
             $table->string('image')->nullable();

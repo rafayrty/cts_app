@@ -31,7 +31,6 @@ class AddressController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\AddressRequest  $request
      * @return \Illuminate\Http\Response
      */
     public function store(AddressRequest $request)
@@ -40,13 +39,14 @@ class AddressController extends Controller
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'user_id' => $request->user()->id,
-            'email' => $request->email,
             'phone' => $request->phone,
             'country_code' => $request->country_code,
-            'country' => $request->country,
-            'state' => $request->state,
-            'apartment_no' => $request->apartment_no,
-            'street' => $request->street,
+            'backup_phone' => $request->backup_phone,
+            'backup_country_code' => $request->backup_country_code,
+            'street_name' => $request->street_name,
+            'city' => $request->city,
+            'street_number' => $request->street_number,
+            'home_no' => $request->home_no,
             'message' => $request->message,
         ]);
 
@@ -96,13 +96,14 @@ class AddressController extends Controller
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'user_id' => $request->user()->id,
-            'email' => $request->email,
             'phone' => $request->phone,
             'country_code' => $request->country_code,
-            'country' => $request->country,
-            'state' => $request->state,
-            'apartment_no' => $request->apartment_no,
-            'street' => $request->street,
+            'backup_phone' => $request->backup_phone,
+            'backup_country_code' => $request->backup_country_code,
+            'street_name' => $request->street_name,
+            'city' => $request->city,
+            'street_number' => $request->street_number,
+            'home_no' => $request->home_no,
             'message' => $request->message,
         ]);
 

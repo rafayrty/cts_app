@@ -14,7 +14,7 @@ class SendPhoneVerification
         $receiverNumber = $user->phone_number;
         $message = 'Your Verification Code For Basmti: '.$token;
 
-        Log::info($receiverNumber);
+        //Log::info($receiverNumber);
         try {
             $account_sid = getenv('TWILIO_SID');
             $auth_token = getenv('TWILIO_TOKEN');
@@ -22,12 +22,15 @@ class SendPhoneVerification
 
             $client = new Client($account_sid, $auth_token);
             $client->messages->create($receiverNumber, [
-                'body' => $message]);
+                'from' => $twilio_number,
+                'body' => $message,
+            ]);
 
             return true;
         } catch (Exception $e) {
-            return false;
             Log::error($e);
+
+            return false;
         }
     }
 }

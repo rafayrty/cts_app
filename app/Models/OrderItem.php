@@ -11,7 +11,7 @@ class OrderItem extends Model
 
     protected $guarded = [];
 
-    protected $casts = ['product_info' => 'array'];
+    protected $casts = ['product_info' => 'array', 'cover' => 'array', 'inputs' => 'array'];
 
     public function order()
     {

@@ -19,6 +19,7 @@ return [
 
     'pdf_info_path' => env('PDF_INFO_PATH', '/opt/homebrew/bin/pdfinfo'),
     'mupdf_path' => env('MUPDF_PATH', '/opt/homebrew/bin/mutool'),
+    'nginx_path' => env('NGINX_PATH', '/opt/homebrew/etc/nginx'),
 
     /*
     |--------------------------------------------------------------------------
@@ -72,7 +73,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Karachi',
 
     /*
     |--------------------------------------------------------------------------
@@ -84,7 +85,7 @@ return [
 
     'seller_payme_id' => env('SELLER_PAYME_ID', ''),
     'payme_url' => env('PAYME_URL', ''),
-    'payme_callback' => env('PAYME_CALLBACK', 'https://carder.app'),
+    'payme_callback' => env('PAYME_CALLBACK', 'https://basmti.com'),
 
     /*
     |--------------------------------------------------------------------------

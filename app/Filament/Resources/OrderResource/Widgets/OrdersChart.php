@@ -12,6 +12,14 @@ class OrdersChart extends LineChartWidget
 {
     protected static ?string $heading = 'Orders Details';
 
+    protected static ?array $options = [
+        'plugins' => [
+            'legend' => [
+                'display' => false,
+            ],
+        ],
+    ];
+
     protected function getData(): array
     {
         $data = Trend::model(Order::class)

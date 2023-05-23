@@ -4,43 +4,67 @@ namespace App\Http\Controllers;
 
 use App\Actions\GeneratePDF;
 use App\Actions\GeneratePDFOrder;
+use App\Actions\Personalization\CreateZipFileFromList;
+use App\Actions\Personalization\GetDocumentInformation;
+use App\Actions\Personalization\GetOrderItemInputs;
+use App\Actions\Personalization\SearchBarcodeWithOrderItemId;
 use App\Models\Document;
 use App\Models\Fonts;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 
 class PersonalizationController extends Controller
 {
-    public function __construct(GeneratePDF $generatePDF, GeneratePDFOrder $generatePDFOrder)
+    public function __construct(GeneratePDF $generatePDF, GeneratePDFOrder $generatePDFOrder,
+        GetDocumentInformation $getDocumentInformation,GetOrderItemInputs $getOrderItemInputs,
+        SearchBarcodeWithOrderItemId $searcBarcodeWithOrderItemId,CreateZipFileFromList $createZipFileFromList
+    )
     {
         $this->GeneratePDFAction = $generatePDF;
         $this->GeneratePDFOrderAction = $generatePDFOrder;
+        $this->GetDocumentInformation = $getDocumentInformation;
+        $this->GetOrderItemInputs = $getOrderItemInputs;
+        $this->SearchBarcodeWithOrderItemId = $searcBarcodeWithOrderItemId;
+        $this->CreateZipFileFromList = $createZipFileFromList;
     }
 
    public function generatePDFFromDocument($id)
    {
        $document = Document::findOrFail($id);
+
        $pages = $document->product->pagesParsed;
        $dedications = $document->product->dedicationsParsed;
-       $replace_name = $document->product->replace_name;
+
+       $inputs = ['name' => $document->product->replace_name, 'first_name' => split_name($document->product->replace_name)[0], 'age' => '٨', 'init' => $document->product->replace_name[0]];
+       $replace_name = $inputs['name'];
+       $replace_first_name = $inputs['first_name'];
+       $replace_age = $inputs['age'];
+       $replace_init = $inputs['init'];
        //Get pages for where the document is the same
        $found = null;
        $pages_array = [];
-       foreach ($pages as  &$page) {
+
+       foreach ($pages as &$page) {
            foreach ($page['pages']['predefined_texts'] as &$page_data) {
-               $page_data['text'] = trim(str_replace('&nbsp;', ' ', str_replace('{basmti}', $replace_name, $page_data['text'])));
+               $page_data['text'] = trim(str_replace('{basmti}', $replace_name, $page_data['text']));
+               $page_data['text'] = str_replace('{age}', $replace_age, $page_data['text']);
+
+               $page_data['text'] = str_replace('{init}', $replace_init, $page_data['text']);
            }
            if ($page['document'] == $document->name) {
                $pages_array[] = ['page' => $page['page'], 'predefined_texts' => $page['pages']['predefined_texts']];
            }
        }
        $dedications_array = [];
-       foreach ($dedications as  &$dedication) {
+       foreach ($dedications as &$dedication) {
            foreach ($dedication['dedications']['dedication_texts'] as &$dedication_data) {
                $dedication_data['text'] = trim(str_replace('{basmti}', $replace_name, $dedication_data['text']));
+               $dedication_data['text'] = str_replace('{age}', $replace_age, $dedication_data['text']);
+               $dedication_data['text'] = str_replace('{init}', $replace_init, $dedication_data['text']);
            }
            if ($dedication['document'] == $document->name) {
                $dedications_array[] = ['page' => $dedication['page'], 'dedication_texts' => $dedication['dedications']['dedication_texts']];
@@ -52,7 +76,7 @@ class PersonalizationController extends Controller
        $array = [];
        if ($fonts) {
            foreach ($fonts as $font) {
-               $array[] = ['font_name' => $font->font_name, 'attatchment' => Storage::path('public/'.$font->attatchment)];
+               $array[] = ['font_name' => $font->font_name, 'attatchment' => Storage::path('public/'.$font->attatchment), 'subsetting' => $font->subsetting];
            }
        }
        $array[] = ['font_name' => 'GE-Dinar-Medium', 'attatchment' => public_path('fonts/GE-Dinar-One-Medium.ttf')];
@@ -71,46 +95,176 @@ class PersonalizationController extends Controller
        }
    }
 
-   public function generatePDFFromDocumentOrder($id, $order_item_id)
+   /**
+    * Downlaod All PDFs by Generating a ZipFile
+    *
+    * @param  int  $order_id
+    * @return Illuminate\Http\Response
+    */
+
+   public function pdf_download_all_document_order($order_id)
    {
-       $document = Document::findOrFail($id);
-       $pages = $document->product->pagesParsed;
-       $dedications = $document->product->dedicationsParsed;
-       $replace_name = $document->product->replace_name;
-       $barcodes = $document->product->barcodes;
-       //Get pages for where the document is the same
-       $found = null;
+       $order_items = Order::findOrFail($order_id)->items;
+        foreach($order_items as $order_item){
+
+            $order_item_id = $order_item->id;
+            foreach($order_item->product->documents as $document){
+                //Checks if cover is the one selected by the user also check if it isn't a book
+                if(!($document->type == ($order_item->cover['type'] == 2 ? 0 : 1) || $document->type  == 2)){
+                    continue;
+                }
+                $data = ($this->GetDocumentInformation)($document->id);
+
+                $document = $data->document;
+                $product = $document->product;
+                $pages = $data->pages;
+                $dedications = $data->dedications;
+                $barcodes = $data->barcodes;
+
+                $replace_name = $product->replace_name;
+                $inputs = ($this->GetOrderItemInputs)($order_item_id,$replace_name);
+
+                //Get pages for where the document is the same
+                $found = null;
+                $pages_array = [];
+                $barcode_array = [];
+
+                //Search for the correct barcode
+                $barcode_found = ($this->SearchBarcodeWithOrderItemId)($order_item_id);
+
+
+                $replace_name = $inputs['name'];
+                $replace_age = $inputs['age'];
+                $replace_init = $inputs['init'];
+
+                foreach ($barcodes as &$barcode) {
+                    if ($barcode['document'] == $document->name) {
+                        $barcode_array[] = ['barcode_path' => Storage::path('public/'.$barcode_found['barcode_path']), 'page' => $barcode['page'], 'barcode_info' => $barcode['barcodes']['barcodes'][0]];
+                    }
+                }
+                foreach ($pages as &$page) {
+                    foreach ($page['pages']['predefined_texts'] as &$page_data) {
+                        $page_data['text'] = trim(str_replace('{basmti}', $replace_name, $page_data['text']));
+                        $page_data['text'] = str_replace('{age}', $replace_age, $page_data['text']);
+                        $page_data['text'] = str_replace('{init}', $replace_init, $page_data['text']);
+                    }
+                    if ($page['document'] == $document->name) {
+                        $pages_array[] = ['page' => $page['page'], 'predefined_texts' => $page['pages']['predefined_texts']];
+                    }
+                }
+                $dedications_array = [];
+
+                $dedication_text = OrderItem::findOrFail($order_item_id)->dedication;
+                foreach ($dedications as &$dedication) {
+                    foreach ($dedication['dedications']['dedication_texts'] as &$dedication_data) {
+                        $dedication_data['text'] = trim(str_replace('{basmti}', $replace_name, $dedication_text));
+                        $dedication_data['text'] = str_replace('{age}', $replace_age, $dedication_text);
+                        $dedication_data['text'] = str_replace('{init}', $replace_init, $dedication_text);
+                    }
+                    if ($dedication['document'] == $document->name) {
+                        $dedications_array[] = ['page' => $dedication['page'], 'dedication_texts' => $dedication['dedications']['dedication_texts']];
+                    }
+                }
+
+                $file = Storage::disk('local')->path('public/'.$document->attatchment);
+                $fonts = Fonts::all();
+                $array = [];
+                if ($fonts) {
+                    foreach ($fonts as $font) {
+                        $array[] = ['font_name' => $font->font_name, 'attatchment' => Storage::path('public/'.$font->attatchment), 'subsetting' => $font->subsetting];
+                    }
+                }
+                $array[] = ['font_name' => 'GE-Dinar-Medium', 'attatchment' => public_path('fonts/GE-Dinar-One-Medium.ttf'), 'subsetting' => 0];
+
+                if (file_exists($file)) {
+                    $response = ($this->GeneratePDFOrderAction)($file, $pages_array, $dedications_array, $barcode_array, array_values($array));
+                    $body = $response->getBody();
+                    // Explicitly cast the body to a string
+                    $stringBody = (string) $body;
+
+                    $type = 'Soft Cover';
+                    if ($document->type == '1') {
+                        $type = 'Hard Cover';
+                    } elseif ($document->type == '2') {
+                        $type = 'Book';
+                    }
+                    $file_name = $order_id.'-'.($order_item->product_id ?? 1234).'-'.$document->id.'-'.$order_item_id.' '.$type.'.pdf';
+                    $path = 'downloads/'.$file_name;
+                    $paths[] = $path;
+                    Storage::put($path, $stringBody);
+
+                    //return response()->download(Storage::path($path), $file_name, [], 'inline');
+                    //return response()->download(Storage::path($path), $file_name, []);
+                }else{
+                    abort(404);
+                }
+            }
+        }
+
+        return ($this->CreateZipFileFromList)($paths,'Order-'.$order_id);
+
+   }
+
+
+   /**
+    * Preview PDF by sending the request to the PDFGenerator
+    *
+    * @param  int  $id,$order_item_id
+    * @return Illuminate\Http\Response
+    */
+
+
+   public function pdf_preview_document_order($id, $order_item_id)
+   {
+
+       $data = ($this->GetDocumentInformation)($id);
+
+       $document = $data->document;
+       $product = $document->product;
+       $pages = $data->pages;
+       $dedications = $data->dedications;
+       $barcodes = $data->barcodes;
+
+       $replace_name = $product->replace_name;
+
+       $inputs = ($this->GetOrderItemInputs)($order_item_id,$replace_name);
+
        $pages_array = [];
-       $barcodes_array = [];
-       $order_item = OrderItem::find($order_item_id)->order_id;
-       $order = Order::findOrFail($order_item);
+       $barcode_array = [];
+       $order_item = OrderItem::find($order_item_id);
+       $order = Order::findOrFail($order_item->order_id);
+
        //Search for the correct barcode
-       $barcode_found = null;
-       foreach ($order->barcodes as $bar) {
-           $parts = explode('-', $bar['barcode_number']);
-           $lastPart = end($parts);
-           if ($lastPart == $id) {
-               $barcode_found = $bar;
-           }
-       }
-       foreach ($barcodes as  &$barcode) {
+       $barcode_found = ($this->SearchBarcodeWithOrderItemId)($order_item_id);
+
+       $replace_name = $inputs['name'];
+       $replace_age = $inputs['age'];
+       $replace_init = $inputs['init'];
+
+
+       foreach ($barcodes as &$barcode) {
            if ($barcode['document'] == $document->name) {
                $barcode_array[] = ['barcode_path' => Storage::path('public/'.$barcode_found['barcode_path']), 'page' => $barcode['page'], 'barcode_info' => $barcode['barcodes']['barcodes'][0]];
            }
        }
-
-       foreach ($pages as  &$page) {
+       foreach ($pages as &$page) {
            foreach ($page['pages']['predefined_texts'] as &$page_data) {
-               $page_data['text'] = trim(str_replace('&nbsp;', ' ', str_replace('{basmti}', $replace_name, $page_data['text'])));
+               $page_data['text'] = trim(str_replace('{basmti}', $replace_name, $page_data['text']));
+               $page_data['text'] = str_replace('{age}', $replace_age, $page_data['text']);
+               $page_data['text'] = str_replace('{init}', $replace_init, $page_data['text']);
            }
            if ($page['document'] == $document->name) {
                $pages_array[] = ['page' => $page['page'], 'predefined_texts' => $page['pages']['predefined_texts']];
            }
        }
        $dedications_array = [];
-       foreach ($dedications as  &$dedication) {
+       $dedication_text = OrderItem::findOrFail($order_item_id)->dedication;
+
+       foreach ($dedications as &$dedication) {
            foreach ($dedication['dedications']['dedication_texts'] as &$dedication_data) {
-               $dedication_data['text'] = trim(str_replace('{basmti}', $replace_name, $dedication_data['text']));
+               $dedication_data['text'] = trim(str_replace('{basmti}', $replace_name, $dedication_text));
+               $dedication_data['text'] = str_replace('{age}', $replace_age, $dedication_text);
+               $dedication_data['text'] = str_replace('{init}', $replace_init, $dedication_text);
            }
            if ($dedication['document'] == $document->name) {
                $dedications_array[] = ['page' => $dedication['page'], 'dedication_texts' => $dedication['dedications']['dedication_texts']];
@@ -122,10 +276,10 @@ class PersonalizationController extends Controller
        $array = [];
        if ($fonts) {
            foreach ($fonts as $font) {
-               $array[] = ['font_name' => $font->font_name, 'attatchment' => Storage::path('public/'.$font->attatchment)];
+               $array[] = ['font_name' => $font->font_name, 'attatchment' => Storage::path('public/'.$font->attatchment), 'subsetting' => $font->subsetting];
            }
        }
-       $array[] = ['font_name' => 'GE-Dinar-Medium', 'attatchment' => public_path('fonts/GE-Dinar-One-Medium.ttf')];
+       $array[] = ['font_name' => 'GE-Dinar-Medium', 'attatchment' => public_path('fonts/GE-Dinar-One-Medium.ttf'), 'subsetting' => 0];
 
        if (file_exists($file)) {
            $response = ($this->GeneratePDFOrderAction)($file, $pages_array, $dedications_array, $barcode_array, array_values($array));
@@ -133,13 +287,21 @@ class PersonalizationController extends Controller
            // Explicitly cast the body to a string
            $stringBody = (string) $body;
 
-           $file_name = 'GeneratedPDF-'.time().'.pdf';
+           $type = 'Soft Cover';
+           if ($document->type == '1') {
+               $type = 'Hard Cover';
+           } elseif ($document->type == '2') {
+               $type = 'Book';
+           }
+           $file_name = $id.'-'.($order_item->product_id ?? 1234).'-'.$document->id.'-'.$order_item_id.' '.$type.'.pdf';
            $path = 'downloads/'.$file_name;
            Storage::put($path, $stringBody);
 
+           //return response()->download(Storage::path($path), $file_name, [], 'inline');
            return response()->download(Storage::path($path), $file_name, [], 'inline');
        }
    }
+
 
    /**
     * Generate PDF by sending the request to the

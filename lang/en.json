@@ -1,0 +1,73 @@
+{
+    "users.viewAny": "Users → View Any",
+    "users.view": "Users → View",
+    "users.create": "Users → Create",
+    "users.update": "Users → Edit",
+    "users.delete": "Users → Delete",
+
+    "products.viewAny": "Products → View Any",
+    "products.view": "Products → View",
+    "products.create": "Products → Create",
+    "products.update": "Products → Edit",
+    "products.delete": "Products → Delete",
+
+    "orders.viewAny": "Orders → View Any",
+    "orders.view": "Orders → View",
+    "orders.create": "Orders → Create",
+    "orders.update": "Orders → Edit",
+    "orders.delete": "Orders → Delete",
+
+    "categories.viewAny": "Categories → View Any",
+    "categories.view": "Categories → View",
+    "categories.create": "Categories → Create",
+    "categories.update": "Categories → Edit",
+    "categories.delete": "Categories → Delete",
+
+    "tags.viewAny": "Tags → View Any",
+    "tags.view": "Tags → View",
+    "tags.create": "Tags → Create",
+    "tags.update": "Tags → Edit",
+    "tags.delete": "Tags → Delete",
+
+    "reviews.viewAny": "Reviews → View Any",
+    "reviews.view": "Reviews → View",
+    "reviews.create": "Reviews → Create",
+    "reviews.update": "Reviews → Edit",
+    "reviews.delete": "Reviews → Delete",
+
+    "covers.viewAny": "Covers → View Any",
+    "covers.view": "Covers → View",
+    "covers.create": "Covers → Create",
+    "covers.update": "Covers → Edit",
+    "covers.delete": "Covers → Delete",
+
+    "dedications.viewAny": "Dedications → View Any",
+    "dedications.view": "Dedications → View",
+    "dedications.create": "Dedications → Create",
+    "dedications.update": "Dedications → Edit",
+    "dedications.delete": "Dedications → Delete",
+
+    "formsubmissions.viewAny": "Form Submissions → View Any",
+    "formsubmissions.view": "Form Submissions → View",
+    "formsubmissions.create": "Form Submissions → Create",
+    "formsubmissions.update": "Form Submissions → Edit",
+    "formsubmissions.delete": "Form Submissions → Delete",
+
+    "fonts.viewAny": "Fonts → View Any",
+    "fonts.view": "Fonts → View",
+    "fonts.create": "Fonts → Create",
+    "fonts.update": "Fonts → Edit",
+    "fonts.delete": "Fonts → Delete",
+
+    "coupon.viewAny": "Coupon → View Any",
+    "coupon.view": "Coupon → View",
+    "coupon.create": "Coupon → Create",
+    "coupon.update": "Coupon → Edit",
+    "coupon.delete": "Coupon → Delete",
+
+    "product_attributes.viewAny": "Product Attributes → View Any",
+    "product_attributes.view": "Product Attributes → View",
+    "product_attributes.create": "Product Attributes → Create",
+    "product_attributes.update": "Product Attributes → Edit",
+    "product_attributes.delete": "Product Attributes → Delete"
+}

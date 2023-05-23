@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use Beier\FilamentPages\Filament\Resources\FilamentPageResource;
 use Beier\FilamentPages\Models\FilamentPage;
-use RalphJSmit\Filament\SEO\SEO;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Resources\Table;
@@ -15,11 +14,10 @@ use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Illuminate\Database\Eloquent\Builder;
-
+use RalphJSmit\Filament\SEO\SEO;
 
 class CustomPageResource extends FilamentPageResource
 {
-
     public static function table(Table $table): Table
     {
         return $table
@@ -30,11 +28,11 @@ class CustomPageResource extends FilamentPageResource
                     ->sortable(),
 
                 //TextColumn::make('slug')
-                    //->label(__('filament-pages::filament-pages.filament.form.slug.label'))
-                    //->icon('heroicon-o-external-link')
-                    //->iconPosition('after')
-                    //->sortable()
-                    //->toggleable(isToggledHiddenByDefault: false),
+                //->label(__('filament-pages::filament-pages.filament.form.slug.label'))
+                //->icon('heroicon-o-external-link')
+                //->iconPosition('after')
+                //->sortable()
+                //->toggleable(isToggledHiddenByDefault: false),
                 BadgeColumn::make('status')
                     ->getStateUsing(fn (FilamentPage $record): string => $record->published_at->isPast() && ($record->published_until?->isFuture() ?? true) ? __('filament-pages::filament-pages.filament.table.status.published') : __('filament-pages::filament-pages.filament.table.status.draft'))
                     ->colors([

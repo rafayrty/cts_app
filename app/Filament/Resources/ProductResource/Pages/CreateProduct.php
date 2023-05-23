@@ -3,7 +3,8 @@
 namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
-use Filament\Forms\Components\Component;
+use App\Models\Document;
+use App\Models\Product;
 use Filament\Notifications\Notification;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
@@ -19,6 +20,19 @@ class CreateProduct extends CreateRecord
             ->title($exception->getMessage())
             ->danger()
             ->send();
+    }
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        //$data['is_published'] = true;
+
+        //Delete the autosaved data
+        $product = Product::where('slug', $data['slug'])->get()->first();
+        $document = Document::where('product_id', $product->id)->get()->first();
+        Document::findOrFail($document->id)->delete();
+        Product::findOrFail($product->id)->delete();
+
+        return $data;
     }
 
     protected function getFormActions(): array
@@ -38,7 +52,6 @@ class CreateProduct extends CreateRecord
             $this->getSubmitFormAction(),
             Action::make('preview_product')
             ->url('https://frontend.basmti.com/product/preview?'.http_build_query($array), true),
-            Action::make('settings')->action('openSettingsModal'),
             $this->getCancelFormAction(),
         ];
     }

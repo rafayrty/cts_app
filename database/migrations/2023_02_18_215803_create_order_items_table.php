@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('dedication');
             $table->string('image')->nullable();
             $table->json('product_info')->nullable();
             $table->bigInteger('product_id')->unsigned();
@@ -23,6 +24,8 @@ return new class extends Migration
             $table->integer('discount_total')->default(0);
             $table->string('gender');
             $table->integer('price');
+            $table->json('cover');
+            $table->json('inputs');
             $table->integer('total')->default(0);
             $table->bigInteger('order_id')->unsigned();
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');

@@ -5,11 +5,14 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\FontsResource\Pages;
 use App\Models\Fonts;
 use Filament\Forms;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\FileUpload;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\URL;
 use Livewire\TemporaryUploadedFile;
 
 class FontsResource extends Resource
@@ -26,6 +29,7 @@ class FontsResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('font_name')
                     ->placeholder('Enter font Name')
+                    ->unique(ignorable: fn ($record) => $record)
                     ->required()
                     ->maxLength(255),
                 FileUpload::make('attatchment')
@@ -35,6 +39,8 @@ class FontsResource extends Resource
                     })
                     ->required()
                     ->directory('fonts'),
+
+                Checkbox::make('subsetting')->label('Subsetting (For fonts which cause issues in pdf generation)'),
             ]);
     }
 
@@ -50,8 +56,12 @@ class FontsResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()->after(function () {
+                    Http::get(URL::to('/personalization/fonts'));
+                }),
+                Tables\Actions\DeleteAction::make()->after(function () {
+                    Http::get(URL::to('/personalization/fonts'));
+                }),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

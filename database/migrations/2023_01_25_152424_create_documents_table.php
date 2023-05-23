@@ -15,16 +15,16 @@ return new class extends Migration
     {
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('pdf_name')->nullable();
-            $table->integer('type')->comment('1. Cover,2. Book');
-            $table->json('gender');
-            $table->string('attatchment');
+            $table->string('name')->unique()->nullable();
+            $table->string('pdf_name')->nullable()->nullable();
+            $table->integer('type')->comment('0.Soft Cover,1.Hard Cover,2. Book')->nullable();
+            $table->json('gender')->nullable();
+            $table->string('attatchment')->nullable();
             $table->json('pages')->nullable();
             $table->json('dedications')->nullable();
             $table->json('dimensions')->nullable();
             $table->json('barcodes')->nullable();
-            $table->bigInteger('product_id')->unsigned();
+            $table->bigInteger('product_id')->unsigned()->nullable();
             $table->foreign('product_id')
                     ->references('id')
                     ->on('products')

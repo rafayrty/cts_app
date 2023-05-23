@@ -16,5 +16,4 @@ class FilamentPage extends BeierFilamentPage
             title: $this->title,
         );
     }
-
 }

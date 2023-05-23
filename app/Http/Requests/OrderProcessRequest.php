@@ -36,11 +36,7 @@ class OrderProcessRequest extends FormRequest
             'subtotal' => 'required',
             'total' => 'required',
             'address' => 'required',
-            'items.*.product_name' => 'required',
-            'items.*.price' => 'required',
-            'items.*.total' => 'required',
-            'items.*.id' => 'required',
-            'items.*.addons_price' => 'required',
+            'items.*.cover' => 'required',
 
         ];
     }

@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\FilamentUserResource as ResourcesFilamentUserResource;
+use Chiiya\FilamentAccessControl\Resources\FilamentUserResource;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -34,5 +36,8 @@ class AppServiceProvider extends ServiceProvider
             'Product Management',
             'Administration',
         ]);
+        $this->app->bind(FilamentUserResource::class, function () {
+            return new ResourcesFilamentUserResource;
+        });
     }
 }

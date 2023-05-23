@@ -5,12 +5,15 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CoversResource\Pages;
 use App\Models\Covers;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 
 class CoversResource extends Resource
 {
@@ -28,6 +31,9 @@ class CoversResource extends Resource
                     ->extraAttributes(['dir' => 'rtl'])
                     ->required()
                     ->maxLength(255),
+                Select::make('type')
+                    ->options(['1' => 'Hard Cover', '2' => 'Soft Cover'])
+                    ->required(),
                 TextInput::make('price')
                     ->required()
                     ->maxLength(255),
@@ -44,6 +50,9 @@ class CoversResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
+                TextColumn::make('type')->getStateUsing(function (Model $record) {
+                    return $type = $record->type == '1' ? 'Hard' : 'Soft';
+                }),
                 Tables\Columns\TextColumn::make('price'),
                 Tables\Columns\ImageColumn::make('image'),
                 Tables\Columns\TextColumn::make('created_at')

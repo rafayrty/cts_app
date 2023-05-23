@@ -6,6 +6,8 @@ namespace Database\Seeders;
 use App\Models\ProductAttribute;
 use App\Models\ProductAttributeOption;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -37,5 +39,10 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
+        Permission::create(['guard_name' => 'filament','name' => 'products.viewAny']);
+        Permission::create(['guard_name' => 'filament','name' => 'products.view']);
+        $role = Role::where('name', 'super-admin')->first();
+        $role->givePermissionTo(Permission::all());
+
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Forms\Components;
 
 use Closure;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Field;
 
 class PDFEditor extends Field

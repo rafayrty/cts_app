@@ -18,7 +18,7 @@ return new class extends Migration
             $table->bigInteger('user_id')->unsigned();
             $table->string('verification_code');
             $table->integer('type')->comment('1. Phone,2. Email');
-            $table->date('expiry');
+            $table->timestamp('expiry');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });

@@ -2,3 +2,18 @@
           font-family: GE-Dinar-Medium;
           src: url('fonts/GE-Dinar-One-Medium.ttf');
         }
+        @font-face{
+            font-family: 'Lalezar';
+            src: url('storage/fonts/1678019977Lalezar-Regular.ttf');
+        }
+      
+        @font-face{
+            font-family: 'Marhey';
+            src: url('storage/fonts/1678019991Marhey-VariableFont_wght.ttf');
+        }
+      
+        @font-face{
+            font-family: 'Baloo Bhaijaan2';
+            src: url('storage/fonts/1678183637BalooBhaijaan2-Bold.ttf');
+        }
+      

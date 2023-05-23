@@ -33,7 +33,7 @@ class EmailVerification extends Mailable
     {
         return new Envelope(
             from: new Address(config('mail.from.address'), config('mail.from.name')),
-            subject: 'Welcome To Basmti - Verify Your Email',
+            subject: 'Basmti | Verify Your Email to Continue',
         );
     }
 
