@@ -223,7 +223,13 @@ class ProductResource extends Resource
                                                  '2' => 'Book',
                                              ])->required()->reactive()
                                               ->helperText('Select a Type To Upload a Document')
-                                              ->afterStateUpdated(Closure::fromCallable(new HandleDocType())),
+                                        ->disabled(function (Closure $get){
+                                        if(count($get('attatchment')) > 0){
+                                            return true;
+                                        }
+                                         return false;
+                                        })
+                                        ->afterStateUpdated(Closure::fromCallable(new HandleDocType())),
                                          Hidden::make('pdf_name'),
                                          Hidden::make('dimensions'),
                                      ])->reactive(),

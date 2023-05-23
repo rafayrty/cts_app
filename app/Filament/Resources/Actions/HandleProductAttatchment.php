@@ -11,7 +11,8 @@ class HandleProductAttatchment
 {
     public function __invoke(Closure $set, Closure $get, $state)
     {
-        $name = $state->getClientOriginalName();
+        //$name = $state->getClientOriginalName();
+        $name = uniqid().".pdf";
         if ($name != $get('pdf_name') && $get('../../pdf_info') != '' && $get('pdf_name') != null) {
             $pdfs = json_decode($get('../../pdf_info'), true);
             $key = array_search($get('pdf_name'), array_column($pdfs, 'filename'));
@@ -27,6 +28,10 @@ class HandleProductAttatchment
         } else {
             $pdfs = [];
         }
+
+
+
+
         $count = $this->getPDFPages($state->path());
         $dimensions = $this->getDimensions($state->path());
         $set('dimensions', $dimensions);
