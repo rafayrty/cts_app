@@ -42,7 +42,7 @@ class CreateOrder extends CreateRecord
                 $increment = ($last_order->id + 1);
             }
             $status = 'PENDING';
-            if($data['card_payment']=='1'){
+            if ($data['card_payment'] == '1') {
                 $buyer = $this->buyerToken($data);
                 $status = 'COMPLETED';
                 // Check If There are any issues in generating the Token
@@ -59,14 +59,14 @@ class CreateOrder extends CreateRecord
                 'shipping' => $shipping_fee * 100,
                 'coupon' => null,
                 'total' => ($data['sub_total'] * 100) + ($shipping_fee * 100),
-                'print_house_status' => PrintHouseStatusEnum::STARTING,
-                'client_status' => ClientStatusEnum::STARTING,
+                'print_house_status' => PrintHouseStatusEnum::NEW_ORDER,
+                'client_status' => ClientStatusEnum::NEW_ORDER,
                 'payment_status' => $status,
-                'discount_total'=>$this->discountTotal($data),
+                'discount_total' => $this->discountTotal($data),
                 'coupon' => Coupon::find($data['coupon']) ? Coupon::find($data['coupon'])->coupon_name : ''
             ]);
 
-            $order_items = $data['items'];
+            $order_items = $data['order_items'];
             foreach ($order_items as $item) {
 
                 $prd = Product::find($item['product_id']);
@@ -87,20 +87,20 @@ class CreateOrder extends CreateRecord
                     'dedication' => $item['dedication'],
                     'cover' => $cover,
                     'price' => $prd->front_price * 100,
-                    'total' => ($cover->price + $prd->front_price) * 100,
+                    'total' => (($cover->price) + ($prd->front_price * 100)),
                 ]);
 
                 foreach ($prd->documents as $document) {
                     if ($document->type == ($cover->type == 2 ? 0 : 1) || $document->type == 2) {
-                        $number = $order->order_numeric_id.'-'.$prd->id.'-'.$document['id'].'-'.$order_item->id;
+                        $number = $order->order_numeric_id . '-' . $prd->id . '-' . $document['id'] . '-' . $order_item->id;
                         $barcodes[] = ['barcode_path' => $this->barcode_generator($number), 'barcode_number' => $number];
                     }
                 }
-        }
+            }
 
             $order->update(['barcodes' => $barcodes]);
 
-            if($data['card_payment'] == '1'){
+            if ($data['card_payment'] == '1') {
                 $sale = $this->generateSale($data, $order, $buyer);
                 if ($sale['status_code'] != 0) {
                     throw ValidationException::withMessages(['message' => $sale['status_error_details']]);
@@ -110,41 +110,50 @@ class CreateOrder extends CreateRecord
                     $order->update(['payment_status' => 'COMPLETED', 'payment_info' => $sale, 'payme_sale_id' => $sale['payme_sale_id']]);
                 }
             }
-        DB::commit();
-        }catch (Throwable $e) {
-                throw $e;
-                Log::error($e);
-                DB::rollback();
+            DB::commit();
+        } catch (Throwable $e) {
+            throw $e;
+            Log::error($e);
+            DB::rollback();
         }
 
         return $order;
     }
 
-      public function barcode_generator($number)
-      {
+    public function barcode_generator($number)
     {
+
         $file_name = 'barcodes/' . time() . $number . '.png';
 
         $background_color = "FFFFFF";
+        $padding = 10; // Adjust the padding value as desired
 
         // Generate a 1D barcode (e.g., Code39)
-        $barcode = DNS1DFacade::getBarcodePNGPath($number, 'CODE11', 1, 30,array(0,0,0), true);
+        $barcode = DNS1DFacade::getBarcodePNGPath($number, 'C128', 1, 55,array(0,0,0), true);
 
         // Load the generated barcode image
         $source_image = imagecreatefrompng($barcode);
 
         // Get image dimensions
-        $width = imagesx($source_image);
-        $height = imagesy($source_image);
+        $barcode_width = imagesx($source_image);
+        $barcode_height = imagesy($source_image);
 
-        // Create a new image with the desired background color
-        $bg_color = imagecreatetruecolor($width, $height);
+        // Calculate the new dimensions for the padded image
+        $padded_width = $barcode_width + ($padding * 2);
+        $padded_height = $barcode_height + ($padding * 2);
+
+        // Create a new image with the desired background color and padding
+        $bg_color = imagecreatetruecolor($padded_width, $padded_height);
         list($r, $g, $b) = sscanf($background_color, "%02x%02x%02x");
         $color = imagecolorallocate($bg_color, $r, $g, $b);
-        imagefilledrectangle($bg_color, 0, 0, $width, $height, $color);
+        imagefilledrectangle($bg_color, 0, 0, $padded_width, $padded_height, $color);
 
-        // Merge the source image with the background image
-        imagecopyresampled($bg_color, $source_image, 0, 0, 0, 0, $width, $height, $width, $height);
+        // Calculate the position to merge the barcode image with the padded image
+        $position_x = $padding;
+        $position_y = $padding;
+
+        // Merge the source image with the background image at the specified position
+        imagecopy($bg_color, $source_image, $position_x, $position_y, 0, 0, $barcode_width, $barcode_height);
 
         // Save the final image to a temporary file
         $temp_file = tempnam(sys_get_temp_dir(), 'barcode');
@@ -160,7 +169,6 @@ class CreateOrder extends CreateRecord
 
         return $file_name;
     }
-      }
 
     /**
      * Create A New Subscription
@@ -188,7 +196,7 @@ class CreateOrder extends CreateRecord
             'language' => 'en',
         ];
         // Generate Token
-        $response = Http::post($payme_url.'/capture-buyer-token', $data);
+        $response = Http::post($payme_url . '/capture-buyer-token', $data);
 
         return $response;
     }
@@ -234,7 +242,7 @@ class CreateOrder extends CreateRecord
             'seller_payme_id' => $seller_payme_id,
             'sale_price' => $order->total,
             'currency' => 'ILS',
-            'product_name' => 'Basmti Payment - #'.$order->order_numeric_id,
+            'product_name' => 'Basmti Payment - #' . $order->order_numeric_id,
             'sale_send_notification' => true,
             'sale_callback_url' => 'https://payme.io',
             'sale_email' => $user->email,
@@ -251,19 +259,19 @@ class CreateOrder extends CreateRecord
             'fees' => ['shipping' => $order->shipping, 'discount' => $order->discount_total],
             'buyer_key' => $buyer['buyer_key'],
             'shipping_details' => [
-                'name' => $order->address['first_name'].' '.$order->address['last_name'],
+                'name' => $order->address['first_name'] . ' ' . $order->address['last_name'],
                 'email' => $user->email,
-                'phone' => '+'.$order->address['country_code'] + $order->address['phone'],
-                'line1' => $order->address['street_name'].' '.$order->address['street_number'].' '.$order->address['home_no'],
+                'phone' => '+' . $order->address['country_code'] + $order->address['phone'],
+                'line1' => $order->address['street_name'] . ' ' . $order->address['street_number'] . ' ' . $order->address['home_no'],
                 'city' => $order->address['city'],
                 'postal_code' => $data['postcode'],
                 'country' => 'IL',
             ],
             'billing_details' => [
-                'name' => $order->address['first_name'].' '.$order->address['last_name'],
+                'name' => $order->address['first_name'] . ' ' . $order->address['last_name'],
                 'email' => $user->email,
-                'phone' => '+'.$order->address['country_code'] + $order->address['phone'],
-                'line1' => $order->address['street_name'].' '.$order->address['street_number'].' '.$order->address['home_no'],
+                'phone' => '+' . $order->address['country_code'] + $order->address['phone'],
+                'line1' => $order->address['street_name'] . ' ' . $order->address['street_number'] . ' ' . $order->address['home_no'],
                 'city' => $order->address['city'],
                 'postal_code' => $data['postcode'],
                 'country' => 'IL',
@@ -271,25 +279,25 @@ class CreateOrder extends CreateRecord
         ];
         Log::info($data);
         // Generate Token
-        $response = Http::post($payme_url.'/generate-sale', $data);
+        $response = Http::post($payme_url . '/generate-sale', $data);
 
         Log::info($response);
 
         return $response;
     }
-    public function discountTotal($data){
+    public function discountTotal($data)
+    {
 
-                        $discount = 0;
-                        $percentage = 0;
-                        $sub_total = $data['sub_total'];
-                        if ($data['coupon']) {
-                            $coupon_details = Coupon::find($data['coupon']);
-                            if ($coupon_details) {
-                                    $discount = ceil($sub_total * ($coupon_details->discount_percentage / 100));
-                                    $percentage = $coupon_details->discount_percentage;
-                                }
-                            }
+        $discount = 0;
+        $percentage = 0;
+        $sub_total = $data['sub_total'];
+        if ($data['coupon']) {
+            $coupon_details = Coupon::find($data['coupon']);
+            if ($coupon_details) {
+                $discount = ceil($sub_total * ($coupon_details->discount_percentage / 100));
+                $percentage = $coupon_details->discount_percentage;
+            }
+        }
         return $discount * 100;
     }
 }
-

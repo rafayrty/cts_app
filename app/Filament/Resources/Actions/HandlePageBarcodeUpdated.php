@@ -35,7 +35,7 @@ class HandlePageBarcodeUpdated
     {
         $key = null;
         foreach ($array as $key => $value) {
-            if ($value['name'] == $search) {
+            if ($value['filename'] == $search) {
                 return $key;
             }
         }

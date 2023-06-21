@@ -106,11 +106,12 @@ class Product extends Model
      */
     public function getHasMaleAttribute()
     {
-        $documents = $this->documents()->get();
-        foreach ($documents as $document) {
-            return in_array('Male', $document->genderParsed);
-        }
+        //$documents = $this->documents()->get();
+        //foreach ($documents as $document) {
+            //return in_array('Male', $document->genderParsed);
+        //}
 
+        return $this->product_attributes()->where('product_attribute_option_id', '1')->count() > 0 ? true : false;
         return false;
     }
 
@@ -151,12 +152,12 @@ class Product extends Model
      */
     public function getHasFemaleAttribute()
     {
-        $documents = $this->documents()->get();
-        foreach ($documents as $document) {
-            return in_array('Female', $document->genderParsed);
-        }
-
-        return false;
+        //$documents = $this->documents()->get();
+        //foreach ($documents as $document) {
+            //return in_array('Female', $document->genderParsed);
+        //}
+        return $this->product_attributes()->where('product_attribute_option_id', '2')->count() > 0 ? true : false;
+        //return false;
     }
 
     public function getIsInWishlistAttribute()

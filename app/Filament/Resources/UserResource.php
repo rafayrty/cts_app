@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use App\Services\RegisterService;
@@ -14,6 +16,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Filters\Filter;
 use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource
@@ -68,7 +71,7 @@ class UserResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('full_name'),
-                Tables\Columns\TextColumn::make('email'),
+                Tables\Columns\TextColumn::make('email')->searchable(),
                 Tables\Columns\TextColumn::make('phone_number')->copyable(),
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->dateTime(),
@@ -78,7 +81,7 @@ class UserResource extends Resource
                 //->dateTime(),
             ])
             ->filters([
-                //
+
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

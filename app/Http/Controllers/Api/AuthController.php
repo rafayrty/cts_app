@@ -59,6 +59,27 @@ class AuthController extends Controller
     //}
 
     /**
+     * Resend Email
+     *
+     * @return \App\Models\User
+     */
+    public function resend_email(Request $request)
+    {
+        $this->validate($request, [
+            'number' => 'required|max:255|min:3',
+            'country_code' => 'required',
+        ]);
+
+        $user = User::where('phone', $request->number)->where('country_code', $request->country_code)->get()->first();
+
+        if (! $user) {
+            abort(404);
+        }
+
+        return $this->registerService->verifyEmail(User::findOrFail($user->id));
+    }
+
+    /**
      * Resend Phone
      *
      * @return \App\Models\User

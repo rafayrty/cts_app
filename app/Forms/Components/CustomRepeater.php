@@ -174,13 +174,13 @@ class CustomRepeater extends Repeater
             if (count($documents) != count($pdf_info)) {
                 foreach($new_array as $document){
                     foreach ($pages as $key => $page) {
-                        if ($page['document'] == $document['name']) {
+                        if ($page['document'] == $document['filename']) {
                             $new_pages[$key] = $page;
                         }
                     }
                     data_set($livewire,'data.pages', $new_pages);
                     foreach ($dedications as $key => $dedication) {
-                        if ($dedication['document'] == $document['name']) {
+                        if ($dedication['document'] == $document['filename']) {
                             $new_dedications[$key] = $dedication;
                         }
                     }
@@ -188,7 +188,7 @@ class CustomRepeater extends Repeater
                     data_set($livewire,'data.dedications', $new_dedications);
 
                     foreach ($barcodes as $key => $barcode) {
-                        if ($barcode['document'] == $document['name']) {
+                        if ($barcode['document'] == $document['filename']) {
                             $new_barcodes[$key] = $barcode;
                         }
                     }

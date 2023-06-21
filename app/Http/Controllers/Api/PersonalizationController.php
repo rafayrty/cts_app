@@ -138,7 +138,7 @@ class PersonalizationController extends Controller
         $filtered_cover_dedications = [];
 
         foreach ($pages as $page) {
-            if ($page['document'] == $document->name) {
+            if ($page['document'] == $document->pdf_name) {
                 $filtered_pages[] = [
                     'page' => $page['page'],
                     'image' => $page['pages']['page'],
@@ -150,7 +150,7 @@ class PersonalizationController extends Controller
 
         //Filtering Cover Pages
         foreach ($cover_pages as $cover_page) {
-            if ($cover_page['document'] == $cover->name) {
+            if ($cover_page['document'] == $cover->pdf_name) {
                 $filtered_cover_pages[] = [
                     'page' => $cover_page['page'],
                     'image' => $cover_page['pages']['page'],
@@ -161,13 +161,13 @@ class PersonalizationController extends Controller
         }
         //Filtering Dedications
         foreach ($dedications as $dedication) {
-            if ($dedication['document'] == $document->name) {
+            if ($dedication['document'] == $document->pdf_name) {
                 $filtered_dedications[] = ['page' => $dedication['page'], 'image' => $dedication['dedications']['page'], 'dimensions' => $dedication['dedications']['dimensions'], 'dedication_texts' => $dedication['dedications']['dedication_texts']];
             }
         }
         //Filtering Cover Dedications
         foreach ($cover_dedications as $cover_dedication) {
-            if ($cover_dedication['document'] == $document->name) {
+            if ($cover_dedication['document'] == $document->pdf_name) {
                 $filtered_cover_dedications[] = ['page' => $cover_dedication['page'], 'image' => $cover_dedication['dedications']['page'], 'dimensions' => $cover_dedication['dedications']['dimensions'], 'dedication_texts' => $cover_dedication['dedications']['dedication_texts']];
             }
         }
@@ -223,7 +223,7 @@ class PersonalizationController extends Controller
         $pdf_info = json_decode($product->pdf_info, true);
         $found_pdf = null;
         foreach ($pdf_info as $pdf) {
-            if ($pdf['name'] == $found_document->name) {
+            if ($pdf['filename'] == $found_document->pdf_name) {
                 $found_pdf = $pdf;
             }
         }
@@ -232,7 +232,7 @@ class PersonalizationController extends Controller
         $pdf_info = json_decode($product->pdf_info, true);
         $found_pdf_cover = null;
         foreach ($pdf_info as $pdf) {
-            if ($pdf['name'] == $found_cover->name) {
+            if ($pdf['filename'] == $found_cover->pdf_name) {
                 $found_pdf_cover = $pdf;
             }
         }
@@ -297,7 +297,7 @@ class PersonalizationController extends Controller
         $filtered_cover_dedications = [];
 
         foreach ($pages as $page) {
-            if ($page['document'] == $document->name) {
+            if ($page['document'] == $document->pdf_name) {
                 $filtered_pages[] = [
                     'page' => $page['page'],
                     'image' => $page['pages']['page'],
@@ -309,7 +309,7 @@ class PersonalizationController extends Controller
 
         //Filtering Cover Pages
         foreach ($cover_pages as $cover_page) {
-            if ($cover_page['document'] == $cover->name) {
+            if ($cover_page['document'] == $cover->pdf_name) {
                 $filtered_cover_pages[] = [
                     'page' => $cover_page['page'],
                     'image' => $cover_page['pages']['page'],
@@ -320,13 +320,13 @@ class PersonalizationController extends Controller
         }
         //Filtering Dedications
         foreach ($dedications as $dedication) {
-            if ($dedication['document'] == $document->name) {
+            if ($dedication['document'] == $document->pdf_name) {
                 $filtered_dedications[] = ['page' => $dedication['page'], 'image' => $dedication['dedications']['page'], 'dimensions' => $dedication['dedications']['dimensions'], 'dedication_texts' => $dedication['dedications']['dedication_texts']];
             }
         }
         //Filtering Cover Dedications
         foreach ($cover_dedications as $cover_dedication) {
-            if ($cover_dedication['document'] == $document->name) {
+            if ($cover_dedication['document'] == $document->pdf_name) {
                 $filtered_cover_dedications[] = ['page' => $cover_dedication['page'], 'image' => $cover_dedication['dedications']['page'], 'dimensions' => $cover_dedication['dedications']['dimensions'], 'dedication_texts' => $cover_dedication['dedications']['dedication_texts']];
             }
         }
@@ -370,7 +370,7 @@ class PersonalizationController extends Controller
         $pdf_info = json_decode($product->pdf_info, true);
         $found_pdf = null;
         foreach ($pdf_info as $pdf) {
-            if ($pdf['name'] == $found_document->name) {
+            if ($pdf['filename'] == $found_document->pdf_name) {
                 $found_pdf = $pdf;
             }
         }
@@ -379,7 +379,7 @@ class PersonalizationController extends Controller
         $pdf_info = json_decode($product->pdf_info, true);
         $found_pdf_cover = null;
         foreach ($pdf_info as $pdf) {
-            if ($pdf['name'] == $found_cover->name) {
+            if ($pdf['filename'] == $found_cover->pdf_name) {
                 $found_pdf_cover = $pdf;
             }
         }

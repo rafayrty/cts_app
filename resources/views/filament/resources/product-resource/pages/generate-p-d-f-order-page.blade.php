@@ -1,4 +1,3 @@
-
 <x-filament::page>
 <div class="filament-forms-card-component p-6 bg-white rounded-xl border border-gray-300 dark:border-gray-600 dark:bg-gray-800">
   <p>Select a Document to Proceed</p>

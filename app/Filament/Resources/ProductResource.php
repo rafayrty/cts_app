@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\Actions\HandleDocType;
 use App\Filament\Resources\Actions\HandleDocumentName;
 use App\Filament\Resources\Actions\HandleDocumentOptions;
+use App\Filament\Resources\Actions\HandleEditorPageNumber;
 use App\Filament\Resources\Actions\HandlePageBarcodeUpdated;
 use App\Filament\Resources\Actions\HandlePageDedicationUpdated;
 use App\Filament\Resources\Actions\HandlePageOptions;
@@ -71,7 +72,7 @@ class ProductResource extends Resource
                         Wizard\Step::make('Add Product')
                         ->schema([
                             ViewField::make('fonts')->dehydrated(false)->view('forms.components.fonts-loader'),
-                            ViewField::make('auto_save')->dehydrated(false)->view('forms.components.auto-save')->hiddenOn('edit'),
+                            //ViewField::make('auto_save')->dehydrated(false)->view('forms.components.auto-save')->hiddenOn('edit'),
                             Placeholder::make('Info')
                             ->extraAttributes(['dir' => 'rtl'])
                             ->content(new HtmlString('<h1 class="bg-gray-200 p-2 rounded-md font-semibold dark:bg-gray-900">Please put this code {basmti} in the position that will be modified by the user</h1>')),
@@ -91,12 +92,13 @@ class ProductResource extends Resource
                             ->afterStateUpdated(Closure::fromCallable(new MakeSlug()))->reactive(),
                             Textarea::make('excerpt')->rows(4)->extraAttributes(['dir' => 'rtl']),
                             TextInput::make('slug')
-                            //->unique(ignorable: fn ($record) => $record)
-                            ->unique(callback: function (Unique $rule, $state, $context, $record) {
-                                if ($context != 'edit') {
-                                    return $rule->where('slug', $state)->where('is_published', true);
-                                }
-                            })->reactive()->placeholder('product-name')
+                            ->unique(ignorable: fn ($record) => $record)
+                            //->unique(callback: function (Unique $rule, $state, $context, $record) {
+                                //if ($context != 'edit') {
+                                    //return $rule->where('slug', $state)->where('is_published', true);
+                                //}
+                            //})
+                            ->reactive()->placeholder('product-name')
                             ->extraAttributes(['dir' => 'rtl'])
                             ->required(),
                             TextInput::make('price')->placeholder('1.00')->numeric()->minValue(1)->required(),
@@ -129,7 +131,8 @@ class ProductResource extends Resource
                                 //->disk('do')
                                 ->image()
                                 ->uploadProgressIndicatorPosition('left')
-                                ->directory('storage/uploads')
+                                //->directory('storage/uploads')
+                                ->directory('uploads')
                                 ->multiple(),
                             Placeholder::make('Seo')->content(new HtmlString('<h1 class="bg-gray-200 p-2 rounded-md font-semibold dark:bg-gray-900">SEO For Product</h1>')),
                             SEO::make(),
@@ -199,17 +202,17 @@ class ProductResource extends Resource
                                      Grid::make(3)
                                      ->schema([
                                          TextInput::make('name')->required()
-                                          //->unique(ignorable: fn ($record) => $record)
-                                          ->unique(callback: function (Unique $rule, $state, $context, $record) {
-                                              if ($context != 'edit') {
-                                                  if ($record) {
-                                                      $product_published = $record->product->is_published;
-                                                      if ($product_published && $rule->where('name', $state)) {
-                                                          return true;
-                                                      }
-                                                  }
-                                              }
-                                          })
+                                          ->unique(ignorable: fn ($record) => $record)
+                                          //->unique(callback: function (Unique $rule, $state, $context, $record) {
+                                              //if ($context != 'edit') {
+                                                  //if ($record) {
+                                                      //$product_published = $record->product->is_published;
+                                                      //if ($product_published && $rule->where('name', $state)) {
+                                                          //return true;
+                                                      //}
+                                                  //}
+                                              //}
+                                          //})
                                           ->extraAttributes(['dir' => 'rtl'])
                                           ->helperText('Document name must be unique')
                                           ->reactive()->afterStateUpdated(Closure::fromCallable(new HandleDocumentName())),
@@ -224,7 +227,7 @@ class ProductResource extends Resource
                                              ])->required()->reactive()
                                               ->helperText('Select a Type To Upload a Document')
                                         ->disabled(function (Closure $get){
-                                        if(count($get('attatchment')) > 0){
+                                        if($get('pdf_name') !=null){
                                             return true;
                                         }
                                          return false;
@@ -254,7 +257,6 @@ class ProductResource extends Resource
                                         foreach ($fonts as $font) {
                                             $fonts_array = array_merge($fonts_array, [$font->font_name => $font->font_name]);
                                         }
-
                                         return $fonts_array;
                                     })->afterStateUpdated(function (Closure $get, Closure $set, $state) {
                                         $pages = $get('pages');
@@ -289,21 +291,20 @@ class ProductResource extends Resource
                                                           if ($get('document') != '' && $get('../../pdf_info') != '') {
                                                               return false;
                                                           }
-
                                                           return true;
                                                       })->afterStateUpdated(Closure::fromCallable(new HandlePageUpdated()))->reactive()->required(),
                                                   Select::make('document')
                                                       ->options(Closure::fromCallable(new HandleDocumentOptions()))
-                                                      ->reactive(),
+                                                      ->disabled(function (Closure $set, Closure $get, $state) {
+                                                          if ($get('document') != '' && $get('../../pdf_info') != '') {
+                                                              return false;
+                                                          }
+                                                          return false;
+                                                      })->reactive(),
                                               ]),
                                               PDFEditor::make('pages')->set_pdf_data(Closure::fromCallable(new SetPdfDataForPositioner()))
                                               ->reactive(),
-                                          ])->minItems(1)->collapsible()->itemLabel(function (array $state) {
-                                              //return "Page #";
-                                              if ($state['document']) {
-                                                  return 'Page #'.($state['page'] + 1).' Of '.$state['document'];
-                                              }
-                                          }),
+                                          ])->minItems(1)->collapsible()->itemLabel(Closure::fromCallable(new HandleEditorPageNumber())),
                                 ]),
                         Wizard\Step::make('Position Dedications')
                                 ->schema([
@@ -354,7 +355,7 @@ class ProductResource extends Resource
                             return true;
                         }
 
-                        return true;
+                        return false;
                         //return false;
                     }),
                 ]),

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\FormSubmissionInfoAdmin;
 use App\Models\FormSubmissions;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class FormSubmissionController extends Controller
 {
@@ -19,6 +21,8 @@ class FormSubmissionController extends Controller
         ]);
         $form = FormSubmissions::create(['form' => 'request', 'content' => $request->all()]);
 
+        $email = config('mail.from.address');
+        Mail::to($email)->queue(new FormSubmissionInfoAdmin($form));
         return $form;
     }
 
@@ -32,6 +36,8 @@ class FormSubmissionController extends Controller
         ]);
         $form = FormSubmissions::create(['form' => 'contact', 'content' => $request->all()]);
 
+        $email = config('mail.from.address');
+        Mail::to($email)->queue(new FormSubmissionInfoAdmin($form));
         return $form;
     }
 }

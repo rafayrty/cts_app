@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\ClientStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OrderProcessRequest;
+use App\Mail\OrderInfoAdmin;
 use App\Mail\OrderSuccess;
 use App\Mail\OrderSummary;
 use App\Models\Coupon;
@@ -43,6 +44,8 @@ class OrdersController extends Controller
             $buyer = $this->buyerToken($request);
             // Check If There are any issues in generating the Token
                 if ($buyer['status_code'] != 0) {
+
+                    Log::error($buyer);
                     throw ValidationException::withMessages(['message' => $buyer['status_error_details']]);
                     //return response()->json(['message' => $buyer['status_error_details']], 500);
                 }
@@ -61,8 +64,8 @@ class OrdersController extends Controller
                 'shipping' => $request->shipping_fee * 100,
                 'coupon' => $request->coupon,
                 'total' => $request->total * 100,
-                'print_house_status' => PrintHouseStatusEnum::STARTING,
-                'client_status' => ClientStatusEnum::STARTING,
+                'print_house_status' => PrintHouseStatusEnum::NEW_ORDER,
+                'client_status' => ClientStatusEnum::NEW_ORDER,
                 'payment_status' => 'PENDING',
             ]);
 
@@ -124,6 +127,8 @@ class OrdersController extends Controller
             $sale = $this->generateSale($request, $order, $buyer);
 
             if ($sale['status_code'] != 0) {
+
+                Log::error($sale);
                 throw ValidationException::withMessages(['message' => $sale['status_error_details']]);
                 throw $sale['status_error_details'];
             }
@@ -134,6 +139,14 @@ class OrdersController extends Controller
             //Send Order Success Email
             Mail::to(auth()->user()->email)->queue(new OrderSuccess($order));
             Mail::to(auth()->user()->email)->queue(new OrderSummary($order));
+
+            $email = config('mail.from.address');
+            Mail::to($email)->queue(new OrderInfoAdmin($order));
+
+            //Send email to admin
+            //$email = config('mail.from.address');
+            //Mail::to($email)->queue(new OrderSuccess($order));
+
             DB::commit();
         } catch (Throwable $e) {
             throw $e;
@@ -166,7 +179,7 @@ class OrdersController extends Controller
             'credit_card_number' => strlen(trim(str_replace(' ', '', $request->creditCard))) > 16 ? substr(trim(str_replace(' ', '', $request->creditCard)), 0, -1) : trim(str_replace(' ', '', $request->creditCard)),
             'credit_card_exp' => $request->expiry,
             'credit_card_cvv' => $request->cvv,
-            'language' => 'en',
+            'language' => 'he',
         ];
         // Generate Token
         $response = Http::post($payme_url.'/capture-buyer-token', $data);
@@ -205,7 +218,6 @@ class OrdersController extends Controller
             'credit_card_exp' => $request->expiry,
             'credit_card_cvv' => $request->cvv,
         ];
-        Log::info($data);
         // Generate Token
         $response = Http::post($payme_url.'/generate-sale', $data);
 
@@ -289,7 +301,6 @@ class OrdersController extends Controller
                 'country' => 'IL',
             ],
         ];
-        Log::info($data);
         // Generate Token
         $response = Http::post($payme_url.'/generate-sale', $data);
 
@@ -299,28 +310,38 @@ class OrdersController extends Controller
     }
     public function barcode_generator($number)
     {
+
         $file_name = 'barcodes/' . time() . $number . '.png';
 
         $background_color = "FFFFFF";
+        $padding = 10; // Adjust the padding value as desired
 
         // Generate a 1D barcode (e.g., Code39)
-        $barcode = DNS1DFacade::getBarcodePNGPath($number, 'CODE11', 1, 30,array(0,0,0), true);
+        $barcode = DNS1DFacade::getBarcodePNGPath($number, 'C128', 1, 55,array(0,0,0), true);
 
         // Load the generated barcode image
         $source_image = imagecreatefrompng($barcode);
 
         // Get image dimensions
-        $width = imagesx($source_image);
-        $height = imagesy($source_image);
+        $barcode_width = imagesx($source_image);
+        $barcode_height = imagesy($source_image);
 
-        // Create a new image with the desired background color
-        $bg_color = imagecreatetruecolor($width, $height);
+        // Calculate the new dimensions for the padded image
+        $padded_width = $barcode_width + ($padding * 2);
+        $padded_height = $barcode_height + ($padding * 2);
+
+        // Create a new image with the desired background color and padding
+        $bg_color = imagecreatetruecolor($padded_width, $padded_height);
         list($r, $g, $b) = sscanf($background_color, "%02x%02x%02x");
         $color = imagecolorallocate($bg_color, $r, $g, $b);
-        imagefilledrectangle($bg_color, 0, 0, $width, $height, $color);
+        imagefilledrectangle($bg_color, 0, 0, $padded_width, $padded_height, $color);
 
-        // Merge the source image with the background image
-        imagecopyresampled($bg_color, $source_image, 0, 0, 0, 0, $width, $height, $width, $height);
+        // Calculate the position to merge the barcode image with the padded image
+        $position_x = $padding;
+        $position_y = $padding;
+
+        // Merge the source image with the background image at the specified position
+        imagecopy($bg_color, $source_image, $position_x, $position_y, 0, 0, $barcode_width, $barcode_height);
 
         // Save the final image to a temporary file
         $temp_file = tempnam(sys_get_temp_dir(), 'barcode');

@@ -23,7 +23,8 @@ class CreateZipFileFromList
         // Add each file to the zip
         foreach ($files as $file) {
             $fileName = basename($file);
-            $zip->addFile(storage_path('app/'.$file), $fileName);
+            //$zip->addFile(storage_path('app/'.$file), $fileName);
+            $zip->addFile($file, $fileName);
         }
 
         // Close the zip

@@ -9,99 +9,29 @@ use Karkow\MuPdf\Pdf;
 
 class HandleProductAttatchment
 {
+    public $pdfs = [];
+    //public $old_pdf_count = 0;
+    public $old_pdf = '';
+
     public function __invoke(Closure $set, Closure $get, $state)
     {
         //$name = $state->getClientOriginalName();
         $name = uniqid().".pdf";
-        if ($name != $get('pdf_name') && $get('../../pdf_info') != '' && $get('pdf_name') != null) {
-            $pdfs = json_decode($get('../../pdf_info'), true);
-            $key = array_search($get('pdf_name'), array_column($pdfs, 'filename'));
+        $this->old_pdf = $get('pdf_name');
 
-            unset($pdfs[$key]);
-            $set('../../pdf_info', json_encode($pdfs));
-        }
-        $path = Storage::disk('local')->path($state->path());
-        $pdf = new Pdf($state->path(), config('app.mupdf_path'));
-        $set('pdf_name', $name);
-        if ($get('../../pdf_info') != '') {
-            $pdfs = json_decode($get('../../pdf_info'), true);
-        } else {
-            $pdfs = [];
-        }
+        //Start by setting the pdfinfo and $pdfs
+        // PDFINFO Stores information about the current files that we have their pdf images as well as dimensions and other info like name e.t.c
+        $this->set_pdf_info($get,$set,$name);
 
+        $this->add_to_pdf_info($get,$set,$state,$name);
 
+        $set('../../pdf_info', json_encode($this->pdfs));
 
-
-        $count = $this->getPDFPages($state->path());
-        $dimensions = $this->getDimensions($state->path());
-        $set('dimensions', $dimensions);
-        $images = [];
-
-        if ($get('type') != 2) {
-            $img_path = 'uploads/'.time().$get('type').'-'.'actual-cover'.'.png';
-
-            $img = $pdf->setPage(1)->saveImage($img_path);
-            $images = $this->getSplittedImages($img_path);
-
-            $dimensions['width'] = $dimensions['width'] / 2;
-            //$dimensions['width'] = getimagesize($images[0])[0];
-            //$dimensions['height'] = getimagesize($images[0])[1];
-
-            array_push($pdfs, ['filename' => $name, 'dimensions' => json_encode($dimensions), 'type' => $get('type'), 'name' => $get('name'), 'pdf' => $images]);
-        } else {
-            $images = [];
-            for ($i = 1; $i <= $count; $i++) {
-                $img_path = 'uploads/'.time().$get('type').'-'.$i.'.png';
-                $pdf->setPage($i)
-                    ->saveImage($img_path);
-                $images[] = $img_path;
-            }
-
-            //array_push($pdfs, ['filename' => $name, 'dimensions' => json_encode($get('dimensions')), 'type' => $get('type'), 'name' => $get('name'), 'pdf' => $images]);
-            array_push($pdfs, ['filename' => $name, 'dimensions' => json_encode($dimensions), 'type' => $get('type'), 'name' => $get('name'), 'pdf' => $images]);
-        }
-
-        $set('../../pdf_info', json_encode($pdfs));
-
-
-
-
-        //$pages = $get('../../pages');
-        //$new_pages = [];
-        //$pdf_info = $pdfs;
-        //$documents = [];
-
-        //$found_document = [];
-
-        //foreach($pdfs as $pdf){
-            //if($pdf['name']==$get('name')){
-                 //$found_document = $pdf;
-            //}
-        //}
-
-        //foreach ($pages as $key => $page) {
-            //if ($page['document'] == $get('name')) {
-                //$page['pages']['dimensions'] = $get('dimensions');
-                //$new_pages[] = $page;
-            //}
-         //}
-            ////Splicing the pages
-        ////$new_pages = array_splice($new_pages,0,count($found_document));
-        //$total_pages = count($found_document['pdf']);
-        //$new_updated_pages = [];
-        //foreach($new_pages as $page){
-            //if($page['document']==$found_document['name']){
-                //if($page['pages']['page_number']<$total_pages){
-                        //$new_updated_pages[] = $page;
-                //}
-            //}
-        //}
-        //$set('pages', $new_updated_pages);
-        //$set('pages', $get('pages'));
     }
 
     public function getDimensions($document)
     {
+
     $cmd = config('app.pdf_info_path');
     exec("$cmd \"$document\" 2>&1", $output);
 
@@ -177,4 +107,137 @@ class HandleProductAttatchment
 
       return [$left_path, $right_path];
   }
+
+
+    public function set_pdf_info(Closure $get,Closure $set,$name)
+    {
+        //Remove the existing document from pdfinfo if it exists
+        if ($get('../../pdf_info') != '' && $get('pdf_name') != null) {
+            $this->pdfs = json_decode($get('../../pdf_info'), true); // Map $this->pdfs from pdf_info
+            $key = array_search($get('pdf_name'), array_column($this->pdfs, 'filename')); //Search using filename
+            //$this->old_pdf_count = count($this->pdfs[$key]['pdf']);
+            unset($this->pdfs[$key]); // Delete the entry from the array
+
+            $set('../../pdf_info', json_encode($this->pdfs)); // Update the pdfinfo json field
+        }        //Else proceed from scratch
+
+        $set('pdf_name', $name);
+
+        if ($get('../../pdf_info') != '') {
+            $this->pdfs = json_decode($get('../../pdf_info'), true); // Map $this->pdfs from pdf_info it might have been updated as well
+        } else {
+            $this->pdfs = [];
+        }
+    }
+
+
+
+    public function add_to_pdf_info(Closure $get,Closure $set,$state,$name):void
+    {
+
+        $mupdf = new Pdf($state->path(), config('app.mupdf_path'));
+
+        $count = $this->getPDFPages($state->path()); //Get The Number of Pages
+        $dimensions = $this->getDimensions($state->path());
+        $set('dimensions', $dimensions);
+
+        //Incase we have a cover hard or soft
+        if ($get('type') != 2) {
+
+            $img_path = 'uploads/'.time().$get('type').'-'.'actual-cover'.'.png';
+
+            $mupdf->setPage(1)->saveImage($img_path);
+
+            $images = $this->getSplittedImages($img_path);
+
+            $dimensions['width'] = $dimensions['width'] / 2;
+
+            unlink($img_path); //Delete the original cover image after getting the splitted version
+
+
+            if(app()->isProduction()){
+                $this->upload_to_do($images);
+            }
+            array_push($this->pdfs, [
+                'filename' => $name,
+                'dimensions' => json_encode($dimensions),
+                'type' => $get('type'),
+                'name' => $get('name'),
+                'pdf' => $images
+            ]);
+
+        } else {
+            $images = [];
+            for ($i = 1; $i <= $count; $i++) {
+                $img_path = 'uploads/'.time().$get('type').'-'.$i.'.png';
+                $mupdf->setPage($i)
+                    ->saveImage($img_path);
+                $images[] = $img_path;
+            }
+
+            //array_push($pdfs, ['filename' => $name, 'dimensions' => json_encode($get('dimensions')), 'type' => $get('type'), 'name' => $get('name'), 'pdf' => $images]);
+            if(app()->isProduction()){
+                $this->upload_to_do($images);
+            }
+            array_push($this->pdfs,[
+                'filename' => $name,
+                'dimensions' => json_encode($dimensions),
+                'type' => $get('type'),
+                'name' => $get('name'),
+                'pdf' => $images
+            ]);
+        }
+
+        $this->adjust_pages($get,$set,$count);
+    }
+
+    // Works in pdf reupload only
+    //Incase the number of pages which were already assigned to the document are more than the new uploaded document
+    public function adjust_pages(Closure $get,Closure $set,$new_count){
+
+
+        $pages = $get('../../pages');
+        $barcodes = $get('../../barcodes');
+        $dedications = $get('../../dedications');
+
+        $new_pages = [];
+        $new_barcodes = [];
+        $new_dedications = [];
+
+        foreach ($pages as &$page) {
+            if ($page['document'] == $this->old_pdf) {
+                continue;
+            }
+            $new_pages[] = $page;
+         }
+
+        foreach ($barcodes as &$barcode) {
+            if ($barcode['document'] == $this->old_pdf) {
+                continue;
+            }
+            $new_barcodes[] = $barcode;
+         }
+
+        foreach ($dedications as &$dedication) {
+            if ($dedication['document'] == $this->old_pdf) {
+                continue;
+            }
+            $new_dedications[] = $dedication;
+         }
+
+        $set('../../pages',$new_pages);
+        $set('../../dedications',$new_dedications);
+        $set('../../barcodes',$new_barcodes);
+
+
+    }
+    public function upload_to_do($images){
+
+        foreach($images as $image){
+            Storage::disk('do')->put($image, file_get_contents($image));
+            Storage::disk('do')->setVisibility($image,'public');
+            // Delete the local file
+            unlink($image);
+        }
+    }
 }

@@ -16,7 +16,7 @@ class HandleDocumentOptions
                 foreach ($json_pdfs as $pdf) {
                     if ($pdf['name']) {
                         //$array[] = $pdf['name'];
-                        $array[$pdf['name']] = $pdf['name'];
+                        $array[$pdf['filename']] = $pdf['name'];
                     }
                 }
             }

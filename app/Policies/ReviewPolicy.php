@@ -17,7 +17,7 @@ class ReviewPolicy
      */
     public function viewAny(User $user)
     {
-        return $user->can('review.viewAny');
+        return $user->can('reviews.viewAny');
     }
 
     /**
@@ -27,7 +27,7 @@ class ReviewPolicy
      */
     public function view(User $user, Review $review)
     {
-        return $user->can('review.view');
+        return $user->can('reviews.view');
     }
 
     /**
@@ -38,7 +38,7 @@ class ReviewPolicy
      */
     public function create(User $user)
     {
-        return $user->can('review.create');
+        return $user->can('reviews.create');
     }
 
     /**
@@ -49,7 +49,7 @@ class ReviewPolicy
      */
     public function update(User $user, Review $review)
     {
-        return $user->can('review.update');
+        return $user->can('reviews.update');
     }
 
     /**
@@ -60,7 +60,7 @@ class ReviewPolicy
      */
     public function delete(User $user, Review $review)
     {
-        return $user->can('review.delete');
+        return $user->can('reviews.delete');
     }
 
     /**

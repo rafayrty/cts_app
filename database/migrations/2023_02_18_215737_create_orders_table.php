@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('payme_sale_id');
             $table->integer('sub_total');
             $table->integer('shipping');
+            $table->boolean('is_viewed')->comment("For Admin Use")->default(false);
             $table->integer('total');
             $table->string('coupon')->nullable();
             $table->string('client_status');

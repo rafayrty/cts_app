@@ -11,7 +11,7 @@ class CalculationsOrder
     public function __invoke(Closure $set, Closure $get)
     {
                 $sub_total = 0;
-                $items = $get('../../items');
+                $items = $get('../../order_items');
                 foreach ($items as $item) {
                     $cover_id = (int) $item['cover_id'];
                     $product_id = (int) $item['product_id'];

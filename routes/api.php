@@ -64,7 +64,7 @@ Route::post('/coupon', [CouponController::class, 'apply'])->name('coupon.apply')
 | Products Routes
 |--------------------------------------------------------------------------
 */
-Route::group(['middleware'=>'cacheResponse:300'],function() {
+//Route::group(['middleware'=>'cacheResponse:300'],function() {
     Route::get('/products/most-sold-products', [ProductsController::class, 'get_most_sold_products'])->name('products.most-sold-products');
     Route::get('/products/get-featured-products', [ProductsController::class, 'get_featured_products'])->name('products.featured-products');
     Route::get('/products/get-related-products/{product_id}/{category_id}/{gender?}', [ProductsController::class, 'get_related_products'])->name('products.related-products');
@@ -83,7 +83,7 @@ Route::group(['middleware'=>'cacheResponse:300'],function() {
     Route::get('/documents/product/{slug}', [PersonalizationController::class, 'get_document_product_slug'])->name('documents.get-document-product-slug');
     Route::get('/documents/inputs/{slug}', [PersonalizationController::class, 'get_document_inputs_slug'])->name('documents.get-document-input-slug');
     Route::get('/documents/{slug}', [PersonalizationController::class, 'get_document_info'])->name('documents.get-document-info');
-});
+//});
 //Get Reviews
 Route::get('/review/{id}', [ReviewController::class, 'get_product_reviews'])->name('review.get-product-reviews');
 
@@ -104,9 +104,11 @@ Route::name('auth.')->group(function () {
     //Route::post('verification/email', [AuthController::class, 'email_verification'])->name('verification.email');
     //Route::post('resend/email', [AuthController::class, 'resend_email'])->name('resend.email');
     Route::post('resend', [AuthController::class, 'resend'])->name('resend');
+    Route::post('resend_email', [AuthController::class, 'resend_email'])->name('resend_email');
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('forgot', [ForgotPasswordController::class, 'forgot_password'])->name('forgot.password');
+    Route::post('forgot_email', [ForgotPasswordController::class, 'forgot_password_email'])->name('forgot.password_email');
     //Route::post('forgot/phone', [ForgotPasswordController::class, 'forgot_password_phone'])->name('forgot.password.phone');
     Route::post('pass/reset', [ForgotPasswordController::class, 'reset_password'])->name('forgot.reset');
     //Route::post('pass/reset/phone', [ForgotPasswordController::class, 'reset_password_phone'])->name('forgot.reset.phone');

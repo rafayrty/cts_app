@@ -35,6 +35,22 @@ class ForgotPasswordController extends Controller
         abort(404, 'No Account was Found');
     }
 
+    public function forgot_password_email(Request $request)
+    {
+        $this->validate($request, [
+            'phone' => 'required',
+            'country_code' => 'required',
+        ]);
+
+        $user_phone = User::where('phone', $request->phone)->where('country_code', $request->country_code)->get()->first();
+
+        if ($user_phone) {
+            $this->sendForgotEmail($user_phone);
+
+            return true;
+        }
+        abort(404, 'No Account was Found');
+    }
     //public function forgot_password(Request $request)
     //{
         //$this->validate($request, [
@@ -52,16 +68,16 @@ class ForgotPasswordController extends Controller
         //abort(404, 'No Account was Found');
     //}
 
-    //public function sendForgotEmail(User $user)
-    //{
-        //$forgot_code = rand(1000, 9999);
-        //DB::table('forgot_passwords')->insert(['user_id' => $user->id, 'type' => 2, 'forgot_code' => $forgot_code, 'created_at' => now(), 'expiry' => now()->addMinutes(10)]);
-        //Mail::to($user->email)->queue(new ForgotPassword($user, $forgot_code));
+    public function sendForgotEmail(User $user):bool
+    {
+        $forgot_code = rand(1000, 9999);
+        DB::table('forgot_passwords')->insert(['user_id' => $user->id, 'type' => 2, 'forgot_code' => $forgot_code, 'created_at' => now(), 'expiry' => now()->addMinutes(10)]);
+        Mail::to($user->email)->queue(new ForgotPassword($user, $forgot_code));
 
-        //return true;
-    //}
+        return true;
+    }
 
-    public function sendForgotPhone(User $user)
+    public function sendForgotPhone(User $user):bool
     {
         $forgot_code = rand(1000, 9999);
         DB::table('forgot_passwords')->insert(['user_id' => $user->id, 'type' => 1, 'forgot_code' => $forgot_code, 'created_at' => now(), 'expiry' => now()->addMinutes(10)]);

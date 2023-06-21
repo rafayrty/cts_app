@@ -18,7 +18,8 @@ class GeneratePDFPage extends Page
 
     public function mount($id)
     {
-        $order = Order::findOrFail($id);
-        $this->items = $order->items;
+        //$order = Order::findOrFail($id);
+        //$this->items = $order->items;
+        return redirect()->route('order.download.pdf',$id);
     }
 }

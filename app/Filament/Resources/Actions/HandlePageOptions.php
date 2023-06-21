@@ -17,7 +17,7 @@ class HandlePageOptions
 
             //Log::info([$get('document')]);
             $array = [];
-            if (is_numeric($key)) {
+            if (is_numeric($key)) { //Hence the key is a number including zero
                 $pages_count = count($json_pdfs[$key]['pdf']);
                 for ($i = 1; $i <= $pages_count; $i++) {
                     $array[] = $i;
@@ -32,7 +32,7 @@ class HandlePageOptions
     {
         $key = null;
         foreach ($array as $key => $value) {
-            if ($value['name'] == $search) {
+            if ($value['filename'] == $search) {
                 return $key;
             }
         }

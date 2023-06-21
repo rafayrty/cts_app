@@ -74,8 +74,8 @@ class OrdersRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
-                Action::make('generate_pdf')
-                ->url(fn (Order $record): string => OrderResource::getUrl('generate_pdf', ['id' => $record->id])),
+                //Action::make('generate_pdf')
+                //->url(fn (Order $record): string => OrderResource::getUrl('generate_pdf', ['id' => $record->id])),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

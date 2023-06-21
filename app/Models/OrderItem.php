@@ -11,6 +11,8 @@ class OrderItem extends Model
 
     protected $guarded = [];
 
+    public $appends = ['nameParsed'];
+
     protected $casts = ['product_info' => 'array', 'cover' => 'array', 'inputs' => 'array'];
 
     public function order()
@@ -21,5 +23,18 @@ class OrderItem extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    //public function cover()
+    //{
+        //return $this->hasOne(Covers::class);
+    //}
+    public function getNameParsedAttribute()
+    {
+
+        $product = $this->product;
+        $name = $this->inputs['name'];
+
+        return str_replace('{basmti}', $name, $product->demo_name);
     }
 }

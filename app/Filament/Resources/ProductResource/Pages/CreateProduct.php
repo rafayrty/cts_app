@@ -27,10 +27,10 @@ class CreateProduct extends CreateRecord
         //$data['is_published'] = true;
 
         //Delete the autosaved data
-        $product = Product::where('slug', $data['slug'])->get()->first();
-        $document = Document::where('product_id', $product->id)->get()->first();
-        Document::findOrFail($document->id)->delete();
-        Product::findOrFail($product->id)->delete();
+        //$product = Product::where('slug', $data['slug'])->get()->first();
+        //$document = Document::where('product_id', $product->id)->get()->first();
+        //Document::findOrFail($document->id)->delete();
+        //Product::findOrFail($product->id)->delete();
 
         return $data;
     }
@@ -56,3 +56,4 @@ class CreateProduct extends CreateRecord
         ];
     }
 }
+

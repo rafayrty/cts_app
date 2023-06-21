@@ -21,13 +21,9 @@ class PDFEditor extends Field
         return $this;
     }
 
-    public function update_pdf_data($data)
-    {
-        dd($data);
-    }
-
    public function getData(): array
    {
        return $this->evaluate($this->data);
    }
+
 }

@@ -14,5 +14,5 @@ $fonts = \App\Models\Fonts::all();
   }
 @endforeach
 </style>
+<script src="/interact.min.js"></script>
 
-<script src="https://unpkg.com/interactjs/dist/interact.min.js"></script>

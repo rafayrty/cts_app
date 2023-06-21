@@ -25,6 +25,8 @@
     <div x-data="{ state: $wire.entangle('{{ $getStatePath() }}').defer }">
 @php
 $order = \App\Models\Order::where('order_numeric_id',$evaluate(fn ($get) => $get('order_numeric_id')))->get()->first();
+
+\App\Models\Order::find($order->id)->update(['is_viewed'=>true]);
 $user_count =  \App\Models\Order::where('user_id',$order->user_id)->count();
 $amount_spent =  \App\Models\Order::where('user_id',$order->user_id)->sum('total');
 @endphp

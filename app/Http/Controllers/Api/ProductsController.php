@@ -52,7 +52,7 @@ class ProductsController extends Controller
 
     public function get_product($slug)
     {
-        $product = Product::where('slug', $slug)->where('is_published', 1)->with('tags')->get()->first();
+        $product = Product::select(['id','images','is_rtl','product_name','slug','demo_name','replace_name','excerpt','price','discount_percentage','description'])->where('slug', $slug)->where('is_published', 1)->with('tags')->get()->first();
         if (! $product) {
             abort(404);
         }

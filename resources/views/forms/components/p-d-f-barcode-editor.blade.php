@@ -43,7 +43,7 @@ table tr{
                 Y_coord: 0,
                 X_coord_percent: 0,
                 Y_coord_percent: 0,
-                max_width: 120,
+                max_width: 200,
                 width_percent: 0,
              });
 

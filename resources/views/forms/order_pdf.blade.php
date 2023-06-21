@@ -14,6 +14,8 @@
 <div x-data="{ state: $wire.entangle('{{ $getStatePath() }}').defer }" style="margin:1rem 0">
 @php
 $order = \App\Models\Order::where('order_numeric_id',$evaluate(fn ($get) => $get('order_numeric_id')))->get()->first();
+// Update to set it as viewed
+\App\Models\Order::find($order->id)->update(['is_viewed'=>true]);
 //$order->documents();
 $items = $order->items;
 $urls = [];

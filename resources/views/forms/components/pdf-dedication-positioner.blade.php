@@ -198,5 +198,5 @@ src="{{ $getData()['page'] }}"
         @endif
     </div>
 </x-forms::field-wrapper>
-<script src="https://unpkg.com/interactjs/dist/interact.min.js"></script>
+<script src="/interact.min.js"></script>
 

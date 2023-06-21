@@ -14,7 +14,7 @@ class ProcessOrderInfo
     public function __invoke(Closure $set, Closure $get, $state)
     {
                 $sub_total = 0;
-                $items = $get('items');
+                $items = $get('order_items');
         if ($items) {
                 foreach ($items as $item) {
                     $cover_id = (int) $item['cover_id'];

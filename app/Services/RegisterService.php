@@ -803,7 +803,7 @@ class RegisterService
             'country_code' => $request->country_code,
         ]);
 
-        $this->verifyPhone($user);
+        //$this->verifyPhone($user);
         return $user;
     }
 
@@ -859,7 +859,7 @@ class RegisterService
     }
 
     /**
-     * Send a Verification Email to the User
+     * Send a Verification Message to the User
      */
     public function verifyPhone(User $user): void
     {
