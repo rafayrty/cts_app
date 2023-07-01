@@ -9,29 +9,27 @@ class GetProductsFilter
 {
     public function __invoke(Request $request)
     {
-        $products = Product::where('is_published', 1);
-
-        if ($request->categories) {
+        $product_type = request()->product_type ?? 1;
+        $products = Product::whereHas('categories', function ($q) use ($request) {
+            if ($request->categories) {
                 $categories = explode(",", $request->categories);
-            if($categories != null){
-                foreach($categories as $category){
-                    Product::whereHas('categories', function ($q) use ($category) {
-                        if ($category != null) {
-                            $q->whereIn('slug', $category);
+                if ($categories != null) {
+                    $q->whereIn('slug', $categories);
 
-                        }
-                    });
                 }
             }
-        }
+        });
 
         if($request->options){
             $options = explode(",", $request->options);
             if($options!=null){
                 foreach($options as $option){
-                    $products->whereHas('product_attributes', function ($q) use ($option) {
-                        $q->where('slug', $option);
-                    });
+                    if($product_type == 2 && $option == 'Male' || $product_type == 2 && $option=='Female'){
+                    }else{
+                        $products->whereHas('product_attributes', function ($q) use ($option) {
+                            $q->where('slug', $option);
+                        });
+                    }
                 }
             }
         }
@@ -43,7 +41,7 @@ class GetProductsFilter
         }
 
         //Check if published
-        $products->where('is_published', 1);
+        $products->where('is_published', 1)->where('product_type',$product_type);
 
         if ($request->sort != '') {
             if ($request->sort == 'high-to-low') {

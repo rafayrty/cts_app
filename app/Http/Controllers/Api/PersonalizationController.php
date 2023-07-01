@@ -29,6 +29,135 @@ class PersonalizationController extends Controller
         return $documents;
     }
 
+    //For Notebooks
+    public function get_notebook_document_info($slug)
+    {
+        $product = Product::where('slug', $slug)->get()->first();
+
+        if (!$product) {
+            abort(404);
+        }
+
+        $name = request()->name;
+        $language = request()->language;
+        if (!request()->name) {
+            $name = $product->replace_name;
+        }
+
+        if (!request()->language) {
+            $language = 'arabic';
+        }
+        $document = null;
+
+        $documents = $product->documents;
+        $found_document = null;
+        $found_cover = null;
+        //Find Type of the document
+        foreach ($documents as $document) {
+
+            if ($document->type == 2 && $document->language == $language) {
+                $found_document = $document;
+            }
+            if ($document->type == 0) {
+                $found_cover = $document;
+            }
+        }
+        if (! $found_document) {
+            abort(404);
+        }
+        if (! $found_cover) {
+            abort(404);
+        }
+        //Get Pages from Product
+        $document = $found_document;
+        $cover = $found_cover;
+        $product = $found_document->product;
+
+        if (! $product) {
+            abort(404);
+        }
+
+        $pages = $product->pagesParsed;
+        $cover_pages = $product->pagesParsed;
+
+        $replace_name = $name;
+
+        //Filtered Pages
+        $filtered_pages = [];
+        $filtered_dedications = [];
+        $filtered_cover_pages = [];
+        $filtered_cover_dedications = [];
+
+        foreach ($pages as $page) {
+            if ($page['document'] == $document->pdf_name) {
+                $filtered_pages[] = [
+                    'page' => $page['page'],
+                    'image' => $page['pages']['page'],
+                    'dimensions' => $page['pages']['dimensions'],
+                    'predefined_texts' => $page['pages']['predefined_texts'],
+                ];
+            }
+        }
+
+        //Filtering Cover Pages
+        foreach ($cover_pages as $cover_page) {
+            if ($cover_page['document'] == $cover->pdf_name) {
+                $filtered_cover_pages[] = [
+                    'page' => $cover_page['page'],
+                    'image' => $cover_page['pages']['page'],
+                    'dimensions' => $cover_page['pages']['dimensions'],
+                    'predefined_texts' => $cover_page['pages']['predefined_texts'],
+                ];
+            }
+        }
+        //Replacing {basmti}
+        if ($filtered_pages) {
+            foreach ($filtered_pages as &$pages) {
+                foreach ($pages['predefined_texts'] as &$page_data) {
+                    $page_data['text'] = trim(str_replace('{basmti}', $replace_name, $page_data['text']));
+                }
+            }
+        }
+
+        //Replacing {basmti}
+        if ($filtered_cover_pages) {
+            foreach ($filtered_cover_pages as &$pages) {
+                foreach ($pages['predefined_texts'] as &$page_data) {
+                    $page_data['text'] = trim(str_replace('{basmti}', $replace_name, $page_data['text']));
+                }
+            }
+        }
+
+        //Filter pdfinfo
+        $pdf_info = json_decode($product->pdf_info, true);
+        $found_pdf = null;
+        foreach ($pdf_info as $pdf) {
+            if ($pdf['filename'] == $found_document->pdf_name) {
+                $found_pdf = $pdf;
+            }
+        }
+
+        //Filter pdfinfo
+        $pdf_info = json_decode($product->pdf_info, true);
+        $found_pdf_cover = null;
+        foreach ($pdf_info as $pdf) {
+            if ($pdf['filename'] == $found_cover->pdf_name) {
+                $found_pdf_cover = $pdf;
+            }
+        }
+        //Replace Names
+        return [
+            'pages' => $found_pdf,
+            'cover_pages' => $found_pdf_cover,
+            'pages_predefined_texts' => $filtered_pages,
+            'pages_dedication_texts' => $filtered_dedications,
+            'cover_pages_predefined_texts' => $filtered_cover_pages,
+            'cover_pages_dedication_texts' => $filtered_cover_dedications,
+        ];
+    }
+
+
+
     public function get_document_info($slug)
     {
         $product = Product::where('slug', $slug)->get()->first();
@@ -47,14 +176,6 @@ class PersonalizationController extends Controller
             $inputs = json_decode($inputs, true);
         }
 
-        //Cleaning the json output
-        //$newArray = [];
-        //foreach ($inputs as $nestedArray) {
-        //foreach ($nestedArray as $key => $value) {
-        //$newArray[$key] = $value;
-        //}
-        //}
-        //$inputs = $newArray;
         if (array_key_exists('name', $inputs)) {
             $inputs['name'] = $inputs['name'] != '' ? $inputs['name'] : $product->replace_name;
         } else {

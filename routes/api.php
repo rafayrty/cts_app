@@ -66,6 +66,7 @@ Route::post('/coupon', [CouponController::class, 'apply'])->name('coupon.apply')
 */
 //Route::group(['middleware'=>'cacheResponse:300'],function() {
     Route::get('/products/most-sold-products', [ProductsController::class, 'get_most_sold_products'])->name('products.most-sold-products');
+    Route::get('/products/personalized-notebooks', [ProductsController::class, 'get_personalized_notebooks_products'])->name('products.personalized-notebooks-products');
     Route::get('/products/get-featured-products', [ProductsController::class, 'get_featured_products'])->name('products.featured-products');
     Route::get('/products/get-related-products/{product_id}/{category_id}/{gender?}', [ProductsController::class, 'get_related_products'])->name('products.related-products');
     Route::get('/products/get-product-slugs', [ProductsController::class, 'get_product_slugs'])->name('products.get-product-slugs');
@@ -80,8 +81,11 @@ Route::post('/coupon', [CouponController::class, 'apply'])->name('coupon.apply')
     Route::get('/categories/get-featured-categories', [CategoriesController::class, 'get_featured_categories'])->name('categories.featured-categories');
     Route::get('/categories/get-all-categories', [CategoriesController::class, 'get_all_categories'])->name('categories.get-all-categories');
 
+
     Route::get('/documents/product/{slug}', [PersonalizationController::class, 'get_document_product_slug'])->name('documents.get-document-product-slug');
     Route::get('/documents/inputs/{slug}', [PersonalizationController::class, 'get_document_inputs_slug'])->name('documents.get-document-input-slug');
+
+    Route::get('/documents-notebook/{slug}', [PersonalizationController::class, 'get_notebook_document_info'])->name('documents.get-notebook-document-info');
     Route::get('/documents/{slug}', [PersonalizationController::class, 'get_document_info'])->name('documents.get-document-info');
 //});
 //Get Reviews

@@ -154,7 +154,7 @@ class OrderResource extends Resource
                                  ->extraAttributes(['dir' => 'rtl'])->preload()
                                  ->afterStateUpdated(Closure::fromCallable(new CalculationsOrder()))
                                  ->options(Covers::all()->pluck('name', 'id'))->searchable()->required()->reactive()->disabled(),
-                         Textarea::make('dedication')->required()->maxLength(500),
+                         Textarea::make('dedication')->maxLength(500),
                     ])
                     ->disableItemCreation()
                     ->disableItemDeletion()
@@ -167,7 +167,7 @@ class OrderResource extends Resource
                          Select::make('product_id')->label('Product Name')
                         ->extraAttributes(['dir' => 'rtl'])->preload()
                         ->afterStateUpdated(Closure::fromCallable(new CalculationsOrder()))
-                        ->options(Product::all()->pluck('product_name', 'id'))->searchable()->required()->reactive()
+                        ->options(Product::where('product_type',1)->pluck('product_name', 'id'))->searchable()->required()->reactive()
                         ->hiddenOn(['edit','view']),
                          Grid::make(3)->schema([
                              TextInput::make('name')->required(),
@@ -178,7 +178,7 @@ class OrderResource extends Resource
                                  ->extraAttributes(['dir' => 'rtl'])->preload()
                                  ->afterStateUpdated(Closure::fromCallable(new CalculationsOrder()))
                                  ->options(Covers::all()->pluck('name', 'id'))->searchable()->required()->reactive()->hiddenOn(['edit','view']),
-                         Textarea::make('dedication')->required()->maxLength(500)->hiddenOn(['edit','view']),
+                         Textarea::make('dedication')->maxLength(500)->hiddenOn(['edit','view']),
                     ])
                     ->collapsible()->collapsed()
                     ->hiddenOn(['edit','view']),

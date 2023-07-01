@@ -13,7 +13,10 @@ class ListProducts extends ListRecords
     protected function getActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()->label('New Personalized Book'),
+            Actions\Action::make('new_personalized_notebook')
+            ->label('New Personalized NoteBook')
+            ->url('/admin/new-products/create'),
         ];
     }
 }

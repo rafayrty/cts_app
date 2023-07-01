@@ -29,6 +29,9 @@ return new class extends Migration
             $table->json('barcodes')->nullable();
             $table->text('pdf_info')->nullable();
             $table->boolean('featured')->default(false);
+
+            $table->json('languages')->nullable()->comment('For Notebook Product only');
+            $table->tinyInteger('product_type')->default(1)->comment('1. Books,2. Notebook');
             $table->integer('sold_amount')->default(0);
             //$table->text('pdf_name');
             $table->integer('price')->nullable();

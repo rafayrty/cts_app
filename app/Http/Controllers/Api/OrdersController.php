@@ -89,15 +89,14 @@ class OrdersController extends Controller
             }
             foreach ($order_items as $item) {
                 $original_product = Product::findOrFail($item['id']);
-                if ($original_product->front_price != $item['price'] && $original_product->front_price + $item['cover']['price'] != $item['total']) {
-                    //abort(404);
-                }
                 //Get Documents
                 //Update product sold
                 $prd = Product::find($item['id']);
                 $prd = $prd->update(['sold_amount' => $prd->sold_amount + 1]);
 
-                $item['cover']['price'] = $item['cover']['price'] * 100;
+                if($original_product->product_type==1){
+                    $item['cover']['price'] = $item['cover']['price'] * 100;
+                }
                 $order_item = OrderItem::create([
                     'order_id' => $order->id,
                     'product_info' => $original_product,
@@ -105,20 +104,34 @@ class OrdersController extends Controller
                     'gender' => $item['gender'],
                     'name' => $item['product_name'],
                     'image' => $item['image'],
-                    'discount_total' => ($original_product->price - $original_product->front_price) * 100,
+                    'product_type' => $item['product_type'],
+                    'language'=>$item['language'],
+                    'discount_total' =>
+                    $original_product->product_type == 1 ? (($original_product->price - $original_product->front_price) * 100) :
+                    (($original_product->price * 4 - $original_product->front_price * 4) * 100),
                     'inputs' => $item['inputs'],
                     'dedication' => $item['dedication'],
-                    'cover' => $item['cover'],
+                    'cover' => $item['cover'] ?? null,
                     'price' => $item['price'] * 100,
                     'total' => $item['total'] * 100,
                 ]);
 
                 $calculated_subtotal += $item['total'];
-                foreach ($original_product->documents as $document) {
-                    //Type of the cover hard or soft cover generating barcodes
-                    if ($document->type == ($item['cover']['type'] == 2 ? 0 : 1) || $document->type == 2) {
-                        $number = $order->order_numeric_id.'-'.$original_product->id.'-'.$document['id'].'-'.$order_item->id;
-                        $barcodes[] = ['barcode_path' => $this->barcode_generator($number), 'barcode_number' => $number];
+                if($original_product->product_type == 1){
+                    foreach ($original_product->documents as $document) {
+                        //Type of the cover hard or soft cover generating barcodes
+                        if ($document->type == ($item['cover']['type'] == 2 ? 0 : 1) || $document->type == 2) {
+                            $number = $order->order_numeric_id.'-'.$original_product->id.'-'.$document['id'].'-'.$order_item->id;
+                            $barcodes[] = ['barcode_path' => $this->barcode_generator($number), 'barcode_number' => $number];
+                        }
+                    }
+                }else if($original_product->product_type == 2){
+                    foreach ($original_product->documents as $document) {
+                        //Type of the cover hard or soft cover generating barcodes
+                        if ($document->type == 0) {
+                            $number = $order->order_numeric_id.'-'.$original_product->id.'-'.$document['id'].'-'.$order_item->id;
+                            $barcodes[] = ['barcode_path' => $this->barcode_generator($number), 'barcode_number' => $number];
+                        }
                     }
                 }
             }
@@ -252,14 +265,17 @@ class OrdersController extends Controller
                 'product_code' => $original_product->id,
             ];
 
-            $items[] = [
-                'name' => $item['cover']['name'],
-                'quantity' => 1,
-                'unit_price' => $item['cover']['price'],
-                'total' => $item['price'],
-                'discount_total' => 0,
-                'product_code' => $item['cover']['id'],
-            ];
+            if($original_product->product_type == 1){
+
+                $items[] = [
+                    'name' => $item['cover']['name'],
+                    'quantity' => 1,
+                    'unit_price' => $item['cover']['price'],
+                    'total' => $item['price'],
+                    'discount_total' => 0,
+                    'product_code' => $item['cover']['id'],
+                ];
+            }
         }
 
         $data = [

@@ -24,6 +24,9 @@ return new class extends Migration
             $table->json('dedications')->nullable();
             $table->json('dimensions')->nullable();
             $table->json('barcodes')->nullable();
+
+            //For Second Product Type Only
+            $table->string('language')->nullable()->comment('For Notebook Product only');
             $table->bigInteger('product_id')->unsigned()->nullable();
             $table->foreign('product_id')
                     ->references('id')

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Actions\Products\GetFeaturedProductsAction;
 use App\Actions\Products\GetMostSoldProductsAction;
+use App\Actions\Products\GetPersonalizedNotebookProductsAction;
 use App\Actions\Products\GetProductAttributeOptionsAction;
 use App\Actions\Products\GetProductsFilter;
 use App\Http\Controllers\Controller;
@@ -14,6 +15,7 @@ class ProductsController extends Controller
 {
     public function __construct(
     GetMostSoldProductsAction $getMostSoldProductsAction,
+    GetPersonalizedNotebookProductsAction $getPersonalizedNotebookProductsAction,
     GetFeaturedProductsAction $getFeaturedProductsAction,
     GetProductAttributeOptionsAction $getProductAttributeOptionsAction,
     GetProductsFilter $getProductsFilter
@@ -22,6 +24,7 @@ class ProductsController extends Controller
         $this->getFeaturedProductsAction = $getFeaturedProductsAction;
         $this->getProductAttributeOptionsAction = $getProductAttributeOptionsAction;
         $this->getProductsFilter = $getProductsFilter;
+        $this->getPersonalizedNotebookProductsAction = $getPersonalizedNotebookProductsAction;
     }
 
     public function get_product_slugs()
@@ -52,7 +55,7 @@ class ProductsController extends Controller
 
     public function get_product($slug)
     {
-        $product = Product::select(['id','images','is_rtl','product_name','slug','demo_name','replace_name','excerpt','price','discount_percentage','description'])->where('slug', $slug)->where('is_published', 1)->with('tags')->get()->first();
+        $product = Product::select(['id','images','is_rtl','languages','product_name','slug','demo_name','replace_name','excerpt','price','discount_percentage','description'])->where('slug', $slug)->where('is_published', 1)->with('tags')->get()->first();
         if (! $product) {
             abort(404);
         }
@@ -75,6 +78,10 @@ class ProductsController extends Controller
         return ($this->getMostSoldProductsAction)();
     }
 
+    public function get_personalized_notebooks_products()
+    {
+        return ($this->getPersonalizedNotebookProductsAction)();
+    }
     public function get_featured_products()
     {
         return ($this->getFeaturedProductsAction)();

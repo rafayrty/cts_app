@@ -2,6 +2,13 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\NewProductResource\Pages;
+use App\Models\Product;
+use Filament\Resources\Form;
+use Filament\Resources\Resource;
+use Filament\Resources\Table;
+use Filament\Tables;
+
 use App\Filament\Resources\Actions\HandleDocType;
 use App\Filament\Resources\Actions\HandleDocumentName;
 use App\Filament\Resources\Actions\HandleDocumentOptions;
@@ -14,12 +21,10 @@ use App\Filament\Resources\Actions\HandleProductAttatchment;
 use App\Filament\Resources\Actions\MakeSlug;
 use App\Filament\Resources\Actions\SetPdfDataForDedicationPositioner;
 use App\Filament\Resources\Actions\SetPdfDataForPositioner;
-use App\Filament\Resources\ProductResource\Pages;
 use App\Forms\Components\CustomRepeater;
 use App\Forms\Components\PDFBarcodeEditor;
 use App\Forms\Components\PDFDedicationEditor;
 use App\Forms\Components\PDFEditor;
-use App\Models\Product;
 use App\Models\Tags;
 use Closure;
 use Filament\Forms\Components\Card;
@@ -29,6 +34,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -36,10 +42,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ViewField;
 use Filament\Forms\Components\Wizard;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\HtmlString;
@@ -47,19 +49,15 @@ use Illuminate\Validation\Rules\Unique;
 use Mohamedsabil83\FilamentFormsTinyeditor\Components\TinyEditor;
 use RalphJSmit\Filament\SEO\SEO;
 
-class ProductResource extends Resource
+class NewProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static bool $shouldRegisterNavigation = false;
+    //protected static ?string $navigationLabel = 'Product Management';
 
-    protected static ?string $navigationGroup = 'Product Management';
-
-    protected static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::count();
-    }
-
+    protected static ?string $slug = 'new-products';
     public static function form(Form $form): Form
     {
         //session()->remove('documents');
@@ -76,6 +74,8 @@ class ProductResource extends Resource
                             Placeholder::make('Info')
                             ->extraAttributes(['dir' => 'rtl'])
                             ->content(new HtmlString('<h1 class="bg-gray-200 p-2 rounded-md font-semibold dark:bg-gray-900">Please put this code {basmti} in the position that will be modified by the user</h1>')),
+                            //Define the product type as A Personalized Notebook
+                            Hidden::make('product_type')->default(2),
                             Grid::make(2)->schema([
                                 TextInput::make('demo_name')->placeholder('Enter Product Name With the {basmti}')
                                 ->regex('/basmti/')
@@ -108,8 +108,9 @@ class ProductResource extends Resource
                             Checkbox::make('featured')->label('Featured Product'),
                             CheckboxList::make('product_attributes')
                                 ->relationship('product_attributes', 'name')->required(),
-                            CheckboxList::make('covers')
-                                ->relationship('covers', 'name')->required(),
+
+                            CheckboxList::make('languages')
+                                ->options(['hebrew'=>"Hebrew",'arabic'=>"Arabic","english"=>"English"])->required(),
                             Select::make('tags')
                             ->multiple()
                             ->extraAttributes(['dir' => 'rtl'])->preload()
@@ -199,7 +200,7 @@ class ProductResource extends Resource
                              CustomRepeater::make('Documents')
                              ->relationship('documents')
                                  ->schema([
-                                     Grid::make(3)
+                                     Grid::make(4)
                                      ->schema([
                                          TextInput::make('name')->required()
                                           ->unique(ignorable: fn ($record) => $record)
@@ -219,11 +220,13 @@ class ProductResource extends Resource
                                          CheckboxList::make('gender')
                                             ->inlineLabel()
                                             ->options(['Male' => 'Male', 'Female' => 'Female'])->required(),
+                                         Radio::make('language')
+                                            ->inlineLabel()
+                                            ->options(['hebrew'=>"Hebrew",'arabic'=>"Arabic","english"=>"English"])->required(),
                                          Select::make('type')
                                              ->options([
-                                                 '0' => 'Soft Cover',
-                                                 '1' => 'Hard Cover',
-                                                 '2' => 'Book',
+                                                 '0' => 'Notebook Cover',
+                                                 '2' => 'NoteBook',
                                              ])->required()->reactive()
                                               ->helperText('Select a Type To Upload a Document')
                                         ->disabled(function (Closure $get){
@@ -306,28 +309,6 @@ class ProductResource extends Resource
                                               ->reactive(),
                                           ])->minItems(1)->collapsible()->itemLabel(Closure::fromCallable(new HandleEditorPageNumber())),
                                 ]),
-                        Wizard\Step::make('Position Dedications')
-                                ->schema([
-                                    Repeater::make('dedications')
-                                          ->schema([
-                                              Grid::make(3)
-                                              ->schema([
-                                                  Select::make('page')
-                                                      ->options(Closure::fromCallable(new HandlePageOptions()))
-                                                      ->disabled(function (Closure $set, Closure $get, $state) {
-                                                          if ($get('document') != '' && $get('../../pdf_info') != '') {
-                                                              return false;
-                                                          }
-
-                                                          return true;
-                                                      })->afterStateUpdated(Closure::fromCallable(new HandlePageDedicationUpdated()))->reactive()->required(),
-                                                  Select::make('document')
-                                                      ->options(Closure::fromCallable(new HandleDocumentOptions()))->reactive(),
-                                              ]),
-                                              PDFDedicationEditor::make('dedications')->set_pdf_data(Closure::fromCallable(new SetPdfDataForDedicationPositioner()))
-                                              ->reactive(),
-                                          ])->minItems(1)->collapsible(),
-                                ]),
                         Wizard\Step::make('Position Barcodes')
                                 ->schema([
                                     Repeater::make('barcodes')
@@ -348,7 +329,7 @@ class ProductResource extends Resource
                                              ]),
                                              PDFBarcodeEditor::make('barcodes')->set_pdf_data(Closure::fromCallable(new SetPdfDataForDedicationPositioner()))
                                              ->reactive(),
-                                         ])->minItems(1)->collapsible(),
+                                         ])->minItems(1)->maxItems(1)->collapsible(),
                                 ]),
                     ])->skippable(function ($context) {
                         if ($context == 'edit') {
@@ -362,86 +343,36 @@ class ProductResource extends Resource
             ]);
     }
 
-  public static function getNameFormField()
-  {
-      return TextInput::make('name')
-          ->required()
-          ->reactive();
-  }
-
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('product_name')->searchable(),
-                Tables\Columns\TextColumn::make('price'),
-                Tables\Columns\TextColumn::make('categories.name'),
-                Tables\Columns\BadgeColumn::make('is_published')
-                ->enum([
-                    0 => 'Draft',
-                    1 => 'Published',
-                ]),
-                Tables\Columns\TextColumn::make('product_attributes.name'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(),
+                //
             ])
             ->filters([
                 //
             ])
             ->actions([
-
-                Action::make('edit')
-                ->url(
-                    fn (Product $record): string => $record->product_type == 1 ? ProductResource::getUrl('edit', ['record' => $record->id]) :
-                    NewProductResource::getUrl('edit', ['record' => $record->id])
-                ),
-                //Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                //Action::make('generate_cover')
-                //->label('Cover')
-                //->url(fn (Product $record): string => route('preview.pdf', $record->id))
-                //->icon('heroicon-o-check-circle')
-                //->openUrlInNewTab(),
-                Action::make('generate_pdf')
-                ->url(fn (Product $record): string => ProductResource::getUrl('generate_pdf', ['id' => $record->id])),
+                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 
-public function autoSave(): void
-{
-    $validator = Validator::make(['data' => $this->form->getState()], $this->getRules());
-    if (! count($validator->invalid())) {
-        $this->save();
-    }
-}
-
     public static function getRelations(): array
     {
         return [
+            //
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProducts::route('/'),
-            'create' => Pages\CreateProduct::route('/create'),
-            //'generate_pdf' => Pages\GeneratePDFPage::route('/generate_pdf'),
-            'generate_pdf' => Pages\GeneratePDFPage::route('/generate_pdf/{id}'),
-            'edit' => Pages\EditProduct::route('/{record}/edit'),
+            'index' => \App\Filament\Resources\ProductResource\Pages\ListProducts::route('/'),
+            'create' => Pages\CreateNewProduct::route('/create'),
+            'edit' => Pages\EditNewProduct::route('/{record}/edit'),
         ];
-    }
-
-    public function searchkey($array, $search)
-    {
-        $key = null;
-        foreach ($array as $key => $value) {
-            if ($value['name'] == $search) {
-                return $key;
-            }
-        }
     }
 }

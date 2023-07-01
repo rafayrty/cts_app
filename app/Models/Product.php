@@ -16,6 +16,7 @@ class Product extends Model
         'pages' => 'array',
         'barcodes' => 'array',
         'dedications' => 'array',
+        'languages'=>'array'
     ];
 
     use HasSEO;

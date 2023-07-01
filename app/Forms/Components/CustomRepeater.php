@@ -146,12 +146,12 @@ class CustomRepeater extends Repeater
 
         $livewire = $component->getLivewire();
 
-         $documents = data_get($livewire,'data.Documents');
-         $file_names = [];
-         foreach ($documents as $document) {
-             $file_names[] = $document['pdf_name'];
-         }
-         $pdf_info = json_decode(data_get($livewire,'data.pdf_info'), true);
+        $documents = data_get($livewire,'data.Documents');
+        $file_names = [];
+        foreach ($documents as $document) {
+            $file_names[] = $document['pdf_name'];
+        }
+        $pdf_info = json_decode(data_get($livewire,'data.pdf_info'), true);
 
         if ($pdf_info) {
             $found_key = null;
@@ -173,26 +173,37 @@ class CustomRepeater extends Repeater
             }
             if (count($documents) != count($pdf_info)) {
                 foreach($new_array as $document){
-                    foreach ($pages as $key => $page) {
-                        if ($page['document'] == $document['filename']) {
-                            $new_pages[$key] = $page;
-                        }
-                    }
-                    data_set($livewire,'data.pages', $new_pages);
-                    foreach ($dedications as $key => $dedication) {
-                        if ($dedication['document'] == $document['filename']) {
-                            $new_dedications[$key] = $dedication;
-                        }
-                    }
+                    if($pages){
 
-                    data_set($livewire,'data.dedications', $new_dedications);
-
-                    foreach ($barcodes as $key => $barcode) {
-                        if ($barcode['document'] == $document['filename']) {
-                            $new_barcodes[$key] = $barcode;
+                        foreach ($pages as $key => $page) {
+                            if ($page['document'] == $document['filename']) {
+                                $new_pages[$key] = $page;
+                            }
                         }
+                        data_set($livewire,'data.pages', $new_pages);
+
                     }
-                    data_set($livewire,'data.barcodes', $new_barcodes);
+                    if($dedications){
+
+                        foreach ($dedications as $key => $dedication) {
+                            if ($dedication['document'] == $document['filename']) {
+                                $new_dedications[$key] = $dedication;
+                            }
+                        }
+
+                        data_set($livewire,'data.dedications', $new_dedications);
+
+                    }
+                    if($barcodes){
+
+                        foreach ($barcodes as $key => $barcode) {
+                            if ($barcode['document'] == $document['filename']) {
+                                $new_barcodes[$key] = $barcode;
+                            }
+                        }
+                        data_set($livewire,'data.barcodes', $new_barcodes);
+
+                    }
                 }
                 if(count($new_array)==0){
                     data_set($livewire,'data.pages', []);

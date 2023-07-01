@@ -204,31 +204,34 @@ class HandleProductAttatchment
         $new_barcodes = [];
         $new_dedications = [];
 
-        foreach ($pages as &$page) {
-            if ($page['document'] == $this->old_pdf) {
-                continue;
+        if($this->old_pdf){
+
+            foreach ($pages as &$page) {
+                if ($page['document'] == $this->old_pdf) {
+                    continue;
+                }
+                $new_pages[] = $page;
             }
-            $new_pages[] = $page;
-         }
 
-        foreach ($barcodes as &$barcode) {
-            if ($barcode['document'] == $this->old_pdf) {
-                continue;
+            foreach ($barcodes as &$barcode) {
+                if ($barcode['document'] == $this->old_pdf) {
+                    continue;
+                }
+                $new_barcodes[] = $barcode;
             }
-            $new_barcodes[] = $barcode;
-         }
 
-        foreach ($dedications as &$dedication) {
-            if ($dedication['document'] == $this->old_pdf) {
-                continue;
+            foreach ($dedications as &$dedication) {
+                if ($dedication['document'] == $this->old_pdf) {
+                    continue;
+                }
+                $new_dedications[] = $dedication;
             }
-            $new_dedications[] = $dedication;
-         }
 
-        $set('../../pages',$new_pages);
-        $set('../../dedications',$new_dedications);
-        $set('../../barcodes',$new_barcodes);
+            $set('../../pages',$new_pages);
+            $set('../../dedications',$new_dedications);
+            $set('../../barcodes',$new_barcodes);
 
+        }
 
     }
     public function upload_to_do($images){

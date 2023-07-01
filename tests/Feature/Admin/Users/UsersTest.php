@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Feature\Admin\Users;
+
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
 use function Pest\Laravel\artisan;
