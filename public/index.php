@@ -3,10 +3,6 @@
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
 
-header('Access-Control-Allow-Origin: http://localhost:3000');
-header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
-header('Access-Control-Allow-Credentials: true');
-header('Access-Control-Allow-Headers: X-Requested-With,X-XSRF-TOKEN, Content-Type, Accept');
 define('LARAVEL_START', microtime(true));
 
 /*

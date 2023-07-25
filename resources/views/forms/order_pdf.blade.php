@@ -24,14 +24,31 @@ $ids = [];
 <div class="filament-forms-card-component p-6 bg-white rounded-xl border border-gray-300 dark:border-gray-600 dark:bg-gray-800">
   <div class="flex items-center justify-between">
   <p>Order Documents Summary</p>
+    @php
+        $invoice_info = json_decode($order->invoice_info,true);
+        $invoice_url = null;
+        if($invoice_info){
+            if(array_key_exists('doc_url',$invoice_info)){
+                $invoice_url = $invoice_info['doc_url'];
+            }
+        }
+    @endphp
+<div>
+  <a href="{{route('order.internal_invoice',$order->id)}}" id="view-invoice" class="filament-link inline-flex  font-medium hover:underline focus:outline-none focus:underline text-sm text-primary-600 hover:text-primary-500 dark:text-primary-500 dark:hover:text-primary-400 filament-tables-link-action"> View Internal Invoice </a>
+  <span>|</span>
+@if($invoice_url)
+  <a href="{{$invoice_url}}" id="view-invoice" class="filament-link inline-flex  font-medium hover:underline focus:outline-none focus:underline text-sm text-primary-600 hover:text-primary-500 dark:text-primary-500 dark:hover:text-primary-400 filament-tables-link-action"> View Invoice </a>
+  <span>|</span>
+@endif
   <a href="{{route('order.download.pdf',$order->id)}}" id="download-all" class="filament-link inline-flex items-center justify-center gap-0.5 font-medium hover:underline focus:outline-none focus:underline text-sm text-primary-600 hover:text-primary-500 dark:text-primary-500 dark:hover:text-primary-400 filament-tables-link-action"> Download All </a>
+  </div>
   </div>
   @foreach ($items as $item)
 
   @php
     $documents = $item->product->documents ?? [];
   @endphp
-  <h2 class="text-xl font-semibold mt-4">{{ str_replace("{basmti}",$item->inputs['name'],$item->product->demo_name)}} {{$item->language}}</h2>
+  <h2 class="text-xl font-semibold mt-4">{{ str_replace("{basmti}",$item->inputs['name'],$item->product->demo_name ?? $item->product_info['demo_name'])}}</h2>
   @foreach ($documents as $document)
 
 @if($item->product_type==1)
@@ -55,13 +72,33 @@ Soft Cover
 
 @endif
   @if($item->product_type==2)
+  {{--@if($item->language == 'english' && $document->type == 0)--}}
+  @if($item->language == 'english')
+  @if($document->type == 0 && $document->language == 'english')
+    <a href="{{route('order.preview.pdf',['id'=>$document->id,'order_item_id'=>$item->id])}}" target="_blank" class="filament-button mt-4 filament-button-size-md inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors focus:outline-none focus:ring-offset-2 focus:ring-2 focus:ring-inset dark:focus:ring-offset-0 min-h-[2.25rem] px-4 text-sm text-white shadow focus:ring-white border-transparent bg-primary-600 hover:bg-primary-500 focus:bg-primary-700 focus:ring-offset-primary-700 filament-page-button-action">
+    {{ str_replace("{basmti}",$item->inputs['name'],$item->product->demo_name)}} - NotebookCover {{$item->language}}</a>
+  <div class="product-info mt-2">
+  <ul>
+      <li><strong>Number of Packages: </strong>{{$item->quantity}}</li>
+      <li><strong>Number of Notebooks: </strong>{{$item->quantity * 4}}</li>
+      <li><strong>Language: </strong>{{$item->language}}</li>
+  </ul>
+  </div>
+  @endif
+  @else
+      @if($document->type == 0 && $document->language !='english')
+        <a href="{{route('order.preview.pdf',['id'=>$document->id,'order_item_id'=>$item->id])}}" target="_blank" class="filament-button mt-4 filament-button-size-md inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors focus:outline-none focus:ring-offset-2 focus:ring-2 focus:ring-inset dark:focus:ring-offset-0 min-h-[2.25rem] px-4 text-sm text-white shadow focus:ring-white border-transparent bg-primary-600 hover:bg-primary-500 focus:bg-primary-700 focus:ring-offset-primary-700 filament-page-button-action">
+        {{ str_replace("{basmti}",$item->inputs['name'],$item->product->demo_name)}} - NotebookCover {{$item->language}}</a>
+  <div class="product-info mt-2">
+  <ul>
+      <li><strong>Number of Packages: </strong>{{$item->quantity}}</li>
+      <li><strong>Number of Notebooks: </strong>{{$item->quantity * 4}}</li>
+      <li><strong>Language: </strong>{{$item->language}}</li>
+  </ul>
+      </div>
+      @endif
+  @endif
 
-
-
-  @if($document->type == 0)
-<a href="{{route('order.preview.pdf',['id'=>$document->id,'order_item_id'=>$item->id])}}" target="_blank" class="filament-button mt-4 filament-button-size-md inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors focus:outline-none focus:ring-offset-2 focus:ring-2 focus:ring-inset dark:focus:ring-offset-0 min-h-[2.25rem] px-4 text-sm text-white shadow focus:ring-white border-transparent bg-primary-600 hover:bg-primary-500 focus:bg-primary-700 focus:ring-offset-primary-700 filament-page-button-action">
-{{ str_replace("{basmti}",$item->inputs['name'],$item->product->demo_name)}} - NotebookCover {{$item->language}}</a>
-@endif
   @endif
   @endforeach
   @endforeach
@@ -78,3 +115,4 @@ for (var i = 0; i < urls.length; i++) {
 }
 })*/
 </script>
+

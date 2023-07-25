@@ -41,12 +41,12 @@ class SalesChart extends ApexChartWidget
         $dateEnd = $this->filterFormData['date_end'];
         //User Information
         $data = Trend::model(Order::class)
-        ->between(
-            start: Carbon::parse($dateStart),
-            end: Carbon::parse($dateEnd),
-        )
-      ->perMonth()
-      ->sum('total');
+            ->between(
+                start: Carbon::parse($dateStart),
+                end: Carbon::parse($dateEnd),
+            )
+            ->perMonth()
+            ->sum('total');
 
         return [
             'chart' => [

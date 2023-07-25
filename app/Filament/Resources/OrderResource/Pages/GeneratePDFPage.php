@@ -20,6 +20,6 @@ class GeneratePDFPage extends Page
     {
         //$order = Order::findOrFail($id);
         //$this->items = $order->items;
-        return redirect()->route('order.download.pdf',$id);
+        return redirect()->route('order.download.pdf', $id);
     }
 }

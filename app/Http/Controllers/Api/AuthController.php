@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\LoginPhoneRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\UserUpdateRequest;
@@ -18,8 +17,8 @@ use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 class AuthController extends Controller
 {
     public function __construct(RegisterService $registerService,
-    LoginService $loginService
-) {
+        LoginService $loginService
+    ) {
         $this->registerService = $registerService;
         $this->loginService = $loginService;
     }
@@ -46,16 +45,16 @@ class AuthController extends Controller
      */
     //public function resend_email(Request $request)
     //{
-        //$this->validate($request, [
-            //'email' => 'required|email',
-        //]);
-        //$user = User::where('email', $request->email)->get()->first();
+    //$this->validate($request, [
+    //'email' => 'required|email',
+    //]);
+    //$user = User::where('email', $request->email)->get()->first();
 
-        //if (! $user) {
-            //abort(404);
-        //}
+    //if (! $user) {
+    //abort(404);
+    //}
 
-        //return $this->registerService->verifyEmail(User::findOrFail($user->id));
+    //return $this->registerService->verifyEmail(User::findOrFail($user->id));
     //}
 
     /**
@@ -107,7 +106,7 @@ class AuthController extends Controller
      */
     //public function email_validation(Request $request)
     //{
-        //return $this->registerService->register($request);
+    //return $this->registerService->register($request);
     //}
 
     /**
@@ -117,12 +116,12 @@ class AuthController extends Controller
      */
     //public function email_verification(Request $request)
     //{
-        //$this->validate($request, [
-            //'email' => 'required|email',
-            //'verification_code' => 'required',
-        //]);
+    //$this->validate($request, [
+    //'email' => 'required|email',
+    //'verification_code' => 'required',
+    //]);
 
-        //return $this->registerService->email_verification($request);
+    //return $this->registerService->email_verification($request);
     //}
 
     /**
@@ -160,7 +159,6 @@ class AuthController extends Controller
             return response()->json(['message' => $login['message']], $login['status']);
         }
     }
-
 
     /**
      * Update The User

@@ -35,7 +35,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 
     Route::post('/user', [AuthController::class, 'update_user'])->name('user.update');
-
     //Address Routes
     Route::resource('address', AddressController::class);
     Route::get('/address', [AddressController::class, 'index']);
@@ -55,7 +54,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 });
 
 Route::get('/get_shipping_fee', [OrderController::class, 'get_shipping_fee'])->name('orders.shipping_fee');
-
 Route::get('/wishlist/check_in_wishlist/{product_id}', [WishListController::class, 'check_in_wishlist'])->name('wishlist.check-in-wishlist');
 Route::post('/coupon', [CouponController::class, 'apply'])->name('coupon.apply');
 
@@ -64,29 +62,30 @@ Route::post('/coupon', [CouponController::class, 'apply'])->name('coupon.apply')
 | Products Routes
 |--------------------------------------------------------------------------
 */
-//Route::group(['middleware'=>'cacheResponse:300'],function() {
-    Route::get('/products/most-sold-products', [ProductsController::class, 'get_most_sold_products'])->name('products.most-sold-products');
-    Route::get('/products/personalized-notebooks', [ProductsController::class, 'get_personalized_notebooks_products'])->name('products.personalized-notebooks-products');
-    Route::get('/products/get-featured-products', [ProductsController::class, 'get_featured_products'])->name('products.featured-products');
-    Route::get('/products/get-related-products/{product_id}/{category_id}/{gender?}', [ProductsController::class, 'get_related_products'])->name('products.related-products');
-    Route::get('/products/get-product-slugs', [ProductsController::class, 'get_product_slugs'])->name('products.get-product-slugs');
-    Route::get('/products/get-product-attribute-options/{id}/{limit}', [ProductsController::class, 'get_product_attribute_options'])->name('products.get-product-attribute-options');
-    Route::get('/products/attributes/get-all-attributes', [AttributesController::class, 'get_all_attributes'])->name('attributes.get-all-attributes');
-    Route::get('/products/get-product-covers/{id}', [ProductsController::class, 'get_product_covers'])->name('products.get-product-covers');
-    Route::get('/dedications/{gender}', [PersonalizationController::class, 'get_dedications'])->name('documents.get-dedications');
+Route::get('/products/sync-cart', [ProductsController::class, 'sync_cart'])->name('products.sync-cart');
+Route::get('/products/most-sold-products', [ProductsController::class, 'get_most_sold_products'])->name('products.most-sold-products');
+Route::get('/products/personalized-notebooks', [ProductsController::class, 'get_personalized_notebooks_products'])->name('products.personalized-notebooks-products');
+Route::get('/products/get-featured-products', [ProductsController::class, 'get_featured_products'])->name('products.featured-products');
+Route::get('/products/get-related-products/{product_id}/{category_id}/{gender?}', [ProductsController::class, 'get_related_products'])->name('products.related-products');
 
-    Route::get('/products/product/{slug}', [ProductsController::class, 'get_product'])->name('products.get-product');
-    Route::get('/products/get-products-filter', [ProductsController::class, 'get_products_filter'])->name('products.get-product-filters');
+Route::get('/products/get-notebook-slugs', [ProductsController::class, 'get_product_notebook_slugs'])->name('products.get-notebook-slugs');
+Route::get('/products/get-product-slugs', [ProductsController::class, 'get_product_slugs'])->name('products.get-product-slugs');
+Route::get('/products/get-product-attribute-options/{id}/{limit}', [ProductsController::class, 'get_product_attribute_options'])->name('products.get-product-attribute-options');
+Route::get('/products/attributes/get-all-attributes', [AttributesController::class, 'get_all_attributes'])->name('attributes.get-all-attributes');
+Route::get('/products/get-product-covers/{id}', [ProductsController::class, 'get_product_covers'])->name('products.get-product-covers');
+Route::get('/dedications/{gender}', [PersonalizationController::class, 'get_dedications'])->name('documents.get-dedications');
 
-    Route::get('/categories/get-featured-categories', [CategoriesController::class, 'get_featured_categories'])->name('categories.featured-categories');
-    Route::get('/categories/get-all-categories', [CategoriesController::class, 'get_all_categories'])->name('categories.get-all-categories');
+Route::get('/products/product/{slug}', [ProductsController::class, 'get_product'])->name('products.get-product');
+Route::get('/products/get-products-filter', [ProductsController::class, 'get_products_filter'])->name('products.get-product-filters');
 
+Route::get('/categories/get-featured-categories', [CategoriesController::class, 'get_featured_categories'])->name('categories.featured-categories');
+Route::get('/categories/get-all-categories', [CategoriesController::class, 'get_all_categories'])->name('categories.get-all-categories');
 
-    Route::get('/documents/product/{slug}', [PersonalizationController::class, 'get_document_product_slug'])->name('documents.get-document-product-slug');
-    Route::get('/documents/inputs/{slug}', [PersonalizationController::class, 'get_document_inputs_slug'])->name('documents.get-document-input-slug');
+Route::get('/documents/product/{slug}', [PersonalizationController::class, 'get_document_product_slug'])->name('documents.get-document-product-slug');
+Route::get('/documents/inputs/{slug}', [PersonalizationController::class, 'get_document_inputs_slug'])->name('documents.get-document-input-slug');
 
-    Route::get('/documents-notebook/{slug}', [PersonalizationController::class, 'get_notebook_document_info'])->name('documents.get-notebook-document-info');
-    Route::get('/documents/{slug}', [PersonalizationController::class, 'get_document_info'])->name('documents.get-document-info');
+Route::get('/documents-notebook/{slug}', [PersonalizationController::class, 'get_notebook_document_info'])->name('documents.get-notebook-document-info');
+Route::get('/documents/{slug}', [PersonalizationController::class, 'get_document_info'])->name('documents.get-document-info');
 //});
 //Get Reviews
 Route::get('/review/{id}', [ReviewController::class, 'get_product_reviews'])->name('review.get-product-reviews');

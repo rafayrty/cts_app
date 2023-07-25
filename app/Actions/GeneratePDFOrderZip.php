@@ -12,7 +12,7 @@ class GeneratePDFOrderZip
 
         $response = Http::timeout(120)->post('http://127.0.0.1:8080/generate_order_zip', [
             'files' => json_encode($files),
-            'zip_name' => $zip_name
+            'zip_name' => $zip_name,
         ]);
 
         if ($response->failed()) {

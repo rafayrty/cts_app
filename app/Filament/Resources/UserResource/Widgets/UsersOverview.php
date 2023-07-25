@@ -44,88 +44,88 @@ class UsersOverview extends BaseWidget
         ];
     }
 
-  public function convert_to_k($number)
-  {
-      if ($number > 100) {
-          $numberInK = number_format($number / 1000, 2).'k';
-      }
+    public function convert_to_k($number)
+    {
+        if ($number > 100) {
+            $numberInK = number_format($number / 1000, 2).'k';
+        }
 
-      return $number;
-  }
+        return $number;
+    }
 
-  public function get_userinfo()
-  {
-      //User Information
-      $data_current = Trend::model(User::class)
-      ->between(
-          start: now()->startOfMonth(),
-          end: now()->endOfMonth(),
-      )
-    ->perDay()
-    ->count();
-      $data_prev = Trend::model(User::class)
-      ->between(
-          start: now()->subMonth()->startOfMonth(),
-          end: now()->subMonth()->endOfMonth(),
-      )
-    ->perDay()
-    ->count();
+    public function get_userinfo()
+    {
+        //User Information
+        $data_current = Trend::model(User::class)
+            ->between(
+                start: now()->startOfMonth(),
+                end: now()->endOfMonth(),
+            )
+            ->perDay()
+            ->count();
+        $data_prev = Trend::model(User::class)
+            ->between(
+                start: now()->subMonth()->startOfMonth(),
+                end: now()->subMonth()->endOfMonth(),
+            )
+            ->perDay()
+            ->count();
 
-      $current_month_sum = array_sum($data_current->map(fn (TrendValue $value) => $value->aggregate)->toArray());
-      $prev_month_sum = array_sum($data_prev->map(fn (TrendValue $value) => $value->aggregate)->toArray());
-      $increase = false;
-      if ($current_month_sum > $prev_month_sum) {
-          $increase = true;
-      }
+        $current_month_sum = array_sum($data_current->map(fn (TrendValue $value) => $value->aggregate)->toArray());
+        $prev_month_sum = array_sum($data_prev->map(fn (TrendValue $value) => $value->aggregate)->toArray());
+        $increase = false;
+        if ($current_month_sum > $prev_month_sum) {
+            $increase = true;
+        }
 
-      return (object) ['increase' => $increase, 'current_month_sum' => $current_month_sum, 'prev_month_sum' => $prev_month_sum, 'data_current' => $data_current, 'data_prev' => $data_prev];
-  }
+        return (object) ['increase' => $increase, 'current_month_sum' => $current_month_sum, 'prev_month_sum' => $prev_month_sum, 'data_current' => $data_current, 'data_prev' => $data_prev];
+    }
 
-  public function get_orderinfo()
-  {
-      //User Information
-      $data_current = Trend::model(Order::class)
-      ->between(
-          start: now()->startOfMonth(),
-          end: now()->endOfMonth(),
-      )
-    ->perDay()
-    ->count();
-      $data_prev = Trend::model(Order::class)
-      ->between(
-          start: now()->subMonth()->startOfMonth(),
-          end: now()->subMonth()->endOfMonth(),
-      )
-    ->perDay()
-    ->count();
+    public function get_orderinfo()
+    {
+        //User Information
+        $data_current = Trend::model(Order::class)
+            ->between(
+                start: now()->startOfMonth(),
+                end: now()->endOfMonth(),
+            )
+            ->perDay()
+            ->count();
+        $data_prev = Trend::model(Order::class)
+            ->between(
+                start: now()->subMonth()->startOfMonth(),
+                end: now()->subMonth()->endOfMonth(),
+            )
+            ->perDay()
+            ->count();
 
-      $current_month_sum = array_sum($data_current->map(fn (TrendValue $value) => $value->aggregate)->toArray());
-      $prev_month_sum = array_sum($data_prev->map(fn (TrendValue $value) => $value->aggregate)->toArray());
-      $increase = false;
-      if ($current_month_sum > $prev_month_sum) {
-          $increase = true;
-      }
+        $current_month_sum = array_sum($data_current->map(fn (TrendValue $value) => $value->aggregate)->toArray());
+        $prev_month_sum = array_sum($data_prev->map(fn (TrendValue $value) => $value->aggregate)->toArray());
+        $increase = false;
+        if ($current_month_sum > $prev_month_sum) {
+            $increase = true;
+        }
 
-      return (object) ['increase' => $increase, 'current_month_sum' => $current_month_sum, 'prev_month_sum' => $prev_month_sum, 'data_current' => $data_current, 'data_prev' => $data_prev];
-  }
+        return (object) ['increase' => $increase, 'current_month_sum' => $current_month_sum, 'prev_month_sum' => $prev_month_sum, 'data_current' => $data_current, 'data_prev' => $data_prev];
+    }
 
     public function get_salesinfo()
     {
         //User Information
         $data_current = Trend::model(Order::class)
-        ->between(
-            start: now()->startOfMonth(),
-            end: now()->endOfMonth(),
-        )
-      ->perDay()
-      ->sum('total');
+            ->between(
+                start: now()->startOfMonth(),
+                end: now()->endOfMonth(),
+            )
+            ->perDay()
+            ->sum('total');
         $data_prev = Trend::model(Order::class)
-        ->between(
-            start: now()->subMonth()->startOfMonth(),
-            end: now()->subMonth()->endOfMonth(),
-        )
-      ->perDay()
-      ->sum('total');
+            ->between(
+                start: now()->subMonth()->startOfMonth(),
+                end: now()->subMonth()->endOfMonth(),
+            )
+            ->perDay()
+            ->sum('total');
 
         $current_month_sum = array_sum($data_current->map(fn (TrendValue $value) => ($value->aggregate / 100))->toArray());
         $prev_month_sum = array_sum($data_prev->map(fn (TrendValue $value) => ($value->aggregate / 100))->toArray());

@@ -73,4 +73,3 @@ function clear_cgi_cache()
     $nginx_cache_path = config('app.nginx_path').'/cache';
     array_map('unlink', glob($nginx_cache_path.'/*/*/*'));
 }
-

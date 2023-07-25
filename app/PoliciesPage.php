@@ -22,10 +22,10 @@ class PoliciesPage implements FilamentPageTemplate
                 ->schema([
                     TextInput::make('title')->required(),
                     Repeater::make('policies')
-                    ->schema([
-                        TextInput::make('title')->required(),
-                        TinyEditor::make('description')->minHeight(300)->profile('custom')->required(),
-                    ])->minItems(1),
+                        ->schema([
+                            TextInput::make('title')->required(),
+                            TinyEditor::make('description')->minHeight(300)->profile('custom')->required(),
+                        ])->minItems(1),
                 ]),
         ];
     }

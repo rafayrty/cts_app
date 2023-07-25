@@ -14,12 +14,12 @@ use Illuminate\Http\Request;
 class ProductsController extends Controller
 {
     public function __construct(
-    GetMostSoldProductsAction $getMostSoldProductsAction,
-    GetPersonalizedNotebookProductsAction $getPersonalizedNotebookProductsAction,
-    GetFeaturedProductsAction $getFeaturedProductsAction,
-    GetProductAttributeOptionsAction $getProductAttributeOptionsAction,
-    GetProductsFilter $getProductsFilter
-) {
+        GetMostSoldProductsAction $getMostSoldProductsAction,
+        GetPersonalizedNotebookProductsAction $getPersonalizedNotebookProductsAction,
+        GetFeaturedProductsAction $getFeaturedProductsAction,
+        GetProductAttributeOptionsAction $getProductAttributeOptionsAction,
+        GetProductsFilter $getProductsFilter
+    ) {
         $this->getMostSoldProductsAction = $getMostSoldProductsAction;
         $this->getFeaturedProductsAction = $getFeaturedProductsAction;
         $this->getProductAttributeOptionsAction = $getProductAttributeOptionsAction;
@@ -27,24 +27,43 @@ class ProductsController extends Controller
         $this->getPersonalizedNotebookProductsAction = $getPersonalizedNotebookProductsAction;
     }
 
-    public function get_product_slugs()
+    public function sync_cart(Request $request)
     {
-        return Product::where('is_published', 1)->get()->pluck('slug');
+        $products = Product::where('is_published', 1)->whereIn('id', explode(',', $request->product_ids));
+
+        $products = $products->get();
+        $ids = [];
+        foreach ($products as $product) {
+            $ids[] = $product->id;
+        }
+
+        return $ids;
     }
 
-    public function get_related_products($product_id, $category_id,$gender='')
+    public function get_product_notebook_slugs()
     {
-        $products = Product::whereHas('categories', function ($query) use ($category_id) {
+        return Product::where('is_published', 1)->where('product_type', 2)->get()->pluck('slug');
+    }
+
+    public function get_product_slugs()
+    {
+        return Product::where('is_published', 1)->where('product_type', 1)->get()->pluck('slug');
+    }
+
+    public function get_related_products($product_id, $category_id, $gender = '')
+    {
+        $products = Product::select(['id','product_type','images', 'is_rtl', 'languages', 'product_name', 'slug', 'demo_name', 'replace_name', 'excerpt', 'price', 'discount_percentage', 'description'])
+        ->whereHas('categories', function ($query) use ($category_id) {
             $query->where('category_id', $category_id);
         })->where('id', '!=', $product_id);
 
-
-        if($gender!=''){
+        if ($gender != '') {
             $products->whereHas('product_attributes', function ($q) use ($gender) {
-                    $q->where('slug', $gender);
+                $q->where('slug', $gender);
             });
         }
-         $products->where('is_published', 1)->take(8)->get();
+        $products->where('is_published', 1)->take(8)->get();
+
         return $products->get();
     }
 
@@ -55,7 +74,7 @@ class ProductsController extends Controller
 
     public function get_product($slug)
     {
-        $product = Product::select(['id','images','is_rtl','languages','product_name','slug','demo_name','replace_name','excerpt','price','discount_percentage','description'])->where('slug', $slug)->where('is_published', 1)->with('tags')->get()->first();
+        $product = Product::select(['id','product_type','images', 'is_rtl', 'languages', 'product_name', 'slug', 'demo_name', 'replace_name', 'excerpt', 'price', 'discount_percentage', 'description'])->where('slug', $slug)->where('is_published', 1)->with('tags')->get()->first();
         if (! $product) {
             abort(404);
         }
@@ -82,6 +101,7 @@ class ProductsController extends Controller
     {
         return ($this->getPersonalizedNotebookProductsAction)();
     }
+
     public function get_featured_products()
     {
         return ($this->getFeaturedProductsAction)();
@@ -92,4 +112,3 @@ class ProductsController extends Controller
         return ($this->getProductAttributeOptionsAction)($id, $limit);
     }
 }
-

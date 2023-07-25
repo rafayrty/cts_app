@@ -23,6 +23,7 @@ class FormSubmissionController extends Controller
 
         $email = config('mail.from.address');
         Mail::to($email)->queue(new FormSubmissionInfoAdmin($form));
+
         return $form;
     }
 
@@ -38,6 +39,7 @@ class FormSubmissionController extends Controller
 
         $email = config('mail.from.address');
         Mail::to($email)->queue(new FormSubmissionInfoAdmin($form));
+
         return $form;
     }
 }

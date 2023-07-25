@@ -5,13 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Actions\Personalization\GetFontsStylesheetAction;
 use App\Http\Controllers\Controller;
 use App\Models\Dedication;
-use App\Models\Document;
 use App\Models\Product;
 
 class PersonalizationController extends Controller
 {
     public function __construct(
-     GetFontsStylesheetAction $getFontsStylesheetAction
+        GetFontsStylesheetAction $getFontsStylesheetAction
     ) {
         $this->getFontsStylesheetAction = $getFontsStylesheetAction;
     }
@@ -34,17 +33,17 @@ class PersonalizationController extends Controller
     {
         $product = Product::where('slug', $slug)->get()->first();
 
-        if (!$product) {
+        if (! $product) {
             abort(404);
         }
 
         $name = request()->name;
         $language = request()->language;
-        if (!request()->name) {
+        if (! request()->name) {
             $name = $product->replace_name;
         }
 
-        if (!request()->language) {
+        if (! request()->language) {
             $language = 'arabic';
         }
         $document = null;
@@ -58,7 +57,9 @@ class PersonalizationController extends Controller
             if ($document->type == 2 && $document->language == $language) {
                 $found_document = $document;
             }
-            if ($document->type == 0) {
+            if ($document->type == 0 && $document->language == $language) {
+                $found_cover = $document;
+            }else if($document->type == 0 && $document->language == null){
                 $found_cover = $document;
             }
         }
@@ -156,13 +157,11 @@ class PersonalizationController extends Controller
         ];
     }
 
-
-
     public function get_document_info($slug)
     {
         $product = Product::where('slug', $slug)->get()->first();
 
-        if (!$product) {
+        if (! $product) {
             abort(404);
         }
         //Get Product Documents

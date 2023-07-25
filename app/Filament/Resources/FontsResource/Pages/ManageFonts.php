@@ -17,11 +17,11 @@ class ManageFonts extends ManageRecords
     {
         return [
             Actions\CreateAction::make()
-            ->using(function (array $data): Model {
-                return static::getModel()::create($data);
-            })->after(function () {
-                Http::get(URL::to('/personalization/fonts'));
-            }),
+                ->using(function (array $data): Model {
+                    return static::getModel()::create($data);
+                })->after(function () {
+                    Http::get(URL::to('/personalization/fonts'));
+                }),
         ];
     }
 }

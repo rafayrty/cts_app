@@ -23,12 +23,12 @@ class OrdersChart extends LineChartWidget
     protected function getData(): array
     {
         $data = Trend::model(Order::class)
-        ->between(
-            start: now()->startOfYear(),
-            end: now()->endOfYear(),
-        )
-    ->perMonth()
-    ->count();
+            ->between(
+                start: now()->startOfYear(),
+                end: now()->endOfYear(),
+            )
+            ->perMonth()
+            ->count();
 
         return [
             'datasets' => [

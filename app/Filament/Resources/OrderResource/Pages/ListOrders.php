@@ -2,10 +2,9 @@
 
 namespace App\Filament\Resources\OrderResource\Pages;
 
-use Closure;
 use App\Filament\Resources\OrderResource;
 use App\Filament\Resources\OrderResource\Widgets\OrderStatusFilter;
-use App\Filament\Widgets\PopularProductsChart;
+use Closure;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -27,15 +26,13 @@ class ListOrders extends ListRecords
         ];
     }
 
-protected function getTableRecordActionUsing(): ?Closure
-{
-    return null;
-}
-protected function getHeaderWidgetsColumns(): int | array
-{
-    return 1;
-}
+    protected function getTableRecordActionUsing(): ?Closure
+    {
+        return null;
+    }
 
-
+    protected function getHeaderWidgetsColumns(): int|array
+    {
+        return 1;
+    }
 }
-

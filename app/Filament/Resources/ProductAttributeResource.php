@@ -38,12 +38,12 @@ class ProductAttributeResource extends Resource
                         ->schema([
                             Grid::make(2)->schema([
                                 TextInput::make('name')->required()->placeholder('Enter Attibute Option Name')
-                                ->maxLength(255)
-                                ->afterStateUpdated(Closure::fromCallable(new MakeSlug()))->reactive(),
+                                    ->maxLength(255)
+                                    ->afterStateUpdated(Closure::fromCallable(new MakeSlug()))->reactive(),
                                 TextInput::make('slug')->required()->maxLength(255),
                                 Textarea::make('description')
-                                        ->rows(5)
-                                        ->maxLength(255),
+                                    ->rows(5)
+                                    ->maxLength(255),
                                 FileUpload::make('image')
                                     ->image()
                                     //->disk('do')

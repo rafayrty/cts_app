@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Http\Requests\LoginPhoneRequest;
 use App\Http\Requests\LoginRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -24,21 +23,19 @@ class LoginService
         //Check if Email or phone
         $loginMethod = 'phone';
 
-        if(filter_var($request->identifier,FILTER_VALIDATE_EMAIL)){
+        if (filter_var($request->identifier, FILTER_VALIDATE_EMAIL)) {
             $loginMethod = 'email';
         }
 
-        if($loginMethod=='email'){
-            return $this->login_email($request->identifier,$request->password);
+        if ($loginMethod == 'email') {
+            return $this->login_email($request->identifier, $request->password);
         }
 
-         return $this->login_phone($request->identifier,$request->password);
+        return $this->login_phone($request->identifier, $request->password);
     }
 
-
-
-
-    public function login_email($email,$password){
+    public function login_email($email, $password)
+    {
 
         if (! Auth::guard('web')->attempt(['email' => $email, 'password' => $password])) {
             return ['message' => 'Email or Password Is Incorrect', 'status' => 404];
@@ -59,7 +56,8 @@ class LoginService
             ];
         }
     }
-    public function login_phone($phone,$password)
+
+    public function login_phone($phone, $password)
     {
         //if (! Auth::guard('web')->attempt(array_merge(['email' => $request->email, 'password' => $request->password], ['active' => 1]))) {
         if (! Auth::guard('web')->attempt(['email' => $this->phone_verification($phone), 'password' => $password])) {

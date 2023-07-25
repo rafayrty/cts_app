@@ -21,9 +21,9 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('image')->nullable();
             $table->foreign('product_attribute_id')
-                    ->references('id')
-                    ->on('product_attributes')
-                    ->onCascade('delete');
+                ->references('id')
+                ->on('product_attributes')
+                ->onCascade('delete');
             $table->timestamps();
         });
     }

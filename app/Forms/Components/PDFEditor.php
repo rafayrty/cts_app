@@ -21,9 +21,8 @@ class PDFEditor extends Field
         return $this;
     }
 
-   public function getData(): array
-   {
-       return $this->evaluate($this->data);
-   }
-
+    public function getData(): array
+    {
+        return $this->evaluate($this->data);
+    }
 }

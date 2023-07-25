@@ -2,7 +2,6 @@
 
 namespace App\Forms\Components;
 
-use Closure;
 use function Filament\Forms\array_move_after;
 use function Filament\Forms\array_move_before;
 use Filament\Forms\Components\Repeater;
@@ -141,26 +140,26 @@ class CustomRepeater extends Repeater
         });
     }
 
-
-    public function updated_documents(Repeater $component){
+    public function updated_documents(Repeater $component)
+    {
 
         $livewire = $component->getLivewire();
 
-        $documents = data_get($livewire,'data.Documents');
+        $documents = data_get($livewire, 'data.Documents');
         $file_names = [];
         foreach ($documents as $document) {
             $file_names[] = $document['pdf_name'];
         }
-        $pdf_info = json_decode(data_get($livewire,'data.pdf_info'), true);
+        $pdf_info = json_decode(data_get($livewire, 'data.pdf_info'), true);
 
         if ($pdf_info) {
             $found_key = null;
             $new_array = [];
-            $pages = data_get($livewire,'data.pages');
+            $pages = data_get($livewire, 'data.pages');
             $new_pages = [];
-            $dedications = data_get($livewire,'data.dedications');
+            $dedications = data_get($livewire, 'data.dedications');
             $new_dedications = [];
-            $barcodes = data_get($livewire,'data.barcodes');
+            $barcodes = data_get($livewire, 'data.barcodes');
             $new_barcodes = [];
             foreach ($pdf_info as $pdf_in) {
                 foreach ($documents as $key => $document) {
@@ -172,18 +171,18 @@ class CustomRepeater extends Repeater
                 }
             }
             if (count($documents) != count($pdf_info)) {
-                foreach($new_array as $document){
-                    if($pages){
+                foreach ($new_array as $document) {
+                    if ($pages) {
 
                         foreach ($pages as $key => $page) {
                             if ($page['document'] == $document['filename']) {
                                 $new_pages[$key] = $page;
                             }
                         }
-                        data_set($livewire,'data.pages', $new_pages);
+                        data_set($livewire, 'data.pages', $new_pages);
 
                     }
-                    if($dedications){
+                    if ($dedications) {
 
                         foreach ($dedications as $key => $dedication) {
                             if ($dedication['document'] == $document['filename']) {
@@ -191,29 +190,28 @@ class CustomRepeater extends Repeater
                             }
                         }
 
-                        data_set($livewire,'data.dedications', $new_dedications);
+                        data_set($livewire, 'data.dedications', $new_dedications);
 
                     }
-                    if($barcodes){
+                    if ($barcodes) {
 
                         foreach ($barcodes as $key => $barcode) {
                             if ($barcode['document'] == $document['filename']) {
                                 $new_barcodes[$key] = $barcode;
                             }
                         }
-                        data_set($livewire,'data.barcodes', $new_barcodes);
+                        data_set($livewire, 'data.barcodes', $new_barcodes);
 
                     }
                 }
-                if(count($new_array)==0){
-                    data_set($livewire,'data.pages', []);
-                    data_set($livewire,'data.dedications', []);
-                    data_set($livewire,'data.barcodes', []);
+                if (count($new_array) == 0) {
+                    data_set($livewire, 'data.pages', []);
+                    data_set($livewire, 'data.dedications', []);
+                    data_set($livewire, 'data.barcodes', []);
 
                 }
             }
-            data_set($livewire,'data.pdf_info', (count($new_array) > 0) ? json_encode($new_array) : "");
+            data_set($livewire, 'data.pdf_info', (count($new_array) > 0) ? json_encode($new_array) : '');
         }
     }
-
 }

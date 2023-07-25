@@ -15,8 +15,8 @@ class ListProducts extends ListRecords
         return [
             Actions\CreateAction::make()->label('New Personalized Book'),
             Actions\Action::make('new_personalized_notebook')
-            ->label('New Personalized NoteBook')
-            ->url('/admin/new-products/create'),
+                ->label('New Personalized NoteBook')
+                ->url('/admin/new-products/create'),
         ];
     }
 }

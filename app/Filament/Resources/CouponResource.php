@@ -4,11 +4,15 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
+use App\Models\Order;
+use Closure;
+use Illuminate\Support\Facades\URL;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Tables;
 
 class CouponResource extends Resource
@@ -22,21 +26,21 @@ class CouponResource extends Resource
         return $form
             ->schema([
                 Card::make()
-                ->schema([
-                    Forms\Components\TextInput::make('coupon_name')
-                        ->required()
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('min_amount')
-                        ->numeric()
-                        ->minValue(0)
-                        ->required(), Forms\Components\TextInput::make('discount_percentage')
-                        ->numeric()
-                        ->minValue(1)
-                        ->maxValue(100)
-                        ->required(),
-                    Forms\Components\DatePicker::make('expiry')
-                        ->required(),
-                ]),
+                    ->schema([
+                        Forms\Components\TextInput::make('coupon_name')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('min_amount')
+                            ->numeric()
+                            ->minValue(0)
+                            ->required(), Forms\Components\TextInput::make('discount_percentage')
+                            ->numeric()
+                            ->minValue(1)
+                            ->maxValue(100)
+                            ->required(),
+                        Forms\Components\DatePicker::make('expiry')
+                            ->required(),
+                    ]),
             ]);
     }
 
@@ -46,12 +50,16 @@ class CouponResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('min_amount'),
                 Tables\Columns\TextColumn::make('coupon_name'),
+                Tables\Columns\TextColumn::make('times_used'),
                 Tables\Columns\TextColumn::make('expiry')
                     ->date(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime(),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(),
+                Tables\Columns\TextColumn::make('updated_at')->label('Sales Generated')->getStateUsing(function (Model $record) {
+                    $coupon = $record;
+                    $totalSalesAmount = Order::where('coupon', $coupon->coupon_name)->sum('total');
+                    return $totalSalesAmount;
+                })->money('ils'),
             ])
             ->filters([
                 //

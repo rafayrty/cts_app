@@ -40,7 +40,7 @@ class SetPdfDataForPositioner
     public function searchkey($array, $search)
     {
         $key = null;
-        if($array){
+        if ($array) {
             foreach ($array as $key => $value) {
                 if ($value['filename'] == $search) {
                     return $key;

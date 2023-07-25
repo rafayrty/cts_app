@@ -84,4 +84,3 @@ class ProductAttributePolicy
         //return $user->can('covers.force_delete');
     }
 }
-

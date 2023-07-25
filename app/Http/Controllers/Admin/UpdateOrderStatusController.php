@@ -10,23 +10,25 @@ use Illuminate\Support\Facades\Mail;
 
 class UpdateOrderStatusController extends Controller
 {
+    public function update_print_status($order_id, $status)
+    {
 
-    public function update_print_status($order_id,$status){
-
-        if(auth()->user()->hasPermissionTo('orders.update', 'filament')){
+        if (auth()->user()->hasPermissionTo('orders.update', 'filament')) {
 
             $order = Order::findOrFail($order_id);
 
             $order->print_house_status = $status;
             $order->save();
-            return redirect()->back()->with('success','Update Successfully');
+
+            return redirect()->back()->with('success', 'Update Successfully');
         }
         abort(401);
     }
 
-    public function update_client_status($order_id,$status){
+    public function update_client_status($order_id, $status)
+    {
 
-        if(auth()->user()->hasPermissionTo('orders.update', 'filament')){
+        if (auth()->user()->hasPermissionTo('orders.update', 'filament')) {
 
             $order = Order::findOrFail($order_id);
             $order->client_status = $status;
@@ -49,9 +51,8 @@ class UpdateOrderStatusController extends Controller
                 }
             }
 
-            return redirect()->back()->with('success','Update Successfully');
+            return redirect()->back()->with('success', 'Update Successfully');
         }
         abort(401);
     }
 }
-

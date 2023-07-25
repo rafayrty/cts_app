@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Actions;
 
 use Closure;
-use Illuminate\Support\Facades\Log;
 
 class HandleDocumentOptions
 {

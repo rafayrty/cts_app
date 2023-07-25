@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources;
 
-
-use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use App\Services\RegisterService;
@@ -16,7 +14,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Filter;
 use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource
@@ -53,8 +50,8 @@ class UserResource extends Resource
                         Forms\Components\DateTimePicker::make('verified_at'),
                         Select::make('country_code')->searchable()->options(RegisterService::$countries_phone_list)->required(),
                         Forms\Components\TextInput::make('phone')
-                        ->tel()
-                        ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/'),
+                            ->tel()
+                            ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/'),
                         Forms\Components\TextInput::make('password')
                             ->password()
                             ->dehydrateStateUsing(fn ($state) => Hash::make($state))

@@ -9,8 +9,8 @@ use App\Http\Controllers\Controller;
 class CategoriesController extends Controller
 {
     public function __construct(
-     GetFeaturedCategoriesAction $getFeaturedCategoriesAction,
-     GetAllCategories $getAllCategories
+        GetFeaturedCategoriesAction $getFeaturedCategoriesAction,
+        GetAllCategories $getAllCategories
     ) {
         $this->getFeaturedCategoriesAction = $getFeaturedCategoriesAction;
         $this->getAllCategories = $getAllCategories;

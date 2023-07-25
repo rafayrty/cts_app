@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Models\ProductAttributeOption;
 use Chiiya\FilamentAccessControl\Models\FilamentUser as User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -84,4 +83,3 @@ class ProductAttributeOptionPolicy
         //return $user->can('covers.force_delete');
     }
 }
-

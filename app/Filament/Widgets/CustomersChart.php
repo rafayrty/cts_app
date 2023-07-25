@@ -41,12 +41,12 @@ class CustomersChart extends ApexChartWidget
         $dateEnd = $this->filterFormData['date_end'];
 
         $data = Trend::model(User::class)
-        ->between(
-            start: Carbon::parse($dateStart),
-            end: Carbon::parse($dateEnd),
-        )
-    ->perMonth()
-    ->count();
+            ->between(
+                start: Carbon::parse($dateStart),
+                end: Carbon::parse($dateEnd),
+            )
+            ->perMonth()
+            ->count();
 
         return [
             'chart' => [

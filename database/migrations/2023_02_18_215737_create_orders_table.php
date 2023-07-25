@@ -20,10 +20,10 @@ return new class extends Migration
             $table->bigInteger('address_id')->unsigned()->nullable();
             $table->bigInteger('user_id')->unsigned();
             $table->integer('discount_total');
-            $table->string('payme_sale_id');
+            $table->string('payme_sale_id')->nullable();
             $table->integer('sub_total');
             $table->integer('shipping');
-            $table->boolean('is_viewed')->comment("For Admin Use")->default(false);
+            $table->boolean('is_viewed')->comment('For Admin Use')->default(false);
             $table->integer('total');
             $table->string('coupon')->nullable();
             $table->string('client_status');
@@ -31,6 +31,7 @@ return new class extends Migration
             $table->string('payment_status');
             $table->json('barcodes')->nullable();
             $table->json('payment_info')->nullable();
+            $table->json('invoice_info')->nullable();
             $table->timestamps();
         });
     }

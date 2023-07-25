@@ -38,12 +38,12 @@ class OrdersChart extends ApexChartWidget
     protected function getOptions(): array
     {
         $data = Trend::model(Order::class)
-        ->between(
-            start: now()->startOfYear(),
-            end: now()->endOfYear(),
-        )
-       ->perMonth()
-       ->count();
+            ->between(
+                start: now()->startOfYear(),
+                end: now()->endOfYear(),
+            )
+            ->perMonth()
+            ->count();
 
         return [
             'chart' => [

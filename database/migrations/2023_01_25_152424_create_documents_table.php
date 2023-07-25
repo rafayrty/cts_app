@@ -29,10 +29,10 @@ return new class extends Migration
             $table->string('language')->nullable()->comment('For Notebook Product only');
             $table->bigInteger('product_id')->unsigned()->nullable();
             $table->foreign('product_id')
-                    ->references('id')
-                    ->on('products')
-                    ->onUpdate('cascade')
-                    ->onDelete('cascade');
+                ->references('id')
+                ->on('products')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
             $table->timestamps();
         });
     }

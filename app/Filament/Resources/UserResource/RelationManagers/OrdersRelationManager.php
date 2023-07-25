@@ -51,20 +51,20 @@ class OrdersRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime(),
             ])
-             ->filters([
-                 SelectFilter::make('status')
-                     ->options([
-                         'DELIVERED' => 'Delivered',
-                         'PENDING' => 'Pending',
-                         'PROCESSING' => 'Processing',
-                         'DELIVERING' => 'Delivering',
-                         'CANCELLED' => 'Cancelled',
-                     ]),
-                 Filter::make('barcode')
-                     ->form([
-                         Forms\Components\TextInput::make('barcode'),
-                     ]),
-             ])
+            ->filters([
+                SelectFilter::make('status')
+                    ->options([
+                        'DELIVERED' => 'Delivered',
+                        'PENDING' => 'Pending',
+                        'PROCESSING' => 'Processing',
+                        'DELIVERING' => 'Delivering',
+                        'CANCELLED' => 'Cancelled',
+                    ]),
+                Filter::make('barcode')
+                    ->form([
+                        Forms\Components\TextInput::make('barcode'),
+                    ]),
+            ])
             ->filters([
                 //
             ])

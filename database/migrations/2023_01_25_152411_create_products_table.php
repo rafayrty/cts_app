@@ -22,7 +22,7 @@ return new class extends Migration
             $table->text('excerpt')->nullable();
             $table->string('slug')->unique()->nullable();
             $table->boolean('is_rtl')->default(0);
-//            $table->string('name');
+            //            $table->string('name');
             $table->text('description')->nullable();
             $table->json('pages')->nullable();
             $table->json('dedications')->nullable();

@@ -90,16 +90,16 @@ class PDFController extends Controller
         return $pt = $px * (72 / 92);
     }
 
-public function findKey($array, $keySearch)
-{
-    foreach ($array as $key => $arr) {
-        if ($arr['page'] == $keySearch) {
-            return $key;
+    public function findKey($array, $keySearch)
+    {
+        foreach ($array as $key => $arr) {
+            if ($arr['page'] == $keySearch) {
+                return $key;
+            }
         }
-    }
 
-    return false;
-}
+        return false;
+    }
 
     /**
      *      * Write code on Method
@@ -169,11 +169,11 @@ public function findKey($array, $keySearch)
         return $fpdi->Output($outputFilePath, 'F');
     }
 
-public function count($path)
-{
-    $pdf = file_get_contents($path);
-    $number = preg_match_all("/\/Page\W/", $pdf, $dummy);
+    public function count($path)
+    {
+        $pdf = file_get_contents($path);
+        $number = preg_match_all("/\/Page\W/", $pdf, $dummy);
 
-    return $number;
-}
+        return $number;
+    }
 }

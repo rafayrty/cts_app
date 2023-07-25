@@ -21,7 +21,7 @@ return new class extends Migration
             $table->json('product_info')->nullable();
             $table->bigInteger('product_id')->unsigned();
             $table->tinyInteger('product_type')->default(1)->comment('1. Books,2. Notebook');
-            $table->string('language')->nullable()->comment("For notebooks only");
+            $table->string('language')->nullable()->comment('For notebooks only');
             $table->integer('quantity')->default(1);
             $table->integer('discount_total')->default(0);
             $table->string('gender')->nullable();

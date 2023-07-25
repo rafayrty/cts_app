@@ -38,6 +38,7 @@ class ItemsRelationManager extends RelationManager
 
                     if ($product) {
                         $name = $inputs['name'];
+
                         return str_replace('{basmti}', $name, $product->demo_name);
                     } else {
                         return $item->name;

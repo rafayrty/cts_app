@@ -21,6 +21,17 @@ class Document extends Model
     protected $guarded = [];
 
     public $appends = ['genderParsed'];
+ protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($model) {
+            // Check if the language field is being set to a specific value
+            if ($model->isDirty('language') && $model->language === 'other') {
+                $model->language = null;
+            }
+        });
+    }
 
     public function getgenderParsedAttribute()
     {

@@ -1,19 +1,18 @@
 <?php
 
 namespace App\Actions\Personalization;
-use ZipArchive;
+
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use ZipArchive;
 
 class CreateZipFileFromList
 {
-
-   /**
-    * Create A Single Zip File From a List of Files
-    *
-    * @param  array<string>,string  $files,$name
-    * @return BinaryFileResponse
-    */
-    public function __invoke($files,$name = 'download'):BinaryFileResponse
+    /**
+     * Create A Single Zip File From a List of Files
+     *
+     * @param  array<string>,string  $files,$name
+     */
+    public function __invoke($files, $name = 'download'): BinaryFileResponse
     {
         // Create a temporary zip file
         $zipPath = storage_path('app/tmp.zip');
@@ -42,6 +41,4 @@ class CreateZipFileFromList
 
         return $response;
     }
-
 }
-

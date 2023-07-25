@@ -27,7 +27,7 @@ class OrderItem extends Model
 
     //public function cover()
     //{
-        //return $this->hasOne(Covers::class);
+    //return $this->hasOne(Covers::class);
     //}
     public function getNameParsedAttribute()
     {
@@ -35,6 +35,6 @@ class OrderItem extends Model
         $product = $this->product;
         $name = $this->inputs['name'];
 
-        return str_replace('{basmti}', $name, $product->demo_name);
+        return str_replace('{basmti}', $name, $product->demo_name ?? $this->product_info['demo_name']);
     }
 }

@@ -29,13 +29,13 @@ class AboutPage implements FilamentPageTemplate
                     TextInput::make('title')->required(),
                     TextInput::make('procedure_title')->required(),
                     Repeater::make('procedure')
-                    ->schema([
-                        FileUpload::make('image')->image()
-                        ->helperText('Must be Less than 10mb')->maxSize(10 * 1024) //10MB
-                        ->directory('uploads')
-                        ->required(),
-                        Textarea::make('description')->required(),
-                    ])->orderable()->minItems(1),
+                        ->schema([
+                            FileUpload::make('image')->image()
+                                ->helperText('Must be Less than 10mb')->maxSize(10 * 1024) //10MB
+                                ->directory('uploads')
+                                ->required(),
+                            Textarea::make('description')->required(),
+                        ])->orderable()->minItems(1),
                     TextInput::make('description_title')->required(),
                     Textarea::make('description')->required(),
                 ]),

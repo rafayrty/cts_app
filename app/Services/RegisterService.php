@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
 
 class RegisterService
 {
@@ -818,8 +817,8 @@ class RegisterService
 
         // Get the timestamp that is 10 minutes ago
         $verifier = DB::table('user_verifications')->where('user_id', $user->id)->where('verification_code', $request->verification_code)
-        ->where('expiry', '>', now())
-        ->latest()->first();
+            ->where('expiry', '>', now())
+            ->latest()->first();
 
         if ($verifier) {
             User::findOrFail($user->id)->update(['verified_at' => now()]);
@@ -844,8 +843,8 @@ class RegisterService
 
         // Get the timestamp that is 10 minutes ago
         $verifier = DB::table('user_verifications')->where('user_id', $user->id)->where('verification_code', $request->verification_code)
-        ->where('expiry', '>', now())
-        ->latest()->first();
+            ->where('expiry', '>', now())
+            ->latest()->first();
 
         if ($verifier) {
             User::findOrFail($user->id)->update(['verified_at' => now()]);

@@ -29,9 +29,9 @@ class TagsResource extends Resource
                     ->afterStateUpdated(Closure::fromCallable(new MakeSlug()))->reactive()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('slug')
-                        ->unique(ignorable: fn ($record) => $record)
-                        ->required()
-                        ->maxLength(255),
+                    ->unique(ignorable: fn ($record) => $record)
+                    ->required()
+                    ->maxLength(255),
             ]);
     }
 

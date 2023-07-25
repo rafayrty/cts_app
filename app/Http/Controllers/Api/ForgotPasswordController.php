@@ -53,22 +53,22 @@ class ForgotPasswordController extends Controller
     }
     //public function forgot_password(Request $request)
     //{
-        //$this->validate($request, [
-            //'email' => 'required',
-        //]);
+    //$this->validate($request, [
+    //'email' => 'required',
+    //]);
 
-        //$user_email = User::where('email', $request->email)->get()->first();
+    //$user_email = User::where('email', $request->email)->get()->first();
 
-        //if ($user_email) {
-            //$this->sendForgotEmail($user_email);
+    //if ($user_email) {
+    //$this->sendForgotEmail($user_email);
 
-            //return true;
-        //}
-
-        //abort(404, 'No Account was Found');
+    //return true;
     //}
 
-    public function sendForgotEmail(User $user):bool
+    //abort(404, 'No Account was Found');
+    //}
+
+    public function sendForgotEmail(User $user): bool
     {
         $forgot_code = rand(1000, 9999);
         DB::table('forgot_passwords')->insert(['user_id' => $user->id, 'type' => 2, 'forgot_code' => $forgot_code, 'created_at' => now(), 'expiry' => now()->addMinutes(10)]);
@@ -77,7 +77,7 @@ class ForgotPasswordController extends Controller
         return true;
     }
 
-    public function sendForgotPhone(User $user):bool
+    public function sendForgotPhone(User $user): bool
     {
         $forgot_code = rand(1000, 9999);
         DB::table('forgot_passwords')->insert(['user_id' => $user->id, 'type' => 1, 'forgot_code' => $forgot_code, 'created_at' => now(), 'expiry' => now()->addMinutes(10)]);
@@ -88,31 +88,31 @@ class ForgotPasswordController extends Controller
 
     //public function reset_password(Request $request)
     //{
-        //$this->validate($request, [
-            //'email' => 'required|min:2|max:64',
-            //'forgot_code' => 'required',
-            //'password' => 'required|min:6|max:64',
-        //]);
+    //$this->validate($request, [
+    //'email' => 'required|min:2|max:64',
+    //'forgot_code' => 'required',
+    //'password' => 'required|min:6|max:64',
+    //]);
 
-        //$user_id = null;
+    //$user_id = null;
 
-        //$user_email = User::where('email', $request->email)->get()->first();
-        //if ($user_email) {
-            //$user_id = $user_email->id;
-        //}
+    //$user_email = User::where('email', $request->email)->get()->first();
+    //if ($user_email) {
+    //$user_id = $user_email->id;
+    //}
 
-        //if ($user_id == null) {
-            //abort(404, 'Code Entered is Incorrect or Expired');
-        //}
+    //if ($user_id == null) {
+    //abort(404, 'Code Entered is Incorrect or Expired');
+    //}
 
-        //$forgot_pass = DB::table('forgot_passwords')->where('user_id', $user_id)->where('forgot_code', $request->forgot_code)->get()->first();
-        //DB::table('forgot_passwords')->where('user_id', $user_id)->delete();
+    //$forgot_pass = DB::table('forgot_passwords')->where('user_id', $user_id)->where('forgot_code', $request->forgot_code)->get()->first();
+    //DB::table('forgot_passwords')->where('user_id', $user_id)->delete();
 
-        //if (! $forgot_pass) {
-            //abort(404, 'Code Entered is Incorrect or Expired');
-        //}
+    //if (! $forgot_pass) {
+    //abort(404, 'Code Entered is Incorrect or Expired');
+    //}
 
-        //return User::findOrFail($user_id)->update(['password' => Hash::make($request->password)]);
+    //return User::findOrFail($user_id)->update(['password' => Hash::make($request->password)]);
     //}
 
     public function reset_password(Request $request)

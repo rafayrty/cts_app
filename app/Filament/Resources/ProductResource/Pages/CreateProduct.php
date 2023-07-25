@@ -51,9 +51,8 @@ class CreateProduct extends CreateRecord
         return [
             $this->getSubmitFormAction(),
             Action::make('preview_product')
-            ->url('https://frontend.basmti.com/product/preview?'.http_build_query($array), true),
+                ->url('https://frontend.basmti.com/product/preview?'.http_build_query($array), true),
             $this->getCancelFormAction(),
         ];
     }
 }
-

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('min_amount')->default(0.00);
             $table->integer('discount_percentage')->default(0.00);
             $table->string('coupon_name');
+            $table->bigInteger('times_used')->default(0);
             $table->date('expiry');
             $table->timestamps();
         });

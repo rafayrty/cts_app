@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 class GeneratePDF
@@ -14,7 +15,7 @@ class GeneratePDF
         ]);
 
         if ($response->failed()) {
-            throw new RuntimeException('Failed to connect ', $response->status());
+            throw new RuntimeException('Unable to Generate Invoice', $response->status());
         }
 
         return $response;

@@ -11,6 +11,6 @@ test('test if login is successfull', function () {
     /** @var \Illuminate\Contracts\Auth\Authenticatable $user */
     actingAs($user, 'filament');
     get('/admin')
-     ->assertStatus(200)
-     ->assertSee($user->name);
+        ->assertStatus(200)
+        ->assertSee($user->name);
 });

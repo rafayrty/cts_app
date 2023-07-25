@@ -78,12 +78,12 @@ class OrderStatusChart extends ApexChartWidget
         ];
     }
 
-protected function getFooter(): string|View
-{
-    $order_pending = Order::where('client_status', 'PENDING')->count();
-    $order_printing = Order::where('client_status', 'PRINTING')->count();
-    $order_completed = Order::where('client_status', 'COMPLETED')->count();
+    protected function getFooter(): string|View
+    {
+        $order_pending = Order::where('client_status', 'PENDING')->count();
+        $order_printing = Order::where('client_status', 'PRINTING')->count();
+        $order_completed = Order::where('client_status', 'COMPLETED')->count();
 
-    return view('order-status-footer', compact('order_pending', 'order_printing', 'order_completed'));
-}
+        return view('order-status-footer', compact('order_pending', 'order_printing', 'order_completed'));
+    }
 }

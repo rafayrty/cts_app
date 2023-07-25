@@ -22,9 +22,9 @@ class EditProduct extends EditRecord
     protected function getSaveFormAction(): Action
     {
         return Action::make('save')
-              ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
-              ->action(fn () => $this->save())
-              ->keyBindings(['command+s', 'ctrl+s']);
+            ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+            ->action(fn () => $this->save())
+            ->keyBindings(['command+s', 'ctrl+s']);
     }
 
     protected function getFormActions(): array
@@ -43,7 +43,7 @@ class EditProduct extends EditRecord
         return [
             $this->getSaveFormAction(),
             Action::make('preview_product')
-            ->url('https://frontend.basmti.com/product/preview?'.http_build_query($array), true),
+                ->url('https://frontend.basmti.com/product/preview?'.http_build_query($array), true),
             $this->getCancelFormAction(),
         ];
     }

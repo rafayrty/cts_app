@@ -1,6 +1,15 @@
 <?php
 
+namespace Tests;
+
+use Chiiya\FilamentAccessControl\Models\FilamentUser;
+use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\TestCase;
+use Illuminate\Support\Facades\Artisan;
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\seed;
+use Spatie\Permission\Models\Role;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,7 +22,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 |
 */
 
-uses(Tests\TestCase::class, RefreshDatabase::class)->in('Feature');
+uses(TestCase::class, RefreshDatabase::class, CreatesApplication::class)->in('Feature', 'Unit');
 
 /*
 |--------------------------------------------------------------------------
@@ -41,7 +50,14 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function loginAdmin()
 {
-    // ..
+    Artisan::call('filament-access-control:install');
+    seed((DatabaseSeeder::class));
+
+    $user = FilamentUser::factory()->create();
+    $role = Role::where('name', 'super-admin')->first();
+    $user->assignRole($role);
+    /** @var \Illuminate\Contracts\Auth\Authenticatable $user */
+    actingAs($user, 'filament');
 }

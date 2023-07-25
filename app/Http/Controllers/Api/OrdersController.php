@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\Orders\GenerateInvoice;
+
+use PDF;
 use App\ClientStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OrderProcessRequest;
@@ -13,19 +16,22 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\PrintHouseStatusEnum;
-use App\Settings\GeneralSettings;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
-use Milon\Barcode\Facades\DNS2DFacade;
 use Milon\Barcode\Facades\DNS1DFacade;
 use Throwable;
 
 class OrdersController extends Controller
 {
+
+    public function __construct(GenerateInvoice $generateInvoice){
+        $this->generateInvoice = $generateInvoice;
+    }
+
     public function process_order(OrderProcessRequest $request)
     {
         $seller_payme_id = config('app.seller_payme_id');
@@ -43,17 +49,20 @@ class OrdersController extends Controller
             }
             $buyer = $this->buyerToken($request);
             // Check If There are any issues in generating the Token
-                if ($buyer['status_code'] != 0) {
+            if ($buyer['status_code'] != 0) {
 
-                    Log::error($buyer);
-                    throw ValidationException::withMessages(['message' => $buyer['status_error_details']]);
-                    //return response()->json(['message' => $buyer['status_error_details']], 500);
-                }
-            if ($request->shipping_fee != app(GeneralSettings::class)->shipping_fee) {
-                //Check if the shipping fee is correct
-                //abort(404);
+                Log::error($buyer);
+                throw ValidationException::withMessages(['message' => $buyer['status_error_details']]);
+                //return response()->json(['message' => $buyer['status_error_details']], 500);
             }
 
+            if($request->coupon){
+                $coupon = Coupon::where('coupon_name',$request->coupon)->where('expiry', '>', now())->get()->first();
+                if(!$coupon){
+                    throw ValidationException::withMessages(['message' => 'Coupon Entered is Invalid']);
+                }
+                Coupon::findOrFail($coupon->id)->update(['times_used'=>$coupon->times_used + 1]);
+            }
             $order = Order::create([
                 'order_numeric_id' => 1000 + $increment,
                 'address' => $request->address,
@@ -68,7 +77,6 @@ class OrdersController extends Controller
                 'client_status' => ClientStatusEnum::NEW_ORDER,
                 'payment_status' => 'PENDING',
             ]);
-
             $order_items = $request->items;
 
             $barcodes = [];
@@ -76,17 +84,7 @@ class OrdersController extends Controller
             foreach ($order_items as $item) {
                 $calculated_subtotal += $item['total'];
             }
-            if ($request->coupon && $request->coupon != '') {
-                $coupon_discount = Coupon::where('coupon_name', $request->coupon)->get()->first();
-                //if (! $coupon_discount) {
-                //abort(404);
-                //}
-                //$calculated_discount = round(($calculated_subtotal * ($coupon_discount->discount_percentage / 100)), 2);
-                //approximately close
-                //if (abs($calculated_discount - $request->discount_total) < 1) {
-                //abort(404);
-                //}
-            }
+
             foreach ($order_items as $item) {
                 $original_product = Product::findOrFail($item['id']);
                 //Get Documents
@@ -94,7 +92,7 @@ class OrdersController extends Controller
                 $prd = Product::find($item['id']);
                 $prd = $prd->update(['sold_amount' => $prd->sold_amount + 1]);
 
-                if($original_product->product_type==1){
+                if ($original_product->product_type == 1) {
                     $item['cover']['price'] = $item['cover']['price'] * 100;
                 }
                 $order_item = OrderItem::create([
@@ -104,20 +102,22 @@ class OrdersController extends Controller
                     'gender' => $item['gender'],
                     'name' => $item['product_name'],
                     'image' => $item['image'],
-                    'product_type' => $item['product_type'],
-                    'language'=>$item['language'],
-                    'discount_total' =>
-                    $original_product->product_type == 1 ? (($original_product->price - $original_product->front_price) * 100) :
-                    (($original_product->price * 4 - $original_product->front_price * 4) * 100),
+                    'product_type' => $original_product->product_type,
+                    'language' => array_key_exists('language', $item) ? $item['language'] : null,
+                    //'discount_total' => $original_product->product_type == 1 ? (($original_product->price - $original_product->front_price) * 100) :
+                    //(($original_product->price * 4 - $original_product->front_price * 4) * 100),
+
+                    'discount_total' => ($original_product->price - $original_product->front_price) * 100,
                     'inputs' => $item['inputs'],
-                    'dedication' => $item['dedication'],
+                    'quantity'=>$item['quantity'],
+                    'dedication' => $item['dedication'] ?? null,
                     'cover' => $item['cover'] ?? null,
                     'price' => $item['price'] * 100,
-                    'total' => $item['total'] * 100,
+                    'total' => ($item['total'] * 100) * $item['quantity'],
                 ]);
 
                 $calculated_subtotal += $item['total'];
-                if($original_product->product_type == 1){
+                if ($original_product->product_type == 1) {
                     foreach ($original_product->documents as $document) {
                         //Type of the cover hard or soft cover generating barcodes
                         if ($document->type == ($item['cover']['type'] == 2 ? 0 : 1) || $document->type == 2) {
@@ -125,7 +125,7 @@ class OrdersController extends Controller
                             $barcodes[] = ['barcode_path' => $this->barcode_generator($number), 'barcode_number' => $number];
                         }
                     }
-                }else if($original_product->product_type == 2){
+                } elseif ($original_product->product_type == 2) {
                     foreach ($original_product->documents as $document) {
                         //Type of the cover hard or soft cover generating barcodes
                         if ($document->type == 0) {
@@ -160,7 +160,14 @@ class OrdersController extends Controller
             //$email = config('mail.from.address');
             //Mail::to($email)->queue(new OrderSuccess($order));
 
+            //Generate Invoice
+            $order = $order->refresh();
+            $response = ($this->generateInvoice)($order);
+            $order->update(['invoice_info'=>$response->json()]);
+
+
             DB::commit();
+
         } catch (Throwable $e) {
             throw $e;
             Log::error($e);
@@ -234,7 +241,6 @@ class OrdersController extends Controller
         // Generate Token
         $response = Http::post($payme_url.'/generate-sale', $data);
 
-        Log::info($response);
 
         return $response;
     }
@@ -265,7 +271,7 @@ class OrdersController extends Controller
                 'product_code' => $original_product->id,
             ];
 
-            if($original_product->product_type == 1){
+            if ($original_product->product_type == 1) {
 
                 $items[] = [
                     'name' => $item['cover']['name'],
@@ -301,7 +307,7 @@ class OrdersController extends Controller
             'shipping_details' => [
                 'name' => $order->address['first_name'].' '.$order->address['last_name'],
                 'email' => $request->user()->email,
-                'phone' => '+'.$order->address['country_code'] + $order->address['phone'],
+                'phone' => '+'.$order->address['country_code'].' '.$order->address['phone'],
                 'line1' => $order->address['street_name'].' '.$order->address['street_number'].' '.$order->address['home_no'],
                 'city' => $order->address['city'],
                 'postal_code' => $request->postcode,
@@ -310,7 +316,7 @@ class OrdersController extends Controller
             'billing_details' => [
                 'name' => $order->address['first_name'].' '.$order->address['last_name'],
                 'email' => $request->user()->email,
-                'phone' => '+'.$order->address['country_code'] + $order->address['phone'],
+                'phone' => '+'.$order->address['country_code'].' '.$order->address['phone'],
                 'line1' => $order->address['street_name'].' '.$order->address['street_number'].' '.$order->address['home_no'],
                 'city' => $order->address['city'],
                 'postal_code' => $request->postcode,
@@ -320,20 +326,20 @@ class OrdersController extends Controller
         // Generate Token
         $response = Http::post($payme_url.'/generate-sale', $data);
 
-        Log::info($response);
 
         return $response;
     }
+
     public function barcode_generator($number)
     {
 
-        $file_name = 'barcodes/' . time() . $number . '.png';
+        $file_name = 'barcodes/'.time().$number.'.png';
 
-        $background_color = "FFFFFF";
+        $background_color = 'FFFFFF';
         $padding = 10; // Adjust the padding value as desired
 
         // Generate a 1D barcode (e.g., Code39)
-        $barcode = DNS1DFacade::getBarcodePNGPath($number, 'C128', 1, 55,array(0,0,0), true);
+        $barcode = DNS1DFacade::getBarcodePNGPath($number, 'C128', 1, 55, [0, 0, 0], true);
 
         // Load the generated barcode image
         $source_image = imagecreatefrompng($barcode);
@@ -348,7 +354,7 @@ class OrdersController extends Controller
 
         // Create a new image with the desired background color and padding
         $bg_color = imagecreatetruecolor($padded_width, $padded_height);
-        list($r, $g, $b) = sscanf($background_color, "%02x%02x%02x");
+        [$r, $g, $b] = sscanf($background_color, '%02x%02x%02x');
         $color = imagecolorallocate($bg_color, $r, $g, $b);
         imagefilledrectangle($bg_color, 0, 0, $padded_width, $padded_height, $color);
 
@@ -373,15 +379,11 @@ class OrdersController extends Controller
 
         return $file_name;
     }
-    //public function barcode_generator($number)
-    //{
-    //$file_name = 'barcodes/'.time().$number.'.png';
 
-    //$background_color = "FFFFFF";
 
-    //Storage::disk('public')->put($file_name, base64_decode(DNS1DFacade::getBarcodePNG($number,'C39+',1,33,array(0,0,0), true,$background_color)));
-
-    //return $file_name;
-    //}
+    public function internal_invoice($order_id){
+        $order = Order::findOrFail($order_id);
+        $pdf = PDF::loadView('internal_invoice',compact('order'));
+        return $pdf->download('invoice.pdf');
+    }
 }
-

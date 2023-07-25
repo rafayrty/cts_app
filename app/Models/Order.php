@@ -11,7 +11,7 @@ class Order extends Model
 {
     use HasFactory;
 
-    protected $guarded = ['id','order_id'];
+    protected $guarded = ['id', 'order_id'];
 
     protected $casts = [
 
