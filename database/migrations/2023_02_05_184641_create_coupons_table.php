@@ -19,6 +19,8 @@ return new class extends Migration
             $table->integer('discount_percentage')->default(0.00);
             $table->string('coupon_name');
             $table->bigInteger('times_used')->default(0);
+            $table->boolean('free_shipping')->default(0);
+            $table->integer('commission_percentage')->default(0);
             $table->date('expiry');
             $table->timestamps();
         });

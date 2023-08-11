@@ -113,9 +113,18 @@ a[x-apple-data-detectors] {
                          <tr>
                           <td align="left" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';line-height:21px;color:#333333;font-size:14px;direction:rtl"><strong>{{$item->nameParsed}}</strong></p></td>
                          </tr>
+                         @if($item->product_type == 1)
                          <tr>
                           <td align="left" style="padding:0;Margin:0;padding-top:5px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';line-height:21px;color:#333333;font-size:12px;direction:rtl">Cover: {{$item->cover['name']}}<br>Price: {{$item->price/100}}<br/>Cover Price: {{$item->cover['price']/100}}</p></td>
                          </tr>
+                         @endif
+
+                         @if($item->product_type == 2)
+                         <tr>
+                          <td align="left" style="padding:0;Margin:0;padding-top:5px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';line-height:21px;color:#333333;font-size:12px;direction:rtl">Language: {{$item->language}}<br>Price: {{$item->price/100}}<br/></p></td>
+                         </tr>
+                         @endif
+
                        </table></td>
                      </tr>
                    </table></td>

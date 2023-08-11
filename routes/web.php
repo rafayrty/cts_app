@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\PersonalizationController as ApiPersonalization;
 use App\Http\Controllers\AutoSaveController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\PersonalizationController;
+use App\Models\Coupon;
 use App\Models\Order;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -43,12 +44,24 @@ Route::group(['middleware' => 'auth:filament'], function () {
     Route::get('find_packaging_order/{barcode?}', [PackagingManagementController::class, 'find_packaging_order'])->name('order.find_packaging_order');
 
     Route::get('internal_invoice/{order_id}', [OrdersController::class, 'internal_invoice'])->name('order.internal_invoice');
+    Route::post('update_font/{id}/{order_id}', [PersonalizationController::class, 'update_font'])->name('order.update_font');
 
 });
 //Route::get('fill-data-pdf-document/{ids}/{order_item_id}', [PersonalizationController::class, 'generatePDFFromDocumentOrderDownload'])->name('order.download.pdf');
 Route::get('/', function () {
     return redirect()->to('/admin');
 });
+Route::get('/influencer_dashboard/{coupon}',function($coupon){
+    if (! request()->hasValidSignature()) {
+            abort(401);
+    }
+    $coupon = Coupon::where('coupon_name',$coupon)->first();
+    return view('influencer_dashboard',compact('coupon'));
+})->name('influencer.dashboard');
+
+
+
+
 
 //Route::get('fonts/personalize-fonts.css', function () {
 //$path = 'fonts.css';

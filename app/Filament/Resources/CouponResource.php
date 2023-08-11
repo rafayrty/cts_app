@@ -33,7 +33,14 @@ class CouponResource extends Resource
                         Forms\Components\TextInput::make('min_amount')
                             ->numeric()
                             ->minValue(0)
-                            ->required(), Forms\Components\TextInput::make('discount_percentage')
+                    ->required(),
+                    Forms\Components\TextInput::make('commission_percentage')
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(100)
+                            ->required(),
+                    Forms\Components\Checkbox::make('free_shipping')->label('Free Shipping Coupon')->helperText('Discount % won\'t be used then'),
+                    Forms\Components\TextInput::make('discount_percentage')
                             ->numeric()
                             ->minValue(1)
                             ->maxValue(100)
@@ -60,6 +67,15 @@ class CouponResource extends Resource
                     $totalSalesAmount = Order::where('coupon', $coupon->coupon_name)->sum('total');
                     return $totalSalesAmount;
                 })->money('ils'),
+                Tables\Columns\TextColumn::make('commission_percentage'),
+                Tables\Columns\TextColumn::make('id')->label('Link')->html()->getStateUsing(function (Model $record) {
+                    $coupon = $record;
+                    $url = URL::signedRoute('influencer.dashboard',$coupon->coupon_name);
+
+                    return "<a href='".$url."' class='
+                        filament-link inline-flex items-center justify-center font-medium outline-none hover:underline focus:underline text-sm text-primary-600 hover:text-primary-500 dark:text-primary-500 dark:hover:text-primary-400 filament-tables-link-action'>
+                        Share Link</a>";
+                })
             ])
             ->filters([
                 //

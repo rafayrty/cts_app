@@ -12,7 +12,10 @@ class HandleDocType
             $json_pdfs = json_decode($get('../../pdf_info'), true);
             $key = array_search($get('pdf_name'), array_column($json_pdfs, 'filename'));
             //$key = $this->searchKey($json_pdfs, $get('name'));
-            $json_pdfs[$key]['type'] = $state;
+            //dd($key,$json_pdfs,$get('pdf_name'));
+            if($key !== false){
+                $json_pdfs[$key]['type'] = $state;
+            }
             $set('../../pdf_info', json_encode($json_pdfs));
         }
     }

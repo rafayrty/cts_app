@@ -56,7 +56,7 @@ class OrdersController extends Controller
                 //return response()->json(['message' => $buyer['status_error_details']], 500);
             }
 
-            if($request->coupon){
+            if($request->coupon && $request->coupon !=''){
                 $coupon = Coupon::where('coupon_name',$request->coupon)->where('expiry', '>', now())->get()->first();
                 if(!$coupon){
                     throw ValidationException::withMessages(['message' => 'Coupon Entered is Invalid']);
@@ -162,7 +162,7 @@ class OrdersController extends Controller
 
             //Generate Invoice
             $order = $order->refresh();
-            $response = ($this->generateInvoice)($order);
+            //$response = ($this->generateInvoice)($order);
             $order->update(['invoice_info'=>$response->json()]);
 
 

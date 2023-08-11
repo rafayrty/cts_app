@@ -14,7 +14,7 @@ class HandleEditorPageNumber
             if ($json_pdfs) {
                 foreach ($json_pdfs as $pdf) {
                     if ($pdf['filename'] == $state['document']) {
-                        return 'Page #'.($state['page'] + 1).' Of '.$pdf['name'];
+                        return 'Page #'.((int)$state['page'] + 1).' Of '.$pdf['name'];
                     }
                 }
             }

@@ -14,5 +14,18 @@ $fonts = \App\Models\Fonts::all();
   }
 @endforeach
 </style>
+<script>
+// Add a 'wheel' event listener to the active element
+let activeElement = document.querySelectorAll('input');
+//document.body.style.overflow = 'hidden'
+setInterval(()=>{
+    activeElements = document.querySelectorAll('input');
+    activeElements.forEach(elem=>{
+        elem.addEventListener('change', ()=> document.body.style.overflow = 'hidden', { passive: false })
+        elem.addEventListener('blur', ()=>{     document.body.style.overflow = 'auto'})
+    });
+},1000)
+//document.addEventListener('scroll',(e)=>console.log("scroll called",e))
+</script>
 <script src="/interact.min.js"></script>
 

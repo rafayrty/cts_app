@@ -48,6 +48,15 @@ $amount_spent =  \App\Models\Order::where('user_id',$order->user_id)->sum('total
     <ul class="billing-info-list">
       @if($order->coupon)
             <li><strong>Applied Coupon:</strong>{{$order->coupon}}</li>
+            @php
+            $coupon = \App\Models\Coupon::where('coupon_name',$order->coupon)->get()->first();
+            @endphp
+
+            @if($coupon)
+                @if($coupon->free_shipping)
+                    <li><strong style="color:red;">Coupon Gives Free Shipping</strong></li>
+                @endif
+            @endif
       @endif
             <li class="mt-2"><strong>Subtotal:</strong>₪ {{$order->sub_total/100}}</li>
             <li  class="mt-2"><strong>Shipping:</strong>₪ {{$order->shipping/100}}</li>

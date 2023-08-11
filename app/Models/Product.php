@@ -4,7 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use RalphJSmit\Laravel\SEO\Support\HasSEO;
+use TKey;
+use TValue;
 
 class Product extends Model
 {
@@ -41,12 +46,16 @@ class Product extends Model
     protected $hidden = ['pagesParsed', 'dedicationsParsed'];
 
     public $appends = ['pagesParsed', 'dedicationsParsed', 'has_sale', 'front_price', 'has_male', 'has_female', 'age_groups', 'is_in_wishlist'];
-
+    /**
+     * @return <missing>|array
+     */
     public function getpagesParsedAttribute()
     {
         return is_array($this->pages) ? $this->pages : (array) json_decode($this->pages);
     }
-
+    /**
+     * @return <missing>|array
+     */
     public function getdedicationsParsedAttribute()
     {
         return is_array($this->dedications) ? $this->dedications : (array) json_decode($this->dedications);
@@ -61,6 +70,7 @@ class Product extends Model
 
     /**
      * Check if the product is discounted
+     * @return bool
      */
     public function getHasSaleAttribute()
     {
@@ -73,6 +83,7 @@ class Product extends Model
 
     /**
      * The Product Price after Calculations
+     * @return float|bool|<missing>
      */
     public function getFrontPriceAttribute()
     {
@@ -85,6 +96,7 @@ class Product extends Model
 
     /**
      * The Product that belongs to the many products
+     * @return BelongsToMany
      */
     public function covers()
     {
@@ -96,11 +108,12 @@ class Product extends Model
      */
     public function product_attributes()
     {
-        return $this->belongsToMany(ProductAttributeOption::class);
+        return $this->belongsToMany(ProductAttributeOption::class)->orderBy('id','ASC');
     }
 
     /**
      * Check if it is also for males
+     * @return bool
      */
     public function getHasMaleAttribute()
     {
@@ -116,6 +129,7 @@ class Product extends Model
 
     /**
      * Check if it is also for males
+     * @return Collection<TKey,TValue>
      */
     public function getMaleDocument()
     {
@@ -132,6 +146,7 @@ class Product extends Model
 
     /**
      * Check if it is also for males
+     * @return Collection<TKey,TValue>
      */
     public function getFemaleDocument()
     {
@@ -148,6 +163,7 @@ class Product extends Model
 
     /**
      * Check if it is also for males
+     * @return bool
      */
     public function getHasFemaleAttribute()
     {
@@ -158,7 +174,9 @@ class Product extends Model
         return $this->product_attributes()->where('product_attribute_option_id', '2')->count() > 0 ? true : false;
         //return false;
     }
-
+    /**
+     * @return bool
+     */
     public function getIsInWishlistAttribute()
     {
         if (request()->user()) {
@@ -173,6 +191,7 @@ class Product extends Model
 
     /**
      * Get the documents for the product.
+     * @return HasMany
      */
     public function documents()
     {
@@ -181,12 +200,15 @@ class Product extends Model
 
     /**
      * Get the wishlist item for the product.
+     * @return HasMany
      */
     public function wishlist()
     {
         return $this->hasMany(Wishlist::class);
     }
-
+    /**
+     * @return BelongsToMany
+     */
     public function tags()
     {
         return $this->belongsToMany(Tags::class);
@@ -194,6 +216,7 @@ class Product extends Model
 
     /**
      * Get the categories for the product.
+     * @return BelongsToMany
      */
     public function categories()
     {
@@ -202,6 +225,7 @@ class Product extends Model
 
     /**
      * Get the reviews for the product.
+     * @return HasMany
      */
     public function reviews()
     {

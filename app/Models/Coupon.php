@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,5 +8,5 @@ class Coupon extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['coupon_name', 'min_amount', 'expiry', 'discount_percentage','times_used'];
+    protected $fillable = ['coupon_name', 'min_amount', 'expiry', 'discount_percentage','times_used','commission_percentage','free_shipping'];
 }

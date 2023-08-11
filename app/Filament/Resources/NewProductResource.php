@@ -216,6 +216,7 @@ class NewProductResource extends Resource
                                                         ->reactive()->afterStateUpdated(Closure::fromCallable(new HandleDocumentName())),
                                                     Radio::make('language')
                                                         ->inlineLabel()
+                                                        ->helperText('Choose English if the cover is english only else leave it blank')
                                                         ->options(fn (Closure $get) => $get('type') == '0' ?  ['english'=>'English'] : ['hebrew' => 'Hebrew', 'drawing' => 'Drawing', 'mathematics' => 'Mathematics', 'arabic' => 'Arabic', 'english' => 'English'])
                                                         ->required(fn (Closure $get)=>$get('type') == '0' ? false : true),
                                                     Select::make('type')

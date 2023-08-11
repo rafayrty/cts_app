@@ -6,6 +6,8 @@ use Closure;
 use Illuminate\Support\Facades\Storage;
 //use Spatie\PdfToImage\Pdf as ConvertToImage;
 use Karkow\MuPdf\Pdf;
+use setasign\Fpdi\Tcpdf\Fpdi;
+use Illuminate\Support\Facades\Log;
 
 class HandleProductAttatchment
 {
@@ -30,9 +32,14 @@ class HandleProductAttatchment
 
     }
 
-    public function getDimensions($document)
+    public function getDimensions($orientation = 'P',$document)
     {
 
+//$pdf = new Fpdi($orientation,'pt'); // change the snd parameter to change the units
+//$pdf->setSourceFile($document);
+//$pageId = $pdf->importPage(1);
+//$width = round($pdf->getPageWidth(),2);
+//$height = round($pdf->getPageHeight(),2);
         $cmd = config('app.pdf_info_path');
         exec("$cmd \"$document\" 2>&1", $output);
 
@@ -54,7 +61,10 @@ class HandleProductAttatchment
                 break;
             }
         }
+        //$dimensions['width'] = $width;
+        //$dimensions['height'] = $height;
 
+        Log::info($dimensions);
         return $dimensions;
     }
 
@@ -136,8 +146,6 @@ class HandleProductAttatchment
         $mupdf = new Pdf($state->path(), config('app.mupdf_path'));
 
         $count = $this->getPDFPages($state->path()); //Get The Number of Pages
-        $dimensions = $this->getDimensions($state->path());
-        $set('dimensions', $dimensions);
 
         //Incase we have a cover hard or soft
         if ($get('type') != 2) {
@@ -148,9 +156,13 @@ class HandleProductAttatchment
 
             $images = $this->getSplittedImages($img_path);
 
-            $dimensions['width'] = $dimensions['width'] / 2;
 
             unlink($img_path); //Delete the original cover image after getting the splitted version
+
+            $dimensions = $this->getDimensions('L',$state->path());
+            $set('dimensions', $dimensions);
+
+            $dimensions['width'] = $dimensions['width'] / 2;
 
             if (app()->isProduction()) {
                 $this->upload_to_do($images);
@@ -164,6 +176,10 @@ class HandleProductAttatchment
             ]);
 
         } else {
+
+            $dimensions = $this->getDimensions('P',$state->path());
+            $set('dimensions', $dimensions);
+
             $images = [];
             for ($i = 1; $i <= $count; $i++) {
                 $img_path = 'uploads/'.time().$get('type').'-'.$i.'.png';

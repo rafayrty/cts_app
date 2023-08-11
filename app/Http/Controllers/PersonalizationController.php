@@ -31,12 +31,50 @@ class PersonalizationController extends Controller
         $this->CreateZipFileFromList = $createZipFileFromList;
     }
 
+    public function update_font($id,$order_id){
+
+        $this->validate(request(),[
+            'font'=>'required'
+        ]);
+
+        $product = Product::findOrFail($id);
+        $order = Order::findOrFail($order_id);
+
+        if(request()->font != 'GE-Dinar-Medium'){
+
+            $font = Fonts::where('font_name',request()->font)->get()->first();
+
+            if(!$font) abort(404);
+
+            $selected_font = $font->font_name;
+        }else{
+            $selected_font = request()->font;
+        }
+        $pages = $product->pages;
+
+        foreach($pages as &$page){
+            foreach($page['pages']['predefined_texts'] as &$text){
+                    $text['font_face'] = $selected_font;
+            }
+        }
+        $product->update(['pages'=>$pages]);
+        //Delete the zip file
+        if($order->zip_path){
+            if(file_exists($order->zip_path)){
+                unlink($order->zip_path);
+            }
+        }
+        $order->update(['queue_status'=>null,'zip_path'=>null]);
+        return redirect()->back()->with('success',"Font Update Successfully");
+    }
+
     public function generatePDFFromDocument($id)
     {
         $document = Document::findOrFail($id);
 
         $pages = $document->product->pagesParsed;
         $dedications = $document->product->dedicationsParsed;
+        $barcodes = $document->product->barcodes;
 
         $inputs = ['name' => $document->product->replace_name, 'first_name' => split_name($document->product->replace_name)[0], 'age' => '٨', 'init' => $document->product->replace_name[0]];
         $replace_name = $inputs['name'];
@@ -70,6 +108,16 @@ class PersonalizationController extends Controller
             }
         }
 
+        $barcode_array = [];
+        if($barcodes){
+
+            foreach ($barcodes as &$barcode) {
+                if ($barcode['document'] == $document->pdf_name) {
+                    $barcode_array[] = ['barcode_path' => Storage::path('public/download.png'), 'page' => $barcode['page'], 'barcode_info' => $barcode['barcodes']['barcodes'][0]];
+                }
+            }
+
+        }
         $file = Storage::disk('local')->path('public/'.$document->attatchment);
         $fonts = Fonts::all();
         $array = [];
@@ -81,7 +129,7 @@ class PersonalizationController extends Controller
         $array[] = ['font_name' => 'GE-Dinar-Medium', 'attatchment' => public_path('fonts/GE-Dinar-One-Medium.ttf')];
 
         if (file_exists($file)) {
-            $response = ($this->GeneratePDFAction)($file, $pages_array, $dedications_array, array_values($array));
+            $response = ($this->GeneratePDFAction)($file, $pages_array, $dedications_array,$barcode_array, array_values($array));
             $body = $response->getBody();
             // Explicitly cast the body to a string
             $stringBody = (string) $body;

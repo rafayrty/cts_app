@@ -21,6 +21,8 @@
         "carlos-meneses/laravel-mpdf": "^2.1",
         "chiiya/filament-access-control": "^1.6",
         "filament/filament": "^2.0",
+         "setasign/fpdf": "1.8.*",
+        "setasign/fpdi": "^2.0",
         "filament/spatie-laravel-settings-plugin": "^2.0",
         "flowframe/laravel-trend": "0.1.5",
         "genealabs/laravel-model-caching": "0.13",
