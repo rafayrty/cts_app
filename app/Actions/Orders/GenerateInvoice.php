@@ -24,7 +24,6 @@ class GenerateInvoice
         }
         $items[] = ['description'=>'דמי משלוח','unitprice_incvat'=>$order->shipping / 100,'quantity'=>1];
 
-        Log::info($items);
         $payment_info = json_decode($order->payment_info,true);
         $payment_info = [
             'sum'=>$order->total/100,
@@ -64,6 +63,7 @@ class GenerateInvoice
             throw new RuntimeException('Failed to connect ', $response->status());
         }
 
+        Log::info($response);
         return $response;
     }
 }

@@ -65,6 +65,14 @@
     "coupon.update": "Coupon → Edit",
     "coupon.delete": "Coupon → Delete",
 
+
+    "referral.viewAny": "Referral → View Any",
+    "referral.view": "Referral → View",
+    "referral.create": "Referral → Create",
+    "referral.update": "Referral → Edit",
+    "referral.delete": "Referral → Delete",
+
+
     "product_attributes.viewAny": "Product Attributes → View Any",
     "product_attributes.view": "Product Attributes → View",
     "product_attributes.create": "Product Attributes → Create",

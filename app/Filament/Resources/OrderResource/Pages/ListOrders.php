@@ -35,4 +35,9 @@ class ListOrders extends ListRecords
     {
         return 1;
     }
+
+protected function getTableRecordsPerPageSelectOptions(): array
+    {
+        return [10, 25, 50, 100];
+    }
 }

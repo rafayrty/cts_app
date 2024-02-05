@@ -3,8 +3,10 @@
 use App\Http\Controllers\Admin\PackagingManagementController;
 use App\Http\Controllers\Admin\PrintingManagementController;
 use App\Http\Controllers\Admin\UpdateOrderStatusController;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OrdersController;
+use App\Models\User;
 use App\Http\Controllers\Api\PersonalizationController as ApiPersonalization;
 use App\Http\Controllers\AutoSaveController;
 use App\Http\Controllers\PDFController;
@@ -70,6 +72,64 @@ Route::get('/influencer_dashboard/{coupon}',function($coupon){
 Route::post('/save_product', [AutoSaveController::class, 'index']);
 Route::get('/personalization/fonts', [ApiPersonalization::class, 'get_fonts'])->name('personalization.get-fonts');
 
+Route::get('testing',function(){
+
+        $mailchimp = new \MailchimpMarketing\ApiClient();
+
+        $mailchimp->setConfig([
+            'apiKey' => config('app.mailchimp_key'),
+            'server' => config('app.mailchimp_server_prefix'),
+        ]);
+
+        $list_id = "305910516b";
+        //$email =  $user->email;
+        //$subscriber_hash = md5(strtolower($email));
+
+        //Users with orders
+        $users = User::join('orders', 'users.id', '=', 'orders.user_id')
+                            ->select('users.*')
+                            ->distinct()->limit(50)->get();
+        //Users Who haven't placed an order
+        //$users_without_orders = User::all();
+        //dd(count($users_without_orders));
+        //$users_without_orders_arr = collect([]);
+        //foreach($users_without_orders as $user_w_orders){
+            //if($user_w_orders->orders()->count()==0){
+                //$users_without_orders_arr->push($user_w_orders);
+            //}
+        //}
+    //dd($users_without_orders_arr);
+    foreach($users as $user){
+        try {
+            $response = $mailchimp->lists->addListMember($list_id, [
+                "email_address" => $user->email,
+                "status" => "subscribed",
+                "tags"  => ['Customer'],
+                "merge_fields" => [
+                    "FNAME" => $user->first_name,
+                    "LNAME" => $user->last_name,
+                    "PHONE" => $user->phone_number
+                ]
+            ]);
+            return $response;
+        } catch (MailchimpMarketing\ApiException $e) {
+            Log::error($e->getMessage());
+            abort(422,"An Unknown Error Occurred");
+        }
+    }
+        //try {
+          //$mailchimp->lists->updateListMemberTags($list_id, $subscriber_hash, [
+            //"tags" => [
+              //[
+                //"name" => "Customer W Order",
+                //"status" => "active"
+              //]
+            //]
+          //]);
+        //} catch (MailchimpMarketing\ApiException $e) {
+            //Log::error($e->getMessage());
+        //}
+});
 //Route::get('/testing', function () {
 
     //$number = '1097-28-119-99';

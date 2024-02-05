@@ -20,6 +20,8 @@ return [
     'pdf_info_path' => env('PDF_INFO_PATH', '/opt/homebrew/bin/pdfinfo'),
     'mupdf_path' => env('MUPDF_PATH', '/opt/homebrew/bin/mutool'),
     'nginx_path' => env('NGINX_PATH', '/opt/homebrew/etc/nginx'),
+    'mailchimp_key' => env('MAILCHIMP_KEY', ''),
+    'mailchimp_server_prefix' => env('MAILCHIMP_SERVER_PREFIX', ''),
 
     /*
     |--------------------------------------------------------------------------

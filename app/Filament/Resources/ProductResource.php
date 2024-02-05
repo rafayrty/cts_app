@@ -397,6 +397,12 @@ class ProductResource extends Resource
                         '1' => 'Personalized Book',
                         '2' => 'Personalized Notebook',
                     ]),
+
+                SelectFilter::make('featured')
+                    ->options([
+                        '1' => 'Featured',
+                        '0' => 'Not Featured',
+                    ]),
                 SelectFilter::make('categories')
                     ->relationship('categories','name'),
             ])

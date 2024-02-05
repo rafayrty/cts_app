@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Actions\SendPhoneVerification;
 use App\Actions\SendWelcomeEmail;
 use App\Mail\EmailVerification;
+use App\Models\Referral;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -778,10 +779,11 @@ class RegisterService
         263 => 'ZW',
     ];
 
-    public function __construct(SendPhoneVerification $sendPhoneVerification, SendWelcomeEmail $sendWelcomeEmail)
+    public function __construct(SendPhoneVerification $sendPhoneVerification, SendWelcomeEmail $sendWelcomeEmail,MailChimpService $mailChimpService)
     {
         $this->sendPhoneVerification = $sendPhoneVerification;
         $this->sendWelcomeEmail = $sendWelcomeEmail;
+        $this->mailChimpService = $mailChimpService;
     }
 
     /**
@@ -793,6 +795,10 @@ class RegisterService
     public function register(Request $request)
     {
         // Create A User
+        $referral = Referral::where('name',$request->referral)->get()->first();
+        if($referral != null){
+            $referral = $referral->id;
+        }
         $user = User::create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
@@ -800,8 +806,10 @@ class RegisterService
             'password' => Hash::make($request->password),
             'phone' => $request->phone,
             'country_code' => $request->country_code,
+            'referral_id' => $referral
         ]);
 
+        $this->mailChimpService->add_to_user_audience($user);
         //$this->verifyPhone($user);
         return $user;
     }

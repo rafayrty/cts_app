@@ -13,6 +13,7 @@ use App\Mail\OrderSuccess;
 use App\Mail\OrderSummary;
 use App\Models\Coupon;
 use App\Models\Order;
+use App\Models\User;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\PrintHouseStatusEnum;
@@ -24,12 +25,13 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Milon\Barcode\Facades\DNS1DFacade;
 use Throwable;
-
+use App\Services\MailChimpService;
 class OrdersController extends Controller
 {
 
-    public function __construct(GenerateInvoice $generateInvoice){
+    public function __construct(GenerateInvoice $generateInvoice,MailChimpService $mailChimpService){
         $this->generateInvoice = $generateInvoice;
+        $this->mailChimpService = $mailChimpService;
     }
 
     public function process_order(OrderProcessRequest $request)
@@ -66,7 +68,7 @@ class OrdersController extends Controller
             $order = Order::create([
                 'order_numeric_id' => 1000 + $increment,
                 'address' => $request->address,
-                'address_id' => $request->address['id'],
+                'address_id' => array_key_exists('id',$request->address) ? $request->address['id'] : null,
                 'user_id' => $request->user()->id,
                 'discount_total' => $request->discount_total * 100,
                 'sub_total' => $request->subtotal * 100,
@@ -79,6 +81,7 @@ class OrdersController extends Controller
             ]);
             $order_items = $request->items;
 
+            Log::info($order_items);
             $barcodes = [];
             $calculated_subtotal = 0;
             foreach ($order_items as $item) {
@@ -136,8 +139,10 @@ class OrdersController extends Controller
                 }
             }
             $order->update(['barcodes' => $barcodes]);
+            Log::info($order);
 
             $sale = $this->generateSale($request, $order, $buyer);
+            Log::info($sale);
 
             if ($sale['status_code'] != 0) {
 
@@ -163,9 +168,15 @@ class OrdersController extends Controller
             //Generate Invoice
             $order = $order->refresh();
             //$response = ($this->generateInvoice)($order);
-            $order->update(['invoice_info'=>$response->json()]);
+            //$order->update(['invoice_info'=>$response->json()]);
 
 
+            $user_order_count =  Order::where('user_id',auth()->user()->id)->count();
+
+            //If it is customer's first order add to mailchimp tag: Customer W Order
+            if($user_order_count==0){
+                $this->mailChimpService->add_to_customer_w_order(User::findOrFail(auth()->user()->id));
+            }
             DB::commit();
 
         } catch (Throwable $e) {

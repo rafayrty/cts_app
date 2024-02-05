@@ -23,22 +23,24 @@ class EditOrder extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
+        $order = $this->record;
         if ($this->record->client_status->value != $data['client_status']) {
                 if ($data['client_status'] == 'packaging') {
-                    $title = 'طلبك قيد '.$order->order_numeric_id.' التغليف';
+                    $title = 'طلبك قيد '.$order->order_numeric_id.'<br/><span style="color:#00214D"> التغليف</span>';
                     $text = 'يسعدنا إخبارك بأنه تمت معالجة طلبك ونحن الآن في طور التعبئة والتغليف. سيتم إرسال طلبك في أقرب وقت ممكن.';
                     Mail::to($order->user->email)->queue(new OrderUpdate($order, $title, $text));
                 }
 
                 if ($data['client_status'] == 'new order') {
+
                     $title = 'طلب جديد '.$order->order_numeric_id.'';
                     $text = 'تم تسجيل طلبك بنجاح. شكرًا لاختياركم منتجاتنا.';
                     Mail::to($order->user->email)->queue(new OrderUpdate($order, $title, $text));
                 }
 
                 if ($data['client_status'] == 'starting printing') {
-                    $title = ' بدء عملية الطباعة لطلبك رقم'.$order->order_numeric_id.' ';
-                    $text = 'لقد تم البدء في عملية طباعة طلبك. سنتأكد من جودة المنتجات قبل التوصيل.';
+                    $title = 'طلبك رقم '.$order->order_numeric_id.'<br/><span style="color:#00214D">طلبك قيد الطباعة</span>';
+                    $text = 'نعلمك اننا بدأنا في تحضير طلبكم - انتظروا منا رسالة جديدة تعلمكم ان الطلب سيكون جاهز خلال الايام القريبة';
                     Mail::to($order->user->email)->queue(new OrderUpdate($order, $title, $text));
                 }
 
@@ -49,27 +51,27 @@ class EditOrder extends EditRecord
                 }
 
                 if ($data['client_status'] == 'ready for delivery') {
-                    $title = 'طلبك جاهز '.$order->order_numeric_id.' للشحن';
-                    $text = 'سعداء جداً لإعلامك بأن طلبك قد تم إنهائه وهو جاهز الآن للتوصيل. سيتم إرسال بريد إلكتروني يحتوي على معلومات الشحن الخاصة بطلبك';
+                    $title = 'طلبك رقم '.$order->order_numeric_id.'<br/><span style="color:#00214D"> جاهز للشحن</span>';
+                    $text = 'نحن سعداء باعلامك بان طلبك تم تجهيزه ونحن بصدد تسليمه لشركة الارساليات ستصلك رسالة نصية SMS من شركة الارساليات تعلمك بوصول الطرد.';
                     Mail::to($order->user->email)->queue(new OrderUpdate($order, $title, $text));
                 }
 
                 if ($data['client_status'] == 'cancel') {
                     $title = ' إلغاء الطلب رقم'.$order->order_numeric_id.' ';
                     $text = 'نأسف لإبلاغكم أن الطلب قد تم إلغاؤه. في حال كانت هناك أي مشكلة، يرجى التواصل معنا.';
-                    Mail::to($order->user->email)->queue(new OrderCancel($order));
+                    Mail::to($order->user->email)->queue(new OrderUpdate($order));
                 }
 
                 if ($data['client_status'] == 'stuck') {
                     $title = ' الطلب رقم'.$order->order_numeric_id.'متوقف';
                     $text = 'نعتذر، لكن هناك تأخير في تقديم طلبك. سنقوم بمعالجة المشكلة بأسرع وقت ممكن.';
-                    Mail::to($order->user->email)->queue(new OrderCancel($order));
+                    Mail::to($order->user->email)->queue(new OrderUpdate($order));
                 }
 
                 if ($data['client_status'] == 'done') {
-                    $title = ' الطلب رقم'.$order->order_numeric_id.'تمّ';
+                    $title = ' الطلب رقم'.$order->order_numeric_id.'<br/><span style="color:#00214D"> تم توصيل الطلب بنجاح</span>';
                     $text = 'نفيدكم بأن الطلب قد تم تنفيذه بنجاح. شكرًا لاختياركم منتجاتنا.';
-                    Mail::to($order->user->email)->queue(new OrderCancel($order));
+                    Mail::to($order->user->email)->queue(new OrderUpdate($order));
                 }
         }
 

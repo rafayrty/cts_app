@@ -14,13 +14,11 @@ class Order extends Model
     protected $guarded = ['id', 'order_id'];
 
     protected $casts = [
-
         'product_info' => 'array',
         'address' => 'array',
         'barcodes' => 'array',
         'print_house_status' => PrintHouseStatusEnum::class,
         'client_status' => ClientStatusEnum::class,
-
     ];
 
     public function documents()

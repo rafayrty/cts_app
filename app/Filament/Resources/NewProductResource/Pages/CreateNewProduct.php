@@ -8,10 +8,11 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateNewProduct extends CreateRecord
 {
     protected static string $resource = NewProductResource::class;
-protected function mutateFormDataBeforeFill(array $data): array
-{
-    return $data;
-}
+
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        return $data;
+    }
 
 
     protected function mutateFormDataBeforeCreate(array $data): array

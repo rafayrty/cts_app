@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>How To Generate Invoice PDF In Laravel 9 - Techsolutionstuff</title>
+    <title>Basmt Invoice</title>
 </head>
 <style type="text/css">
     body{

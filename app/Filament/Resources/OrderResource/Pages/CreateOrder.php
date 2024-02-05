@@ -46,8 +46,7 @@ class CreateOrder extends CreateRecord
                 $status = 'COMPLETED';
                 // Check If There are any issues in generating the Token
                 if ($buyer['status_code'] != 0) {
-                    throw ValidationException::withMessages(['message' => $buyer['status_error_details']]);
-                    //return response()->json(['message' => $buyer['status_error_details']], 500);
+                    throw ValidationException::withMessages(['message' => $buyer['status_error_details']]); //return response()->json(['message' => $buyer['status_error_details']], 500);
                 }
             }
             $order = Order::create([
@@ -57,7 +56,7 @@ class CreateOrder extends CreateRecord
                 'sub_total' => $data['sub_total'] * 100,
                 'shipping' => $shipping_fee * 100,
                 'coupon' => null,
-                'total' => ($data['sub_total'] * 100) + ($shipping_fee * 100),
+                'total' => ($data['sub_total'] * 100) + ($shipping_fee * 100) - $this->discountTotal($data),
                 'print_house_status' => PrintHouseStatusEnum::NEW_ORDER,
                 'client_status' => ClientStatusEnum::NEW_ORDER,
                 'payment_status' => $status,
@@ -69,32 +68,56 @@ class CreateOrder extends CreateRecord
             foreach ($order_items as $item) {
 
                 $prd = Product::find($item['product_id']);
+                //dd($prd->documents);
                 $prd->update(['sold_amount' => $prd->sold_amount + 1]);
 
                 $cover = Covers::find($item['cover_id']);
 
-                $cover->price = $cover->price * 100;
+                if ($prd->product_type == 1) {
+                    $cover->price = $cover->price * 100;
+                }
                 $order_item = OrderItem::create([
                     'order_id' => $order->id,
                     'product_info' => $prd,
+                    'product_type' => $prd->product_type,
                     'product_id' => $prd->id,
                     'gender' => $prd->has_male ? 'Male' : 'Female',
                     'name' => $prd->product_name,
                     'image' => $prd->images[0],
+                    'language' => array_key_exists('language', $item) ? $item['language'] : null,
                     'discount_total' => ($prd->price - $prd->front_price) * 100,
                     'inputs' => ['name' => $item['name'], 'age' => $item['age'], 'f_name' => $item['first_letter']],
                     'dedication' => $item['dedication'],
-                    'cover' => $cover,
+                    'cover' => $prd->product_type == 1 ? $cover : null,
                     'price' => $prd->front_price * 100,
-                    'total' => (($cover->price) + ($prd->front_price * 100)),
+                    'total' => (($prd->product_type == 1 ? $cover->price : 0) + ($prd->front_price * 100)),
                 ]);
 
-                foreach ($prd->documents as $document) {
-                    if ($document->type == ($cover->type == 2 ? 0 : 1) || $document->type == 2) {
-                        $number = $order->order_numeric_id.'-'.$prd->id.'-'.$document['id'].'-'.$order_item->id;
-                        $barcodes[] = ['barcode_path' => $this->barcode_generator($number), 'barcode_number' => $number];
+
+                if ($prd->product_type == 1) {
+                    foreach ($prd->documents as $document) {
+                        //Type of the cover hard or soft cover generating barcodes
+                        if ($document->type == ($cover->type == 2 ? 0 : 1) || $document->type == 2) {
+                            $number = $order->order_numeric_id.'-'.$prd->id.'-'.$document['id'].'-'.$order_item->id;
+                            $barcodes[] = ['barcode_path' => $this->barcode_generator($number), 'barcode_number' => $number];
+                        }
+                    }
+                } elseif ($prd->product_type == 2) {
+                    //dd($prd->product_type);
+                    foreach ($prd->documents as $document) {
+                        if ($document->type == 0) {
+                            $number = $order->order_numeric_id.'-'.$prd->id.'-'.$document['id'].'-'.$order_item->id;
+                            $barcodes[] = ['barcode_path' => $this->barcode_generator($number), 'barcode_number' => $number];
+                        }
                     }
                 }
+
+                //foreach ($prd->documents as $document) {
+                    //if ($document->type == ($cover->type == 2 ? 0 : 1) || $document->type == 2) {
+                        //$number = $order->order_numeric_id.'-'.$prd->id.'-'.$document['id'].'-'.$order_item->id;
+                        //$barcodes[] = ['barcode_path' => $this->barcode_generator($number), 'barcode_number' => $number];
+                    //}
+                //}
             }
 
             $order->update(['barcodes' => $barcodes]);

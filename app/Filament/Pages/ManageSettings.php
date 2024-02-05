@@ -19,6 +19,19 @@ class ManageSettings extends SettingsPage
 
     protected static string $settings = GeneralSettings::class;
 
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        //$data['is_published'] = true;
+
+        //Delete the autosaved data
+        //$product = Product::where('slug', $data['slug'])->get()->first();
+        //$document = Document::where('product_id', $product->id)->get()->first();
+        //Document::findOrFail($document->id)->delete();
+        //Product::findOrFail($product->id)->delete();
+
+        dd($data);
+        return $data;
+    }
     protected function getFormSchema(): array
     {
         return [

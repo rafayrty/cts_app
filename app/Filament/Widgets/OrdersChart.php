@@ -37,10 +37,14 @@ class OrdersChart extends ApexChartWidget
      */
     protected function getOptions(): array
     {
+
+        $start = $this->filterFormData['date_start'];
+        $end = $this->filterFormData['date_end'];
+
         $data = Trend::model(Order::class)
             ->between(
-                start: now()->startOfYear(),
-                end: now()->endOfYear(),
+                start: Carbon::parse($start),
+                end: Carbon::parse($end),
             )
             ->perMonth()
             ->count();

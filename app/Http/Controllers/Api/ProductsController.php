@@ -74,7 +74,7 @@ class ProductsController extends Controller
 
     public function get_product($slug)
     {
-        $product = Product::select(['id','product_type','images', 'is_rtl', 'languages', 'product_name', 'slug', 'demo_name', 'replace_name', 'excerpt', 'price', 'discount_percentage', 'description'])->where('slug', $slug)->where('is_published', 1)->with('tags')->get()->first();
+        $product = Product::select(['id','product_type','images', 'is_rtl', 'languages', 'product_name', 'slug', 'demo_name', 'replace_name', 'excerpt', 'price', 'discount_percentage', 'description'])->where('slug', $slug)->where('is_published', 1)->with('tags')->with('categories')->get()->first();
         if (! $product) {
             abort(404);
         }

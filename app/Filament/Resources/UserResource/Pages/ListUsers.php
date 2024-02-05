@@ -3,8 +3,11 @@
 namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 
 class ListUsers extends ListRecords
 {
@@ -14,6 +17,8 @@ class ListUsers extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
+            //ExportAction::make()
+            //FilamentExportHeaderAction::make('export'),
         ];
     }
 }

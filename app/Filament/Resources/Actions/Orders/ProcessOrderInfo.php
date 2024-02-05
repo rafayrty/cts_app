@@ -23,7 +23,7 @@ class ProcessOrderInfo
                     $sub_total += Covers::find($cover_id)->price;
                 }
                 if ($product_id != 0) {
-                    $sub_total += Product::find($product_id)->price;
+                    $sub_total += Product::find($product_id)->front_price;
                 }
             }
             $set('sub_total', ceil($sub_total));

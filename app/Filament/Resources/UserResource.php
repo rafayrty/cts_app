@@ -3,6 +3,14 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
+use App\Models\Referral;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
+//use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
+
+use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Services\RegisterService;
 use Filament\Forms;
@@ -41,6 +49,7 @@ class UserResource extends Resource
                         TextInput::make('last_name')
                             ->required()
                             ->maxLength(255),
+
                         Forms\Components\TextInput::make('email')
                             ->email()
                             ->unique(ignorable: fn ($record) => $record)
@@ -63,10 +72,31 @@ class UserResource extends Resource
             ]);
     }
 
+
     public static function table(Table $table): Table
     {
         return $table
+            ->headerActions(
+                [
+                    ExportAction::make(),
+                    ExportAction::make('export_w_orders')->label('Export W Orders')->exports([
+                        ExcelExport::make()
+                        ->fromTable()
+                        ->modifyQueryUsing(function ($query) {
+                        return $query->join('orders', 'users.id', '=', 'orders.user_id')
+                            ->select('users.*')
+                            ->distinct();
+                        })
+                    ])
+                ]
+            )
             ->columns([
+                Tables\Columns\TextColumn::make('id')->label("Order Count")->getStateUsing(function (Model $record) {
+                    $item = $record;
+                   $user_count =  \App\Models\Order::where('user_id',$item->id)->count();
+
+                    return $user_count;
+                }),
                 Tables\Columns\TextColumn::make('full_name'),
                 Tables\Columns\TextColumn::make('email')->searchable(),
                 Tables\Columns\TextColumn::make('phone_number')->copyable(),
@@ -77,7 +107,10 @@ class UserResource extends Resource
                 //Tables\Columns\TextColumn::make('updated_at')
                 //->dateTime(),
             ])
+            ->defaultSort('id', 'desc')
             ->filters([
+                SelectFilter::make('referral_id')->label("Referral")
+                    ->options(Referral::all()->pluck('name', 'id')),
 
             ])
             ->actions([
@@ -86,6 +119,7 @@ class UserResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
+                ExportBulkAction::make()
             ]);
     }
 

@@ -1,9 +1,14 @@
 <?php
 
 use App\Filament\Widgets\CustomersChart;
+use App\Filament\Widgets\LatestPromotions;
+use App\Filament\Widgets\LatestReviews;
 use App\Filament\Widgets\OrdersChart;
 use App\Filament\Widgets\OrderStatusChart;
 use App\Filament\Widgets\PopularProductsChart;
+use App\Filament\Widgets\PopularBooksChart;
+use App\Filament\Widgets\PopularNotebooksChart;
+use App\Filament\Widgets\PopularPromotionsChart;
 use App\Filament\Widgets\SalesChart;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -155,6 +160,11 @@ return [
             OrdersChart::class,
             OrderStatusChart::class,
             PopularProductsChart::class,
+            PopularBooksChart::class,
+            PopularNotebooksChart::class,
+            PopularPromotionsChart::class,
+            LatestPromotions::class,
+            LatestReviews::class,
             //Widgets\FilamentInfoWidget::class,
         ],
     ],

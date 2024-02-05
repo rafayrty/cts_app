@@ -5,7 +5,7 @@ namespace App\Filament\Widgets;
 use App\Models\Order;
 use Illuminate\Contracts\View\View;
 use Leandrocfe\FilamentApexCharts\Widgets\ApexChartWidget;
-
+use App\ClientStatusEnum;
 class OrderStatusChart extends ApexChartWidget
 {
     /**
@@ -25,16 +25,20 @@ class OrderStatusChart extends ApexChartWidget
     protected function getOptions(): array
     {
         //List of Orders that have been delivered
-        $delivered = Order::where('client_status', 'delivered')->count();
+        $done = Order::where('client_status', ClientStatusEnum::DONE)->count();
         $total = Order::count();
         if ($total != 0) {
-            $percentage = ($delivered / $total) * 100;
+            $percentage = round(($done / $total) * 100,2);
         } else {
             $percentage = 0;
         }
-
+//<g id="SvgjsG6827" class="apexcharts-datalabels-group" transform="translate(0, 0) scale(1)" style="opacity: 1;"><text id="SvgjsText6828" font-family="Helvetica, Arial, sans-serif" x="108" y="190" text-anchor="middle" dominant-baseline="auto" font-size="16px" font-weight="600" fill="#6366f1" class="apexcharts-text apexcharts-datalabel-label" style="font-family: Helvetica, Arial, sans-serif;">Orders Completed</text><text id="SvgjsText6829" font-family="Helvetica, Arial, sans-serif" x="108" y="122" text-anchor="middle" dominant-baseline="auto" font-size="22px" font-weight="400" fill="#f6f7f8" class="apexcharts-text apexcharts-datalabel-value" style="font-family: Helvetica, Arial, sans-serif;">0%</text></g>
         return [
             'series' => [$percentage],
+
+            'dataLabels'=>[
+                'style'=>['colors' => ['black']]
+            ],
             'chart' => [
                 'height' => 240,
                 'type' => 'radialBar',
@@ -74,16 +78,16 @@ class OrderStatusChart extends ApexChartWidget
             'labels' => [
                 'Orders Completed',
             ],
-            'colors' => ['#6366f1'],
+            'colors' => ['#8da12b'],
         ];
     }
 
     protected function getFooter(): string|View
     {
-        $order_pending = Order::where('client_status', 'PENDING')->count();
-        $order_printing = Order::where('client_status', 'PRINTING')->count();
-        $order_completed = Order::where('client_status', 'COMPLETED')->count();
+        $order_new_order = Order::where('client_status', ClientStatusEnum::NEW_ORDER)->count();
+        $order_printing_status =  Order::where('client_status',ClientStatusEnum::STARTING)->count();
+        $order_in_delivery = Order::where('client_status', ClientStatusEnum::IN_DELIVERY)->count();
 
-        return view('order-status-footer', compact('order_pending', 'order_printing', 'order_completed'));
+        return view('order-status-footer', compact('order_new_order', 'order_printing_status', 'order_in_delivery'));
     }
 }

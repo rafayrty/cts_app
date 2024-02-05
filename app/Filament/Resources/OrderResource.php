@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\Actions\Orders\CalculationsOrder;
 use App\Filament\Resources\Actions\Orders\ProcessOrderInfo;
 use App\Filament\Resources\OrderResource\Pages;
+use Filament\Forms\Components\Radio;
 use App\Mail\OrderCancel;
 use App\Mail\OrderUpdate;
 use App\Models\Coupon;
@@ -164,17 +165,61 @@ class OrderResource extends Resource
                         Select::make('product_id')->label('Product Name')
                             ->extraAttributes(['dir' => 'rtl'])->preload()
                             ->afterStateUpdated(Closure::fromCallable(new CalculationsOrder()))
-                            ->options(Product::where('product_type', 1)->pluck('product_name', 'id'))->searchable()->required()->reactive()
+                            ->options(Product::all()->pluck('product_name', 'id'))->searchable()->required()->reactive()
                             ->hiddenOn(['edit', 'view']),
                         Grid::make(3)->schema([
                             TextInput::make('name')->required(),
                             TextInput::make('age')->helperText('Only add if exists'),
                             TextInput::make('first_letter')->helperText('Only add if exists'),
+                            Radio::make('language')
+                                ->inlineLabel()
+                                ->reactive()
+                                ->hidden(function (Closure $get, Closure $set, $state){
+                                    $product_id = $get('product_id');
+                                    if($product_id){
+                                        $product = Product::find($product_id);
+
+                                        if($product){
+                                            $product_type = $product->product_type;
+                                        if($product_type == 2){
+                                            return false;
+                                        }
+                                        }
+                                    }
+                                    return true;
+                                })
+                                ->options(['english'=>'English','hebrew' => 'Hebrew', 'drawing' => 'Drawing', 'mathematics' => 'Mathematics', 'arabic' => 'Arabic', 'english' => 'English'])
+                                ->required()
                         ])->hiddenOn(['edit', 'view']),
                         Select::make('cover_id')->label('Cover')->hiddenOn(['edit', 'view'])
-                            ->extraAttributes(['dir' => 'rtl'])->preload()
-                            ->afterStateUpdated(Closure::fromCallable(new CalculationsOrder()))
-                            ->options(Covers::all()->pluck('name', 'id'))->searchable()->required()->reactive()->hiddenOn(['edit', 'view']),
+                        ->reactive()
+                        ->extraAttributes(['dir' => 'rtl'])
+                        //->disabled(function (Closure $get, Closure $set, $state){
+                                    //$product_id = $get('product_id');
+                                    //if($product_id){
+                                        //return false;
+                                    //}
+                            //dd($product_id,true);
+                            //return true;
+                        //})
+                        ->hidden(function (Closure $get, Closure $set, $state){
+                                    $product_id = $get('product_id');
+                                    if($product_id){
+                                        $product = Product::find($product_id);
+
+                                        if($product){
+                                            $product_type = $product->product_type;
+                                            if($product_type == 2){
+                                             return true;
+                                            }
+                                        }
+                                    }
+
+                                    return false;
+                                })
+                        ->afterStateUpdated(Closure::fromCallable(new CalculationsOrder()))
+                        ->options(Covers::all()->pluck('name', 'id'))->searchable()->required(),
+
                         Textarea::make('dedication')->maxLength(500)->hiddenOn(['edit', 'view']),
                     ])
                         ->collapsible()->collapsed()
@@ -229,13 +274,15 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('order_numeric_id')->label('Order ID#')->sortable()->searchable()->html()->getStateUsing(function (Order $record) {
                     return "<span class='flex items-center'>".(! $record->is_viewed ? "<span  class='bg-primary-600 mr-2 rounded-full h-3 w-3 block'></span>" : '').$record->order_numeric_id.'</span>';
                 }),
-                Tables\Columns\TextColumn::make('id')->label('Download')->html()
-                    ->getStateUsing(function (Order $record) {
-                        //
-                        return "<a href='".route('order.download.pdf', $record->id)."' class='
-                        filament-link inline-flex items-center justify-center font-medium outline-none hover:underline focus:underline text-sm text-primary-600 hover:text-primary-500 dark:text-primary-500 dark:hover:text-primary-400 filament-tables-link-action'>Download All</a>";
-                    }),
-                Tables\Columns\TextColumn::make('user.full_name')->label('Client Name')->sortable(),
+                //Tables\Columns\TextColumn::make('id')->label('Download')->html()
+                    //->getStateUsing(function (Order $record) {
+                        ////
+                    //return "
+                        //";
+                    //}),
+
+                ViewColumn::make('id')->view('tables.columns.download-all')->url(fn (): string => 'javascript:void(0)'),
+                Tables\Columns\TextColumn::make('user.full_name')->label('Client Name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('sub_total')->label('Subtotal')->money('ils')->sortable(),
                 Tables\Columns\TextColumn::make('shipping')->label('Shipping')->money('ils')->sortable(),
                 ViewColumn::make('print_house_status')->view('tables.columns.status-switcher')->url(fn (): string => 'javascript:void(0)'),
@@ -379,6 +426,11 @@ class OrderResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
+        //protected function getTablePollingInterval(): ?string
+        //{
+            //return '10s';
+        //}
+
 
     public static function getRelations(): array
     {

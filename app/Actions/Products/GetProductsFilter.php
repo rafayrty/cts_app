@@ -43,6 +43,7 @@ class GetProductsFilter
         //Check if published
         $products->where('is_published', 1)->where('product_type', $product_type);
 
+        $products->orderBy('created_at','ASC');
         if ($request->sort != '') {
             if ($request->sort == 'high-to-low') {
                 $products->orderBy('price', 'DESC');

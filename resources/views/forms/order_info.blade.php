@@ -43,6 +43,9 @@ $amount_spent =  \App\Models\Order::where('user_id',$order->user_id)->sum('total
           +{{$order->user->country_code ?? ''}}{{$order->user->phone ?? ''}}</a></li>
           <li class="mt-2"><strong>Order Count:</strong> {{$user_count}}</li>
           <li class="mt-2"><strong>Amount Spent:</strong>₪ {{$amount_spent/100}}</li>
+          @if($order->user->referral)
+            <li class="mt-2"><strong>From Referral:</strong> {{$order->user->referral}}</li>
+         @endif
       </ul>
     <h1 class="mt-4 text-xl font-bold text-gray-400">Billing Info:</h1>
     <ul class="billing-info-list">

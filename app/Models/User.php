@@ -13,7 +13,6 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
-    use Cachable;
 
     /**
      * The attributes that are mass assignable.
@@ -28,6 +27,7 @@ class User extends Authenticatable
         'country_code',
         'phone',
         'password',
+        'referral_id'
     ];
 
     protected $accessors = ['full_name', 'phone_number'];
@@ -97,5 +97,13 @@ class User extends Authenticatable
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Get the referral for the user
+     */
+    public function referral()
+    {
+        return $this->belongsTo(Referral::class);
     }
 }
