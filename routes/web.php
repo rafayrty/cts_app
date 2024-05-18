@@ -3,6 +3,7 @@
 use App\Events\SendLocation;
 use App\Http\Controllers\QuizController;
 use App\Models\Package;
+use Chiiya\FilamentAccessControl\Models\FilamentUser;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,6 +21,7 @@ Route::group(['middleware' => 'auth:filament'], function () {
     Route::get('/quiz_attempt/{id}',[QuizController::class,'quiz'])->name('quiz.attempt');
     Route::post('/quiz_attempt/{id}',[QuizController::class,'submit'])->name('quiz.submit');
     Route::get('/quiz_results/{id}',[QuizController::class,'results'])->name('quiz.results');
+
 });
 //Route::get('fill-data-pdf-document/{ids}/{order_item_id}', [PersonalizationController::class, 'generatePDFFromDocumentOrderDownload'])->name('order.download.pdf');
 Route::get('/', function () {
