@@ -7,9 +7,10 @@ use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Support\Facades\Artisan;
+use Spatie\Permission\Models\Role;
+
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\seed;
-use Spatie\Permission\Models\Role;
 
 /*
 |--------------------------------------------------------------------------

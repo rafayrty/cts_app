@@ -66,8 +66,7 @@ class FilamentUserResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return $table
-            ->columns([
+        return $table ->columns([
                 TextColumn::make('full_name')
                     ->label(__('filament-access-control::default.fields.full_name'))
                     ->searchable(['first_name', 'last_name']),

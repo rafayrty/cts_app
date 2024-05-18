@@ -89,6 +89,10 @@ return [
     'payme_url' => env('PAYME_URL', ''),
     'payme_callback' => env('PAYME_CALLBACK', 'https://basmti.com'),
 
+    'zcredit_terminal_number' => env('ZCREDIT_TERMINAL_NUMBER', ''),
+    'zcredit_password' => env('ZCREDIT_PASSWORD', ''),
+    'zcredit_url' => env('ZCREDIT_URL', ''),
+
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration

@@ -2,12 +2,11 @@
 
 namespace App\Filament\Resources\UserResource\Pages;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\UserResource;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
-use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
-use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 
 class ListUsers extends ListRecords
 {

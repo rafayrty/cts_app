@@ -34,24 +34,32 @@ class AppServiceProvider extends ServiceProvider
         });
         Filament::registerNavigationGroups([
             'Order Management',
-            'Product Management',
+            //'Product Management',
             'Administration',
         ]);
         Filament::registerNavigationItems(
-            [
-                NavigationItem::make('Orders Printing')
-                    ->url('/admin/orders/printing')
-                    ->icon('heroicon-o-link')
-                    ->group('Order Management')
-                    ->isActiveWhen(fn (): bool => request()->routeIs('filament.resources.orders.printing'))
-                    ->sort(1),
-                NavigationItem::make('Orders Packaging')
-                    ->url('/admin/orders/packaging')
-                    ->icon('heroicon-o-link')
-                    ->isActiveWhen(fn (): bool => request()->routeIs('filament.resources.orders.packaging'))
-                    ->group('Order Management')
-                    ->sort(2),
-            ]);
+        [
+            //NavigationItem::make('Package Tracking')
+            //->url('/admin/packages/package_tracking')
+            //->icon('heroicon-o-link')
+            //->isActiveWhen(fn (): bool => request()->routeIs('filament.resources.packages.package_tracking'))
+            //->sort(1),
+        ]);
+        //Filament::registerNavigationItems(
+        //[
+        //NavigationItem::make('Orders Printing')
+        //->url('/admin/orders/printing')
+        //->icon('heroicon-o-link')
+        //->group('Order Management')
+        //->isActiveWhen(fn (): bool => request()->routeIs('filament.resources.orders.printing'))
+        //->sort(1),
+        //NavigationItem::make('Orders Packaging')
+        //->url('/admin/orders/packaging')
+        //->icon('heroicon-o-link')
+        //->isActiveWhen(fn (): bool => request()->routeIs('filament.resources.orders.packaging'))
+        //->group('Order Management')
+        //->sort(2),
+        //]);
         $this->app->bind(FilamentUserResource::class, function () {
             return new ResourcesFilamentUserResource;
         });

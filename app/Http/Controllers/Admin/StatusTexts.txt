@@ -1,0 +1,51 @@
+
+            if ($original_client_status != $status) {
+                if ($status == 'packaging') {
+                    $title = ' طلبك رقم '.$order->order_numeric_id.'<br/><span style="color:#00214D">قيد التغليف</span>';
+                    $text = 'يسعدنا إخبارك بأنه تم معالجة طلبك ونحن الآن في طور التعبئة والتغليف. سيتم إرسال طلبك في أقرب وقت ممكن.';
+                    Mail::to($order->user->email)->queue(new OrderUpdate($order, $title, $text));
+                }
+
+                if ($status == 'new order') {
+                    $title = ' طلب جديد '.$order->order_numeric_id.'';
+                    $text = 'تم تسجيل طلبك بنجاح. شكرًا لاختياركم منتجاتنا.';
+                    Mail::to($order->user->email)->queue(new OrderUpdate($order, $title, $text));
+                }
+
+                if ($status == 'starting printing') {
+                    $title = ' طلبك رقم '.$order->order_numeric_id.'<br/><span style="color:#00214D">طلبك قيد الطباعة</span>';
+                    $text = 'نعلمك اننا بدأنا في تحضير طلبكم - انتظروا منا رسالة جديدة تعلمكم ان الطلب سيكون جاهز خلال الايام القريبة';
+                    Mail::to($order->user->email)->queue(new OrderUpdate($order, $title, $text));
+                }
+
+                if ($status == 'in delivery') {
+                    $title = ' طلبك رقم '.$order->order_numeric_id.'<br/><span style="color:#00214D">تم توصيل الطلب بنجاح </span>';
+                    $text = 'سعداء بأن المنتج بين يديكم ، نرجو أن يكون قد نال اعجابكم، لطفا منكم ان تشاركوا المنتج في مواقع التواصل الاجتماعي';
+                    Mail::to($order->user->email)->queue(new OrderUpdate($order, $title, $text));
+                }
+
+                if ($status == 'ready for delivery') {
+                    $title = ' طلبك رقم '.$order->order_numeric_id.'<br/><span style="color:#00214D"> جاهز للشحن</span>';
+                    $text = 'نحن سعداء باعلامك بان طلبك تم تجهيزه ونحن بصدد تسليمه لشركة الارساليات ستصلك رسالة نصية SMS من شركة الارساليات تعلمك بوصول الطرد.';
+                    Mail::to($order->user->email)->queue(new OrderUpdate($order, $title, $text));
+                }
+
+                if ($status == 'cancel') {
+                    $title = ' إلغاء الطلب رقم '.$order->order_numeric_id.' ';
+                    $text = 'نأسف لإبلاغكم أن الطلب قد تم إلغاؤه. في حال كانت هناك أي مشكلة، يرجى التواصل معنا.';
+                    Mail::to($order->user->email)->queue(new OrderUpdate($order,$title,$text));
+                }
+
+                if ($status == 'stuck') {
+                    $title = ' الطلب رقم '.$order->order_numeric_id.'متوقف';
+                    $text = 'نعتذر، لكن هناك تأخير في تقديم طلبك. سنقوم بمعالجة المشكلة بأسرع وقت ممكن.';
+                    Mail::to($order->user->email)->queue(new OrderUpdate($order,$title,$text));
+                }
+
+                if ($status == 'done') {
+                    $title = ' طلبك رقم '.$order->order_numeric_id.'<br/><span style="color:#00214D">تم الطلب بنجاح</span>';
+                    $text = 'شكرًا  لاختيارك بصمتي،
+قمت بما يجب وعلينا نحن التنفيذ، طلبك سيدخل الان مرحلة الانشاء ، لا داع للقلق في كل مرحلة ستصلك رسالة منا لحتلنتك بوضع طلبك ومرحلته.';
+                    Mail::to($order->user->email)->queue(new OrderUpdate($order,$title,$text));
+                }
+            }

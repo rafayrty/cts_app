@@ -4,16 +4,11 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\Referral;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
-use pxlrbt\FilamentExcel\Exports\ExcelExport;
-//use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
-
-use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Services\RegisterService;
 use Filament\Forms;
+//use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
+
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
@@ -22,7 +17,12 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 
 class UserResource extends Resource
 {
@@ -72,7 +72,6 @@ class UserResource extends Resource
             ]);
     }
 
-
     public static function table(Table $table): Table
     {
         return $table
@@ -81,19 +80,19 @@ class UserResource extends Resource
                     ExportAction::make(),
                     ExportAction::make('export_w_orders')->label('Export W Orders')->exports([
                         ExcelExport::make()
-                        ->fromTable()
-                        ->modifyQueryUsing(function ($query) {
-                        return $query->join('orders', 'users.id', '=', 'orders.user_id')
-                            ->select('users.*')
-                            ->distinct();
-                        })
-                    ])
+                            ->fromTable()
+                            ->modifyQueryUsing(function ($query) {
+                                return $query->join('orders', 'users.id', '=', 'orders.user_id')
+                                    ->select('users.*')
+                                    ->distinct();
+                            }),
+                    ]),
                 ]
             )
             ->columns([
-                Tables\Columns\TextColumn::make('id')->label("Order Count")->getStateUsing(function (Model $record) {
+                Tables\Columns\TextColumn::make('id')->label('Order Count')->getStateUsing(function (Model $record) {
                     $item = $record;
-                   $user_count =  \App\Models\Order::where('user_id',$item->id)->count();
+                    $user_count = \App\Models\Order::where('user_id', $item->id)->count();
 
                     return $user_count;
                 }),
@@ -109,7 +108,7 @@ class UserResource extends Resource
             ])
             ->defaultSort('id', 'desc')
             ->filters([
-                SelectFilter::make('referral_id')->label("Referral")
+                SelectFilter::make('referral_id')->label('Referral')
                     ->options(Referral::all()->pluck('name', 'id')),
 
             ])
@@ -119,7 +118,7 @@ class UserResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-                ExportBulkAction::make()
+                ExportBulkAction::make(),
             ]);
     }
 

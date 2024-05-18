@@ -3,11 +3,11 @@
 namespace App\Filament\Resources\Actions;
 
 use Closure;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 //use Spatie\PdfToImage\Pdf as ConvertToImage;
+use Illuminate\Support\Facades\Storage;
 use Karkow\MuPdf\Pdf;
 use setasign\Fpdi\Tcpdf\Fpdi;
-use Illuminate\Support\Facades\Log;
 
 class HandleProductAttatchment
 {
@@ -32,14 +32,14 @@ class HandleProductAttatchment
 
     }
 
-    public function getDimensions($orientation = 'P',$document)
+    public function getDimensions($orientation, $document)
     {
 
-//$pdf = new Fpdi($orientation,'pt'); // change the snd parameter to change the units
-//$pdf->setSourceFile($document);
-//$pageId = $pdf->importPage(1);
-//$width = round($pdf->getPageWidth(),2);
-//$height = round($pdf->getPageHeight(),2);
+        //$pdf = new Fpdi($orientation,'pt'); // change the snd parameter to change the units
+        //$pdf->setSourceFile($document);
+        //$pageId = $pdf->importPage(1);
+        //$width = round($pdf->getPageWidth(),2);
+        //$height = round($pdf->getPageHeight(),2);
         $cmd = config('app.pdf_info_path');
         exec("$cmd \"$document\" 2>&1", $output);
 
@@ -65,6 +65,7 @@ class HandleProductAttatchment
         //$dimensions['height'] = $height;
 
         Log::info($dimensions);
+
         return $dimensions;
     }
 
@@ -156,10 +157,9 @@ class HandleProductAttatchment
 
             $images = $this->getSplittedImages($img_path);
 
-
             unlink($img_path); //Delete the original cover image after getting the splitted version
 
-            $dimensions = $this->getDimensions('L',$state->path());
+            $dimensions = $this->getDimensions('L', $state->path());
             $set('dimensions', $dimensions);
 
             $dimensions['width'] = $dimensions['width'] / 2;
@@ -177,7 +177,7 @@ class HandleProductAttatchment
 
         } else {
 
-            $dimensions = $this->getDimensions('P',$state->path());
+            $dimensions = $this->getDimensions('P', $state->path());
             $set('dimensions', $dimensions);
 
             $images = [];

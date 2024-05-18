@@ -29,26 +29,10 @@ $options = [
     @php
         $record = $getRecord();
     @endphp
-    <select style="background:{{$statuses[$getState()]}}" data-id="{{$record->id}}" class="print-status-switcher text-gray-900 block w-full transition duration-75 rounded-lg shadow-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-inset focus:ring-primary-500 disabled:opacity-70 dark:bg-gray-700 dark:text-white dark:focus:border-primary-500 border-gray-300 dark:border-gray-600">
+    <select id="print_status-{{$record->id}}" style="background:{{$statuses[$getState()]}}" data-id="{{$record->id}}" class="print-status-switcher text-gray-900 block w-full transition duration-75 rounded-lg shadow-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-inset focus:ring-primary-500 disabled:opacity-70 dark:bg-gray-700 dark:text-white dark:focus:border-primary-500 border-gray-300 dark:border-gray-600">
             @foreach($options as $key => $value)
                 <option value="{{$key}}" @if($getState()==$key) selected @endif>{{$value}}</option>
             @endforeach
     </select>
 </div>
 
-<script>
-document.querySelectorAll('.print-status-switcher').forEach(elem=>{
-      elem.addEventListener('change', function(event) {
-          const id = event.target.getAttribute('data-id')
-          const print_status = event.target.value
-
-          window.location.href = "{{route('order.update_print.status')}}/"+id+"/"+print_status
-      });
-  })
-  @if(Session::has('success'))
-   if(!window.shownMessage) {
-       //alert("Print House Status Updated Successfully");
-       window.shownMessage = true;
-   }
-@endif
-</script>

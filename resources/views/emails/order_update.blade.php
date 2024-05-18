@@ -94,7 +94,7 @@ a[x-apple-data-detectors] {
                      </tr>
 
                      <tr>
-                        <td align="center"><p style="color:#1b2d45;"> {{$order->created_at->toDateString()}} في {{$order->created_at->toTimeString()}} </p></td>
+                        <td align="center"><p style="color:#1b2d45;"> {{now()->toDateString()}} في {{now()->toTimeString()}} </p></td>
                      </tr>
                      <tr>
                       <td align="center" class="es-m-p0r es-m-p0l" style="Margin:0;padding-top:0px;padding-bottom:15px;padding-left:40px;padding-right:40px;color:#"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';line-height:21px;color:#00214d;font-size:14px;direction:rtl;color:#00214d;">
@@ -108,7 +108,7 @@ a[x-apple-data-detectors] {
 		<w:anchorlock></w:anchorlock>
 		<center style='color:#00214d; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:18px; font-weight:400; line-height:18px;  mso-text-raise:1px'>تصفح المنتجات</center>
 	</v:roundrect></a>
-<![endif]--><!--[if !mso]><!-- --><span class="msohide es-button-border" style="border-style:solid;border-color:#2CB543;background:#0cdfbf;border-width:0px;display:inline-block;border-radius:6px;width:auto;mso-border-alt:10px;mso-hide:all"><a href="" class="es-button" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#00214d;font-size:20px;padding:10px 30px 10px 30px;display:inline-block;background:#0cdfbf;border-radius:6px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:normal;font-style:normal;line-height:24px;width:auto;text-align:center;padding-left:30px;padding-right:30px;border-color:#0cdfbf" dir="rtl">تصفح المنتجات</a></span><!--<![endif]--></td>
+<![endif]--><!--[if !mso]><!-- --><span class="msohide es-button-border" style="border-style:solid;border-color:#2CB543;background:#0cdfbf;border-width:0px;display:inline-block;border-radius:6px;width:auto;mso-border-alt:10px;mso-hide:all"><a href="https://basmti.com" class="es-button" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#00214d;font-size:20px;padding:10px 30px 10px 30px;display:inline-block;background:#0cdfbf;border-radius:6px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:normal;font-style:normal;line-height:24px;width:auto;text-align:center;padding-left:30px;padding-right:30px;border-color:#0cdfbf" dir="rtl">تصفح منتجاتنا</a></span><!--<![endif]--></td>
                      </tr>
                    </table></td>
                  </tr>
@@ -160,7 +160,7 @@ a[x-apple-data-detectors] {
                       <td align="center" style="padding:15px;Margin:0;font-size:0px"><img src="https://gnokdg.stripocdn.email/content/guids/CABINET_b53993ff88ea5c22d1f265473bd0d9659fbaa14877bf1dd95fc6233843c577c5/images/blue.png" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="100"></td>
                      </tr>
                      <tr>
-                      <td align="center" style="padding:0;Margin:0;padding-bottom:15px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';line-height:18px;color:#00214d;font-size:12px;direction:rtl">Copyright 2023 <strong>BASMTI</strong> . All rights reserved</p></td>
+                      <td align="center" style="padding:0;Margin:0;padding-bottom:15px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';line-height:18px;color:#00214d;font-size:12px;direction:rtl">Copyright 2024 <strong>BASMTI</strong> . All rights reserved</p></td>
                      </tr>
                    </table></td>
                  </tr>

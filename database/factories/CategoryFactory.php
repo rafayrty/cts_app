@@ -21,10 +21,11 @@ class CategoryFactory extends Factory
     public function definition()
     {
         $title = $this->faker->sentence;
+
         return [
-            'name'=>$title,
-            'slug'=>Str::slug($title),
-            'featured'=>false
+            'name' => $title,
+            'slug' => Str::slug($title),
+            'featured' => false,
         ];
     }
 }

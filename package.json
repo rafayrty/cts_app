@@ -17,6 +17,8 @@
         "vite": "^4.0.0"
     },
     "dependencies": {
+        "laravel-echo": "^1.16.0",
+        "pusher-js": "^8.4.0-rc2",
         "react-intl-tel-input": "^8.2.0"
     }
 }

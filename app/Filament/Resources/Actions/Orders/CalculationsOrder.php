@@ -16,7 +16,7 @@ class CalculationsOrder
             $cover_id = (int) $item['cover_id'];
             $product_id = (int) $item['product_id'];
             $product = Product::find($product_id);
-            if($product){
+            if ($product) {
                 if ($cover_id != 0 && $product->product_type != 2) {
                     $sub_total += Covers::find($cover_id)->price;
                 }

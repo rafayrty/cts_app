@@ -4,7 +4,7 @@ if (! function_exists('make_slug')) {
     /**
      * Create a slug (Supports arabic)
      *
-     * @param $value string the string to be converted
+     * @param  $value  string the string to be converted
      * @return string
      */
     function make_slug($value)
@@ -24,7 +24,7 @@ if (! function_exists('search_key')) {
     /**
      * Create a slug (Supports arabic)
      *
-     * @param $array<mixed>,$search the string to be searched
+     * @param  $array<mixed>,$search  the string to be searched
      * @return string
      */
     function search_key($array, $search)
@@ -42,7 +42,7 @@ if (! function_exists('pt2px')) {
     /**
      * Convert pt to px
      *
-     * @param $points,$dpi the dpi
+     * @param  $points,$dpi  the dpi
      * @return string
      */
     function pt2px($points, $dpi = 96)

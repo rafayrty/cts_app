@@ -5,9 +5,9 @@ use App\Filament\Widgets\LatestPromotions;
 use App\Filament\Widgets\LatestReviews;
 use App\Filament\Widgets\OrdersChart;
 use App\Filament\Widgets\OrderStatusChart;
-use App\Filament\Widgets\PopularProductsChart;
 use App\Filament\Widgets\PopularBooksChart;
 use App\Filament\Widgets\PopularNotebooksChart;
+use App\Filament\Widgets\PopularProductsChart;
 use App\Filament\Widgets\PopularPromotionsChart;
 use App\Filament\Widgets\SalesChart;
 use Filament\Http\Middleware\Authenticate;
@@ -153,18 +153,18 @@ return [
         'path' => app_path('Filament/Widgets'),
         'register' => [
             Widgets\AccountWidget::class,
-            App\Filament\Resources\UserResource\Widgets\UsersOverview::class,
+            //App\Filament\Resources\UserResource\Widgets\UsersOverview::class,
             //App\Filament\Resources\OrderResource\Widgets\OrdersChart::class,
-            SalesChart::class,
-            CustomersChart::class,
-            OrdersChart::class,
-            OrderStatusChart::class,
-            PopularProductsChart::class,
-            PopularBooksChart::class,
-            PopularNotebooksChart::class,
-            PopularPromotionsChart::class,
-            LatestPromotions::class,
-            LatestReviews::class,
+            //SalesChart::class,
+            //CustomersChart::class,
+            //OrdersChart::class,
+            //OrderStatusChart::class,
+            //PopularProductsChart::class,
+            //PopularBooksChart::class,
+            //PopularNotebooksChart::class,
+            //PopularPromotionsChart::class,
+            //LatestPromotions::class,
+            //LatestReviews::class,
             //Widgets\FilamentInfoWidget::class,
         ],
     ],

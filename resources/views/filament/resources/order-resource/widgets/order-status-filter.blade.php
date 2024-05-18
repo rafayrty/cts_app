@@ -63,6 +63,19 @@ if (isset($_GET['tableFilters']['print_house_status']['value'])) {
 <script>
 let status_print = document.querySelectorAll('.status-print-kanban');
 let current_active = @js($printStatus ?? '');
+function delegate_event(event_type, ancestor_element, target_element_selector, listener_function)
+{
+    ancestor_element.addEventListener(event_type, function(event)
+    {
+        if (event.target && event.target.matches && event.target.matches(target_element_selector))
+        {
+            (listener_function)(event);
+        }
+    });
+}
+
+
+
 status_print.forEach(elem =>{
 
     elem.addEventListener('click',(e)=>{
@@ -75,4 +88,41 @@ status_print.forEach(elem =>{
     }
 })
 })
+document.addEventListener('DOMContentLoaded',()=>{
+
+const body = document.querySelector("body");
+
+body.addEventListener("change", (event) => {
+  if (event.target.classList.contains("client-status-switcher")) {
+          const id = event.target.getAttribute('data-id')
+          const client_status = event.target.value
+          event.target.disabled = true;
+          window.location.href = "{{route('order.update_client.status')}}/"+id+"/"+client_status;
+  }
+
+  if (event.target.classList.contains("print-status-switcher")) {
+          const id = event.target.getAttribute('data-id')
+          const print_status = event.target.value
+          event.target.disabled = true;
+          window.location.href = "{{route('order.update_print.status')}}/"+id+"/"+print_status;
+  }
+
+});
+
+
+    })
+  @if(Session::has('success'))
+   if(!window.shownMessage) {
+   //    alert("Client Status Updated Successfully");
+       window.shownMessage = true;
+   }
+      @endif
+   document.addEventListener("DOMContentLoaded", function(event) {
+            var scrollpos = localStorage.getItem('scrollpos');
+            if (scrollpos) window.scrollTo(0, scrollpos);
+        });
+
+        window.onbeforeunload = function(e) {
+            localStorage.setItem('scrollpos', window.scrollY);
+        };
 </script>
