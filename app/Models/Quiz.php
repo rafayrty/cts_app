@@ -5,14 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Content extends Model
+class Quiz extends Model
 {
     use HasFactory;
 
     protected $guarded = [];
 
+    protected $casts = [
+        'questions' => 'array'
+    ];
+
     public function class_room()
     {
-        return $this->hasMany(ClassRoom::class, 'id', 'class_id');
+        return $this->belongsTo(ClassRoom::class, 'class_id', 'id');
     }
 }

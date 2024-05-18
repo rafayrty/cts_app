@@ -3,15 +3,17 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ClassRoomResource\Pages;
-use App\Filament\Resources\ClassRoomResource\RelationManagers;
 use App\Models\ClassRoom;
+use Chiiya\FilamentAccessControl\Models\FilamentUser;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\PasswordInput;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class ClassRoomResource extends Resource
 {
@@ -26,8 +28,16 @@ class ClassRoomResource extends Resource
                 Forms\Components\TextInput::make('class_name')
                     ->required()
                     ->maxLength(255),
+                //Hash
+
+            //Select::make('filament_users')
+                //->multiple()
+                //->preload()
+                //->options(FilamentUser::all()->pluck('email', 'id'))->searchable()->required()
+                //->searchable(),
                 Forms\Components\Toggle::make('is_published')
-                    ->required(),
+                ->hidden(fn () => Auth::user()->hasRole('Student'))
+                ->required(),
             ]);
     }
 
@@ -60,6 +70,8 @@ class ClassRoomResource extends Resource
         return [
             ClassRoomResource\RelationManagers\ContentsRelationManager::class,
             ClassRoomResource\RelationManagers\CommentsRelationManager::class,
+            ClassRoomResource\RelationManagers\UsersRelationManager::class,
+            ClassRoomResource\RelationManagers\QuizzesRelationManager::class,
         ];
     }
 
@@ -69,6 +81,7 @@ class ClassRoomResource extends Resource
             'index' => Pages\ListClassRooms::route('/'),
             'create' => Pages\CreateClassRoom::route('/create'),
             'edit' => Pages\EditClassRoom::route('/{record}/edit'),
+            'view' => Pages\ViewClassRoom::route('/{record}'),
         ];
     }
 }

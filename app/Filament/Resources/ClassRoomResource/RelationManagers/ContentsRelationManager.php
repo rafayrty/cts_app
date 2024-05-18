@@ -3,13 +3,11 @@
 namespace App\Filament\Resources\ClassRoomResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Resources\Form;
 use Filament\Forms\Components\FileUpload;
+use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 
 class ContentsRelationManager extends RelationManager
@@ -22,6 +20,7 @@ class ContentsRelationManager extends RelationManager
     {
         return $data;
     }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -32,7 +31,7 @@ class ContentsRelationManager extends RelationManager
                 FileUpload::make('file')
                     ->required()
                     ->uploadProgressIndicatorPosition('left')
-                    ->directory('uploads')
+                    ->directory('uploads'),
             ]);
     }
 
@@ -49,13 +48,13 @@ class ContentsRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
-                ->mutateFormDataUsing(function (array $data): array {
-                    $file_type = substr(strrchr($data['file'], '.'), 1);
-                    $data['user_id'] = Auth::user()->id;
-                    $data['file_type'] = $file_type;
+                    ->mutateFormDataUsing(function (array $data): array {
+                        $file_type = substr(strrchr($data['file'], '.'), 1);
+                        $data['user_id'] = Auth::user()->id;
+                        $data['file_type'] = $file_type;
 
-                    return $data;
-                })
+                        return $data;
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

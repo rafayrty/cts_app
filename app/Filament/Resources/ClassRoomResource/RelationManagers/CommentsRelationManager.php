@@ -7,8 +7,7 @@ use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class CommentsRelationManager extends RelationManager
 {
@@ -20,7 +19,7 @@ class CommentsRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\Textarea::make('string')
+                Forms\Components\Textarea::make('comment')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -30,13 +29,19 @@ class CommentsRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('class_id'),
+                Tables\Columns\TextColumn::make('comment'),
+                Tables\Columns\TextColumn::make('user.email'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    ->mutateFormDataUsing(function (array $data): array {
+                        $data['user_id'] = Auth::user()->id;
+
+                        return $data;
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

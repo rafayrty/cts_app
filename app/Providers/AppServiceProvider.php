@@ -38,13 +38,13 @@ class AppServiceProvider extends ServiceProvider
             'Administration',
         ]);
         Filament::registerNavigationItems(
-        [
-            //NavigationItem::make('Package Tracking')
-            //->url('/admin/packages/package_tracking')
-            //->icon('heroicon-o-link')
-            //->isActiveWhen(fn (): bool => request()->routeIs('filament.resources.packages.package_tracking'))
-            //->sort(1),
-        ]);
+            [
+                //NavigationItem::make('Package Tracking')
+                //->url('/admin/packages/package_tracking')
+                //->icon('heroicon-o-link')
+                //->isActiveWhen(fn (): bool => request()->routeIs('filament.resources.packages.package_tracking'))
+                //->sort(1),
+            ]);
         //Filament::registerNavigationItems(
         //[
         //NavigationItem::make('Orders Printing')

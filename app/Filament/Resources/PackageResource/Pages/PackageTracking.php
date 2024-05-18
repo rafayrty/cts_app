@@ -14,7 +14,7 @@ class PackageTracking extends Page
 
     //public function __construct()
     //{
-        //abort_unless(auth()->user()->can('package.view'), 403);
+    //abort_unless(auth()->user()->can('package.view'), 403);
     //}
 
 }

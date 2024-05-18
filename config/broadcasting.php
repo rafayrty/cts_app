@@ -32,8 +32,8 @@ return [
 
         'pusher' => [
             'driver' => 'pusher',
-            'key' => "9a65148e18ad205e0979",
-            'secret' => "0404e89fdb8cffccd842",
+            'key' => '9a65148e18ad205e0979',
+            'secret' => '0404e89fdb8cffccd842',
             'app_id' => 948761,
             'options' => [
                 'host' => env('PUSHER_HOST') ?: 'api-ap2.pusher.com',

@@ -66,26 +66,26 @@ class FilamentUserResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return $table ->columns([
-                TextColumn::make('full_name')
-                    ->label(__('filament-access-control::default.fields.full_name'))
-                    ->searchable(['first_name', 'last_name']),
-                TextColumn::make('email')
-                    ->label(__('filament-access-control::default.fields.email'))
-                    ->searchable(),
-                TextColumn::make('role')
-                    ->label(__('filament-access-control::default.fields.role'))
-                    ->getStateUsing(fn (FilamentUser $record) => __(optional($record->roles->first())->name)),
-                ...(
-                    Feature::enabled(Feature::ACCOUNT_EXPIRY)
-                    ? [
-                        BooleanColumn::make('active')
-                            ->label(__('filament-access-control::default.fields.active'))
-                            ->getStateUsing(fn (FilamentUser $record) => ! $record->isExpired()),
-                    ]
-                    : []
-                ),
-            ])
+        return $table->columns([
+            TextColumn::make('full_name')
+                ->label(__('filament-access-control::default.fields.full_name'))
+                ->searchable(['first_name', 'last_name']),
+            TextColumn::make('email')
+                ->label(__('filament-access-control::default.fields.email'))
+                ->searchable(),
+            TextColumn::make('role')
+                ->label(__('filament-access-control::default.fields.role'))
+                ->getStateUsing(fn (FilamentUser $record) => __(optional($record->roles->first())->name)),
+            ...(
+                Feature::enabled(Feature::ACCOUNT_EXPIRY)
+                ? [
+                    BooleanColumn::make('active')
+                        ->label(__('filament-access-control::default.fields.active'))
+                        ->getStateUsing(fn (FilamentUser $record) => ! $record->isExpired()),
+                ]
+                : []
+            ),
+        ])
             ->prependBulkActions([
                 ...(
                     Feature::enabled(Feature::ACCOUNT_EXPIRY)
